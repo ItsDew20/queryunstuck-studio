@@ -4,16 +4,23 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+# Pushes go through the queryunstuck-bot GitHub App, the ruleset bypass actor for main.
 permissions:
-  contents: write
+  contents: read
 jobs:
   approve:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'content/')
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.QU_APP_CLIENT_ID }}
+          private-key: ${{ secrets.QU_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v4
         with:
           ref: main
+          token: ${{ steps.app-token.outputs.token }}
       - name: Set status approved
         env:
           BRANCH: ${{ github.event.pull_request.head.ref }}
@@ -33,7 +40,15 @@ jobs:
           json.dump(s, open(p, "w"), indent=2, ensure_ascii=False); open(p, "a").write("\n")
           print("approved", p)
           PY
-      - run: |
-          git config user.name "queryunstuck-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git commit -am "approve: ${{ github.event.pull_request.head.ref }}" && git push || echo "nothing to commit"
+      - name: Commit and push as the bot
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          uid=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${uid}+${APP_SLUG}[bot]@users.noreply.github.com"
+          if git diff --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -am "approve: ${BRANCH}"
+          git push
