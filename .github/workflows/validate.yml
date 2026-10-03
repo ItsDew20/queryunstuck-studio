@@ -1,7 +1,6 @@
 name: validate-content
 on:
   pull_request:
-    paths: ["content/**", "schemas/**", "scripts/**"]
   push:
     branches: [main]
     paths: ["content/**", "schemas/**"]
