@@ -1,0 +1,39 @@
+# When Dew merges a content PR, mark the piece as approved on main.
+name: approve-on-merge
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  approve:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'content/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set status approved
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          python3 - <<'PY'
+          import json, os, glob, datetime
+          pid = os.environ["BRANCH"].split("/", 1)[1]
+          matches = glob.glob(f"content/{pid}-*/spec.json") or glob.glob(f"content/{pid}/spec.json")
+          assert matches, f"no spec for {pid}"
+          p = matches[0]
+          s = json.load(open(p))
+          s["status"] = "approved"
+          s["history"].append({"at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+                               "agent": "github-actions", "action": "approved",
+                               "note": f"PR #{os.environ['PR']} merged"})
+          json.dump(s, open(p, "w"), indent=2, ensure_ascii=False); open(p, "a").write("\n")
+          print("approved", p)
+          PY
+      - run: |
+          git config user.name "queryunstuck-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -am "approve: ${{ github.event.pull_request.head.ref }}" && git push || echo "nothing to commit"

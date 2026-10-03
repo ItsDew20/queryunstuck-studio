@@ -1,0 +1,19 @@
+{
+  "id": "qu-001",
+  "slug": "sql-execution-order",
+  "title": "SQL Query Execution Order, Visualized",
+  "format": "reel-animated",
+  "pillar": "data-analysis",
+  "status": "idea",
+  "audience_level": "beginner",
+  "hook_options": [
+    "You write SELECT first. The database reads it almost last.",
+    "Why can't you use a SELECT alias in WHERE?",
+    "The order SQL actually runs your query in"
+  ],
+  "target_duration_sec": 35,
+  "scheduled_for": "2026-10-20T19:00:00+05:30",
+  "history": [
+    {"at": "2026-10-03T12:00:00+05:30", "agent": "setup", "action": "created example piece"}
+  ]
+}

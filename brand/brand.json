@@ -1,0 +1,34 @@
+{
+  "name": "QueryUnstuck",
+  "handle": "@queryunstuck",
+  "watermark": "queryunstuck",
+  "fonts": {"heading": "Montserrat", "body": "Montserrat", "code": "JetBrains Mono"},
+  "colors": {
+    "background": "#0A1628",
+    "surface": "#122340",
+    "surfaceAlt": "#1A3157",
+    "primary": "#1E4B8F",
+    "accent": "#FFC72C",
+    "text": "#FFFFFF",
+    "textMuted": "#9FB0CC",
+    "border": "#2E4A78"
+  },
+  "semantic": {
+    "active": "#FFC72C",
+    "match": "#22C55E",
+    "noMatch": "#EF4444",
+    "pending": "#64748B",
+    "partitionPalette": ["#38BDF8", "#A78BFA", "#F472B6", "#34D399", "#FB923C", "#A3E635"]
+  },
+  "layout": {
+    "reel": {"width": 1080, "height": 1920, "fps": 30, "titleZone": [0, 380], "animZone": [380, 1250], "codeZone": [1250, 1650], "safeBottom": 270, "safeRight": 140},
+    "landscape": {"width": 1920, "height": 1080, "fps": 30}
+  },
+  "links": {
+    "website": "TBD",
+    "newsletter": "TBD",
+    "discord": "TBD",
+    "youtube": "TBD",
+    "instagram": "TBD"
+  }
+}

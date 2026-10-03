@@ -1,0 +1,43 @@
+# Seed backlog. content-strategist adds `used: qu-NNN` when a topic is scheduled.
+# format hint: animated | list | longform
+data-engineering:
+  - {topic: "Batch vs streaming, visualized", format: animated}
+  - {topic: "How a Spark shuffle works", format: animated}
+  - {topic: "Narrow vs wide transformations in Spark", format: animated}
+  - {topic: "Kafka topics, partitions and consumer groups", format: animated}
+  - {topic: "Change Data Capture (CDC) step by step", format: animated}
+  - {topic: "SCD Type 1 vs Type 2", format: animated}
+  - {topic: "Medallion architecture (bronze/silver/gold)", format: animated}
+  - {topic: "Idempotent pipelines: why re-runs shouldn't double your data", format: animated}
+  - {topic: "Late-arriving data and watermarks", format: animated}
+  - {topic: "Partition pruning, visualized", format: animated}
+  - {topic: "15 Must-Know Data Engineering Concepts", format: list}
+  - {topic: "10 Must-Know File Formats & Table Formats (CSV to Iceberg)", format: list}
+  - {topic: "dbt models, refs and the DAG", format: animated}
+  - {topic: "Data Engineering was HARD until I learned these 20 concepts", format: longform}
+data-analysis:
+  - {topic: "SQL query execution order", format: animated}
+  - {topic: "4 Must-Know SQL Joins (with NULLs)", format: list}
+  - {topic: "ROW_NUMBER vs RANK vs DENSE_RANK", format: animated}
+  - {topic: "Window functions: PARTITION BY + ORDER BY + frame", format: animated}
+  - {topic: "GROUP BY vs window functions", format: animated}
+  - {topic: "10 Must-Know SQL Window Functions", format: list}
+  - {topic: "Star schema vs snowflake schema", format: animated}
+  - {topic: "DAX row context vs filter context", format: animated}
+  - {topic: "CALCULATE explained visually", format: animated}
+  - {topic: "SQL for Data Analysts: 25 concepts in one video", format: longform}
+ai-ml:
+  - {topic: "How RAG works, step by step", format: animated}
+  - {topic: "Embeddings and vector similarity, visualized", format: animated}
+  - {topic: "Gradient descent, visualized", format: animated}
+  - {topic: "Train / validation / test split and data leakage", format: animated}
+  - {topic: "Precision vs recall vs F1", format: animated}
+  - {topic: "15 Must-Know AI/LLM Concepts for Data Engineers", format: list}
+  - {topic: "Chunking strategies for RAG", format: list}
+data-system-design:
+  - {topic: "Data warehouse vs data lake vs lakehouse", format: animated}
+  - {topic: "OLTP vs OLAP", format: animated}
+  - {topic: "Row vs columnar storage", format: animated}
+  - {topic: "Sharding vs partitioning vs replication", format: animated}
+  - {topic: "Designing a clickstream analytics pipeline", format: longform}
+  - {topic: "10 Must-Know Data System Design Patterns", format: list}
