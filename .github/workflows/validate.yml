@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches: [main]
-    paths: ["content/**", "schemas/**"]
+    paths: ["content/**", "schemas/**", "video/**", "brand/**"]
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -14,3 +14,21 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: python scripts/validate_spec.py
+  video-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: video
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: video/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npx tsc --noEmit
+      - name: demo specs resolve to a timeline
+        run: |
+          npm run -s timeline -- src/demos/demo-sql-order.json > /dev/null
+          npm run -s timeline -- src/demos/demo-components.json > /dev/null

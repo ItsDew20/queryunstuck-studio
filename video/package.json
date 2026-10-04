@@ -1,0 +1,30 @@
+{
+  "name": "queryunstuck-video",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QueryUnstuck Remotion video engine: spec.json -> video",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render:demo": "remotion render src/index.ts FromSpec out/demo.mp4 --props=src/demos/demo-sql-order.json",
+    "render:demo:landscape": "remotion render src/index.ts FromSpecLandscape out/demo-landscape.mp4 --props=src/demos/demo-sql-order.json",
+    "stills:demo": "node scripts/stills.mjs src/demos/demo-sql-order.json out/stills",
+    "sfx:generate": "python3 scripts/gen_sfx.py",
+    "render:gallery": "remotion render src/index.ts FromSpec out/gallery.mp4 --props=src/demos/demo-components.json",
+    "timeline": "esbuild scripts/timeline.ts --bundle --platform=node --format=cjs --log-level=error --alias:@remotion/google-fonts/Montserrat=./scripts/stub-font.ts --alias:@remotion/google-fonts/JetBrainsMono=./scripts/stub-font.ts --outfile=out/.timeline.cjs && node out/.timeline.cjs",
+    "sfx:cues": "npm run -s timeline --"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.532",
+    "@remotion/google-fonts": "4.0.532",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.532"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "@types/react": "19.3.0",
+    "esbuild": "0.28.1",
+    "typescript": "7.0.2"
+  }
+}
