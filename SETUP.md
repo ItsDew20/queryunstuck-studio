@@ -4,7 +4,7 @@ Tick each box. Steps marked (verify) depend on platform rules that may have chan
 official docs at that step.
 
 ## A. Accounts & handles (Day 1, ~1 hr)
-- [ ] A1. Check/claim `@queryunstuck` on Instagram (or closest available). Switch it to a
+- [x] A1. Check/claim `@queryunstuck` on Instagram (or closest available). Switch it to a
       **Professional account → Creator** (Settings → Account type and tools).
 - [ ] A2. Create a **Facebook Page** for QueryUnstuck and link the Instagram account to it
       (required for API publishing). (verify)
@@ -13,20 +13,25 @@ official docs at that step.
 - [ ] A4. Decide the website domain later (Phase 7); leave `links` as TBD in `brand/brand.json`.
 
 ## B. Repo (Day 1, ~20 min)
-- [ ] B1. Create a **private** GitHub repo `queryunstuck-studio`; unzip this folder into it; commit; push.
-- [ ] B2. In `brand/brand.json` replace the placeholder hex colours with your exact brand hexes.
-- [ ] B3. Settings → Rules → add a ruleset for `main`: require PR + the `validate-content` check, and add **GitHub Actions** to the bypass list (the approve and publish workflows commit status updates to main).
-- [ ] B4. Settings → Actions → General → Workflow permissions: "Read and write".
-- [ ] B5. Install GitHub CLI locally and run `gh auth login`.
+- [x] B1. Create a **private** GitHub repo `queryunstuck-studio`; unzip this folder into it; commit; push.
+      _Done; repo later made **public** because rulesets need GitHub Pro on private repos._
+- [x] B2. In `brand/brand.json` replace the placeholder hex colours with your exact brand hexes.
+- [x] B3. Settings → Rules → add a ruleset for `main`: require PR + the `validate-content` check, and add **GitHub Actions** to the bypass list (the approve and publish workflows commit status updates to main).
+      _Done as ruleset `protect-main`. Personal repos can't use GitHub Actions as a bypass actor, so the
+      bypass is the private GitHub App `queryunstuck-bot`; workflows push with its token
+      (`vars.QU_APP_CLIENT_ID`, `secrets.QU_APP_PRIVATE_KEY`)._
+- [x] B4. Settings → Actions → General → Workflow permissions: "Read and write".
+- [x] B5. Install GitHub CLI locally and run `gh auth login`.
 
 ## C. Local machine (MacBook, ~30 min)
-- [ ] C1. Install Node.js LTS, Python 3.12, ffmpeg (`brew install node python@3.12 ffmpeg`).
-- [ ] C2. `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
-- [ ] C3. `python scripts/validate_spec.py` → should print `1 piece(s) checked, 0 error(s)`.
-- [ ] C4. Install Claude Code, open the repo folder, run `claude`, then `/agents` – confirm the 11
+- [x] C1. Install Node.js LTS, Python 3.12, ffmpeg (`brew install node python@3.12 ffmpeg`).
+- [x] C2. `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
+- [x] C3. `python scripts/validate_spec.py` → should print `1 piece(s) checked, 0 error(s)`.
+- [x] C4. Install Claude Code, open the repo folder, run `claude`, then `/agents` – confirm the 11
       agents appear – and type `/` to confirm `/run-pipeline`, `/plan-week`, `/weekly-report`.
 - [ ] C5. Copy `.env.example` → `.env` and add `ANTHROPIC_API_KEY` (only needed for unattended
       runs; interactive Claude Code uses your login).
+      _`.env` created from the example; secrets not filled yet._
 
 ## D. Build phases with Claude Code (one at a time – see docs/PHASE_PROMPTS.md)
 - [ ] Phase 1 – Remotion video engine + 8 components → checkpoint: test reel renders.
