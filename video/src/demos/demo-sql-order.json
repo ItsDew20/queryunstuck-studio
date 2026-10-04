@@ -1,0 +1,409 @@
+{
+  "id": "qu-000",
+  "slug": "demo-sql-order",
+  "title": "SQL Execution Order (engine demo)",
+  "format": "reel-animated",
+  "pillar": "data-analysis",
+  "status": "storyboarded",
+  "audience_level": "beginner",
+  "hook": "You write SELECT first. The database reads it almost last.",
+  "target_duration_sec": 35,
+  "scheduled_for": "2026-10-03T12:00:00+05:30",
+  "sources": [
+    {
+      "claim": "SELECT is processed as FROM, WHERE, GROUP BY, HAVING, SELECT list, DISTINCT, ORDER BY, LIMIT",
+      "url": "https://www.postgresql.org/docs/current/sql-select.html",
+      "type": "primary",
+      "accessed": "2026-10-03"
+    },
+    {
+      "claim": "Logical processing order is FROM, ON, JOIN, WHERE, GROUP BY, HAVING, SELECT, DISTINCT, ORDER BY, TOP; actual physical execution can differ",
+      "url": "https://learn.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql#logical-processing-order-of-the-select-statement",
+      "type": "primary",
+      "accessed": "2026-10-03"
+    }
+  ],
+  "code_blocks": [
+    {
+      "lang": "sql",
+      "dialect": "sqlite",
+      "setup": "CREATE TABLE orders(order_id INT, customer TEXT, amount INT, status TEXT);\nINSERT INTO orders VALUES (1,'ana',120,'paid'),(2,'ben',40,'refunded'),(3,'ana',75,'paid'),(4,'cara',200,'paid'),(5,'ben',90,'paid'),(6,'dev',30,'pending');",
+      "code": "SELECT customer, SUM(amount) AS total\nFROM orders\nWHERE status = 'paid'\nGROUP BY customer\nORDER BY total DESC\nLIMIT 2;",
+      "expected_output": "cara|200\nana|195",
+      "verified": true
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1-hook",
+      "duration_sec": 3,
+      "beat": "hook",
+      "on_screen_text": [
+        "SQL Execution Order"
+      ],
+      "component": "TitleCard",
+      "props": {
+        "kicker": "SQL",
+        "title": "SQL Execution Order",
+        "highlight": [
+          "Order"
+        ],
+        "subtitle": "You write SELECT first. The database reads it almost last."
+      }
+    },
+    {
+      "id": "s2-written-vs-run",
+      "duration_sec": 7,
+      "beat": "written order vs logical order",
+      "on_screen_text": [
+        "Written ≠ executed",
+        "Logical order. The planner may run it differently."
+      ],
+      "component": "CodePanel",
+      "code_block": 0,
+      "props": {
+        "title": "orders_by_customer.sql",
+        "steps": [
+          {
+            "lines": [
+              2
+            ],
+            "note": "1 · FROM"
+          },
+          {
+            "lines": [
+              3
+            ],
+            "note": "2 · WHERE"
+          },
+          {
+            "lines": [
+              4
+            ],
+            "note": "3 · GROUP BY"
+          },
+          {
+            "lines": [
+              1
+            ],
+            "note": "4 · SELECT"
+          },
+          {
+            "lines": [
+              5
+            ],
+            "note": "5 · ORDER BY"
+          },
+          {
+            "lines": [
+              6
+            ],
+            "note": "6 · LIMIT"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s3-from",
+      "duration_sec": 4,
+      "beat": "FROM loads the rows",
+      "on_screen_text": [
+        "1 · FROM",
+        "Start with every row in the table"
+      ],
+      "component": "DataTable",
+      "code_block": 0,
+      "props": {
+        "title": "orders",
+        "columns": [
+          "order_id",
+          "customer",
+          "amount",
+          "status"
+        ],
+        "rows": [
+          [
+            1,
+            "ana",
+            120,
+            "paid"
+          ],
+          [
+            2,
+            "ben",
+            40,
+            "refunded"
+          ],
+          [
+            3,
+            "ana",
+            75,
+            "paid"
+          ],
+          [
+            4,
+            "cara",
+            200,
+            "paid"
+          ],
+          [
+            5,
+            "ben",
+            90,
+            "paid"
+          ],
+          [
+            6,
+            "dev",
+            30,
+            "pending"
+          ]
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            2
+          ]
+        }
+      }
+    },
+    {
+      "id": "s4-where",
+      "duration_sec": 6,
+      "beat": "WHERE filters rows before grouping",
+      "on_screen_text": [
+        "2 · WHERE",
+        "Filter rows before any grouping"
+      ],
+      "component": "RowHighlight",
+      "code_block": 0,
+      "props": {
+        "title": "orders",
+        "columns": [
+          "order_id",
+          "customer",
+          "amount",
+          "status"
+        ],
+        "rows": [
+          [
+            1,
+            "ana",
+            120,
+            "paid"
+          ],
+          [
+            2,
+            "ben",
+            40,
+            "refunded"
+          ],
+          [
+            3,
+            "ana",
+            75,
+            "paid"
+          ],
+          [
+            4,
+            "cara",
+            200,
+            "paid"
+          ],
+          [
+            5,
+            "ben",
+            90,
+            "paid"
+          ],
+          [
+            6,
+            "dev",
+            30,
+            "pending"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "status = 'paid' ?",
+            "rows": [
+              0,
+              2,
+              3,
+              4
+            ],
+            "state": "match",
+            "highlightCols": [
+              "status"
+            ]
+          },
+          {
+            "label": "drop the rest",
+            "rows": [
+              1,
+              5
+            ],
+            "state": "noMatch"
+          },
+          {
+            "label": "4 rows survive",
+            "order": [
+              0,
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            3
+          ]
+        }
+      }
+    },
+    {
+      "id": "s5-group-select",
+      "duration_sec": 5,
+      "beat": "GROUP BY collapses, SELECT computes the alias",
+      "on_screen_text": [
+        "3 · GROUP BY → 4 · SELECT",
+        "One row per customer, then total is born"
+      ],
+      "component": "DataTable",
+      "code_block": 0,
+      "props": {
+        "title": "grouped",
+        "columns": [
+          "customer",
+          "total"
+        ],
+        "rows": [
+          [
+            "ana",
+            195
+          ],
+          [
+            "cara",
+            200
+          ],
+          [
+            "ben",
+            90
+          ]
+        ],
+        "highlightCols": [
+          "total"
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                4
+              ],
+              "note": "GROUP BY"
+            },
+            {
+              "lines": [
+                1
+              ],
+              "note": "SELECT"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s6-order-limit",
+      "duration_sec": 6,
+      "beat": "ORDER BY can use the alias, LIMIT trims",
+      "on_screen_text": [
+        "5 · ORDER BY → 6 · LIMIT",
+        "Sort the groups, then keep the top 2"
+      ],
+      "component": "RowHighlight",
+      "code_block": 0,
+      "props": {
+        "title": "grouped",
+        "columns": [
+          "customer",
+          "total"
+        ],
+        "rows": [
+          [
+            "ana",
+            195
+          ],
+          [
+            "cara",
+            200
+          ],
+          [
+            "ben",
+            90
+          ]
+        ],
+        "steps": [
+          {
+            "label": "ORDER BY total DESC",
+            "order": [
+              1,
+              0,
+              2
+            ],
+            "highlightCols": [
+              "total"
+            ]
+          },
+          {
+            "label": "LIMIT 2",
+            "order": [
+              1,
+              0
+            ],
+            "rows": [
+              1,
+              0
+            ],
+            "state": "match"
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5
+              ],
+              "note": "ORDER BY"
+            },
+            {
+              "lines": [
+                6
+              ],
+              "note": "LIMIT"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s7-end",
+      "duration_sec": 4,
+      "beat": "recap + CTA",
+      "on_screen_text": [
+        "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT"
+      ],
+      "component": "EndCard",
+      "props": {
+        "headline": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT",
+        "cta": "Save this for your next interview"
+      }
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-10-03T12:00:00+05:30",
+      "agent": "animator",
+      "action": "created engine demo spec"
+    }
+  ]
+}
