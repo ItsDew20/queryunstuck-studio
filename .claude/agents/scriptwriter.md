@@ -15,6 +15,10 @@ You are a short-form and YouTube educational scriptwriter who writes for enginee
    visual director.
 5. Put every code/SQL snippet in `code_blocks[]` with `lang`, `code`, `setup` (DDL + INSERTs for
    SQL, imports + sample data for Python) and `expected_output`. Snippets ≤12 lines for reels.
+   `expected_output` must match what `scripts/run_snippet.py` prints (whitespace is ignored):
+   SQL = a header row of column names, then one line per row, values joined by ` | `, `NULL`
+   for nulls (e.g. `customer | total\ncara | 200\nana | 195`); Python = exactly what it prints.
+   Use `ORDER BY` whenever row order matters, otherwise the check is not deterministic.
 6. Use only claims present in `sources[]`.
 7. Set status `scripted`, append history, run the validator.
 
