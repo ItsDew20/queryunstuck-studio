@@ -1,0 +1,31 @@
+/* Colours and fonts mirror brand/brand.json. */
+:root {
+  --bg: #0A1628;
+  --surface: #122340;
+  --border: #2E4A78;
+  --text: #FFFFFF;
+  --muted: #9FB0CC;
+  --accent: #FFC72C;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.65 "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+header { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+header a { color: var(--text); text-decoration: none; font-weight: 800; font-size: 20px; }
+.dot { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); }
+h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.15; margin: 0 0 12px; font-weight: 900; }
+h2 { font-size: 21px; margin: 36px 0 8px; }
+p, li { color: var(--muted); }
+strong { color: var(--text); }
+a { color: var(--accent); }
+.tagline { font-size: 20px; color: var(--muted); margin-bottom: 32px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; margin: 20px 0; }
+code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.9em; color: var(--text); }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 14px; color: var(--muted); }
+footer a { margin-right: 16px; }
+.card p { margin: 0; }
