@@ -26,10 +26,10 @@
   "code_blocks": [
     {
       "lang": "sql",
-      "dialect": "sqlite",
+      "dialect": "duckdb",
       "setup": "CREATE TABLE orders(order_id INT, customer TEXT, amount INT, status TEXT);\nINSERT INTO orders VALUES (1,'ana',120,'paid'),(2,'ben',40,'refunded'),(3,'ana',75,'paid'),(4,'cara',200,'paid'),(5,'ben',90,'paid'),(6,'dev',30,'pending');",
       "code": "SELECT customer, SUM(amount) AS total\nFROM orders\nWHERE status = 'paid'\nGROUP BY customer\nORDER BY total DESC\nLIMIT 2;",
-      "expected_output": "cara|200\nana|195",
+      "expected_output": "customer | total\ncara | 200\nana | 195",
       "verified": true
     }
   ],
