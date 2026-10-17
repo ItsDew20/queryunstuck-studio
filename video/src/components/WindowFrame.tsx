@@ -1,7 +1,7 @@
 import React from "react";
 import { alpha, colors, radius } from "../brand";
 import { fonts } from "../fonts";
-import { mix, progress, stepStarts } from "../lib/anim";
+import { mix, progress, stepStarts, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { Cell, TableView, useTableMetrics } from "../lib/table";
 import { Chip, Fill, useScale } from "../lib/ui";
@@ -59,8 +59,8 @@ export const frameBounds = (
 /** Frames for the frame outline to slide one row. */
 const MOVE = 10;
 
-export const windowStarts = (count: number, fps: number, durationInFrames: number) =>
-  stepStarts(Array.from({ length: count }, () => ({})), fps, durationInFrames, 0.6, 1.5);
+export const windowStarts = (count: number, fps: number, durationInFrames: number, grid?: Grid) =>
+  stepStarts(Array.from({ length: count }, () => ({})), fps, durationInFrames, 0.6, 1.5, grid);
 
 export const WindowFrame: React.FC<WindowFrameProps> = ({
   columns,
@@ -74,7 +74,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   decimals = 2,
   label,
 }) => {
-  const { frame, fps, durationInFrames, height } = useScene();
+  const { frame, fps, durationInFrames, height, grid } = useScene();
   const s = useScale();
   const vi = colIndex(columns, valueColumn);
   const pi = partitionColumn !== undefined ? colIndex(columns, partitionColumn) : -1;
@@ -89,7 +89,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     ),
   );
 
-  const starts = windowStarts(rows.length, fps, durationInFrames);
+  const starts = windowStarts(rows.length, fps, durationInFrames, grid);
   // Continuous cursor position for smooth sliding.
   let cursor = 0;
   starts.forEach((st, i) => {
@@ -171,9 +171,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   );
 };
 
-export const windowFrameCues: CueFn<WindowFrameProps> = ({ rows }, { fps, durationInFrames }) =>
+export const windowFrameCues: CueFn<WindowFrameProps> = ({ rows }, { fps, durationInFrames, grid }) =>
   // One sound per slide; the output value appearing right after stays silent.
-  windowStarts(rows.length, fps, durationInFrames).map((f, i) => ({
+  windowStarts(rows.length, fps, durationInFrames, grid).map((f, i) => ({
     frame: f,
     sound: i === 0 ? ("pop" as const) : ("slide" as const),
   }));

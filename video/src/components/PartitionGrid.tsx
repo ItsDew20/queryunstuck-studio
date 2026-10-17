@@ -1,10 +1,10 @@
 import React from "react";
 import { alpha, colors, partitionColor, radius } from "../brand";
 import { fonts } from "../fonts";
-import { enter, progress } from "../lib/anim";
+import { enter, progress, snapToGrid, coarseGrid, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { useScale } from "../lib/ui";
-import type { CueFn } from "../lib/sfx";
+import { minGapFrames, type CueFn } from "../lib/sfx";
 
 export interface PartitionItem {
   label: string;
@@ -56,21 +56,37 @@ export const partitionTiming = (
   moveSpan: number | undefined,
   fps: number,
   durationInFrames: number,
+  grid?: Grid,
 ) => {
   const { start, end } = partitionSlots(items, n);
   const moveStart = Math.round((moveAt ?? durationInFrames / fps / 3) * fps);
   const span = Math.max(1, Math.round(durationInFrames * Math.min(0.8, Math.max(0.1, moveSpan ?? 0.35))));
   const crossers = items.map((_, i) => i).filter((i) => start[i].bin !== end[i].bin);
   const stagger = crossers.length > 1 ? span / crossers.length : 0;
+  // Crossing starts snap to the beat grid (when synced) so each swoosh lands on the beat.
+  // Use beat multiples that respect the swoosh minimum gap, so crossings stay on the beat
+  // without counting as "crowded" (which would slow the scene down).
+  const crossStarts = snapToGrid(
+    crossers.map((_, k) => Math.round(moveStart + k * stagger)),
+    coarseGrid(grid, minGapFrames("swoosh", fps)),
+    durationInFrames,
+  );
   const order = new Map(crossers.map((i, k) => [i, k]));
   /** Frame item i starts moving, or null if it never moves. */
   const moveStartFor = (i: number): number | null => {
-    if (order.has(i)) return moveStart + order.get(i)! * stagger;
+    if (order.has(i)) return crossStarts[order.get(i)!];
     if (start[i].slot !== end[i].slot) return moveStart; // quiet slide within its partition
     return null;
   };
-  const lastCross = crossers.length ? moveStart + (crossers.length - 1) * stagger : null;
-  return { start, end, moveStart, moveStartFor, crossers, lastCross, appearAt: (i: number) => 4 + i * 2 };
+  const lastCross = crossers.length ? crossStarts[crossers.length - 1] : null;
+  // "Settled" snap: on the first grid line after the last item lands.
+  const settleAt =
+    lastCross === null
+      ? null
+      : grid
+        ? Math.round(Math.ceil((grid.offset + lastCross + MOVE_FRAMES) / grid.step) * grid.step - grid.offset)
+        : lastCross + MOVE_FRAMES;
+  return { start, end, moveStart, moveStartFor, crossers, lastCross, settleAt, appearAt: (i: number) => 4 + i * 2 };
 };
 
 export const PartitionGrid: React.FC<PartitionGridProps> = ({
@@ -82,7 +98,7 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
   moveSpan,
   colorByDestination = true,
 }) => {
-  const { frame, fps, durationInFrames, width, height } = useScene();
+  const { frame, fps, durationInFrames, width, height, grid } = useScene();
   const s = useScale();
   const n = partitions.length;
   const gap = 24 * s;
@@ -99,6 +115,7 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
     moveSpan,
     fps,
     durationInFrames,
+    grid,
   );
   const maxSlots = Math.max(
     ...partitions.map((_, b) => Math.max(start.filter((x) => x.bin === b).length, end.filter((x) => x.bin === b).length)),
@@ -213,21 +230,22 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
 
 export const partitionGridCues: CueFn<PartitionGridProps> = (
   { partitions, items, moveAt, moveSpan },
-  { fps, durationInFrames },
+  { fps, durationInFrames, grid },
 ) => {
-  const { moveStartFor, crossers, lastCross, appearAt } = partitionTiming(
+  const { moveStartFor, crossers, settleAt, appearAt } = partitionTiming(
     items,
     partitions.length,
     moveAt,
     moveSpan,
     fps,
     durationInFrames,
+    grid,
   );
   return [
     ...items.map((_, i) => ({ frame: appearAt(i), sound: "tick" as const })),
     // One swoosh per item that actually crosses partitions; quiet slides and static items are silent.
     ...crossers.map((i) => ({ frame: Math.round(moveStartFor(i)!), sound: "swoosh" as const })),
     // Everything has settled into its partition.
-    ...(lastCross !== null ? [{ frame: Math.round(lastCross) + MOVE_FRAMES, sound: "snap" as const }] : []),
+    ...(settleAt !== null ? [{ frame: settleAt, sound: "snap" as const }] : []),
   ];
 };

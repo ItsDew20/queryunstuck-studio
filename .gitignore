@@ -11,3 +11,6 @@ content/*/render/*.mov
 
 # QA stills are regenerable from the render (qa.md keeps the findings)
 content/*/qa/
+
+# Music beds are generated deterministically (npm run music:generate); only the manifest is tracked
+video/public/music/*.wav

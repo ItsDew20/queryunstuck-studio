@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
+import type { Grid } from "./anim";
 
 export interface SceneInfo {
   /** Length of the current scene in frames. */
@@ -8,6 +9,8 @@ export interface SceneInfo {
   width: number;
   height: number;
   orientation: "portrait" | "landscape";
+  /** Music beat grid, when the piece has music with sync on. */
+  grid?: Grid;
 }
 
 const SceneCtx = createContext<SceneInfo | null>(null);
@@ -28,5 +31,6 @@ export const useScene = () => {
     width: ctx?.width ?? width,
     height: ctx?.height ?? height,
     orientation: ctx?.orientation ?? (width >= height ? "landscape" : "portrait"),
+    grid: ctx?.grid,
   } as const;
 };

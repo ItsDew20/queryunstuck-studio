@@ -1,7 +1,7 @@
 import React from "react";
 import { alpha, colors, radius } from "../brand";
 import { fonts } from "../fonts";
-import { enter, progress, stepStarts } from "../lib/anim";
+import { enter, progress, stepStarts, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { Fill, useScale } from "../lib/ui";
 import { noteFor, type CueFn } from "../lib/sfx";
@@ -25,7 +25,13 @@ export interface ListCardProps {
 }
 
 /** Start frame of each item. Shared by the component and its sound cues. */
-export const listStarts = (count: number, stagger: boolean, fps: number, durationInFrames: number): number[] =>
+export const listStarts = (
+  count: number,
+  stagger: boolean,
+  fps: number,
+  durationInFrames: number,
+  grid?: Grid,
+): number[] =>
   stagger
     ? stepStarts(
         Array.from({ length: count }, () => ({})),
@@ -33,6 +39,7 @@ export const listStarts = (count: number, stagger: boolean, fps: number, duratio
         durationInFrames,
         0.4,
         Math.max(1.2, durationInFrames / fps / 3),
+        grid,
       )
     : Array.from({ length: count }, (_, i) => i * 2);
 
@@ -44,10 +51,10 @@ export const ListCard: React.FC<ListCardProps> = ({
   stagger = true,
   activeIndex,
 }) => {
-  const { frame, fps, durationInFrames } = useScene();
+  const { frame, fps, durationInFrames, grid } = useScene();
   const s = useScale();
   const norm = items.map((it) => (typeof it === "string" ? { text: it } : it));
-  const starts = listStarts(norm.length, stagger, fps, durationInFrames);
+  const starts = listStarts(norm.length, stagger, fps, durationInFrames, grid);
   const dense = norm.length > 8;
   const fs = (dense ? 34 : 42) * s;
   return (
@@ -118,9 +125,9 @@ export const ListCard: React.FC<ListCardProps> = ({
   );
 };
 
-export const listCardCues: CueFn<ListCardProps> = ({ title, items, stagger = true }, { fps, durationInFrames }) => [
+export const listCardCues: CueFn<ListCardProps> = ({ title, items, stagger = true }, { fps, durationInFrames, grid }) => [
   ...(title ? [{ frame: 0, sound: "pop" as const }] : []),
   ...(stagger
-    ? listStarts(items.length, true, fps, durationInFrames).map((f, i) => ({ frame: f, ...noteFor(i) }))
+    ? listStarts(items.length, true, fps, durationInFrames, grid).map((f, i) => ({ frame: f, ...noteFor(i) }))
     : [{ frame: 2, sound: "swoosh" as const }]),
 ];

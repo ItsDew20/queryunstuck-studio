@@ -32,11 +32,11 @@ export interface RowHighlightProps {
 const TRANSITION = 12;
 
 export const RowHighlight: React.FC<RowHighlightProps> = ({ columns, rows, title, steps }) => {
-  const { frame, fps, durationInFrames, height } = useScene();
+  const { frame, fps, durationInFrames, height, grid } = useScene();
   const s = useScale();
   const reserve = TABLE_BAND * s + (title ? 60 * s : 0);
   const { rh } = useTableMetrics({ columns, rows, maxHeight: height - reserve });
-  const starts = stepStarts(steps, fps, durationInFrames);
+  const starts = stepStarts(steps, fps, durationInFrames, undefined, undefined, grid);
   const si = activeStep(starts, frame);
   const p = si >= 0 ? progress(frame, starts[si], TRANSITION) : 0;
 
@@ -113,8 +113,8 @@ export const RowHighlight: React.FC<RowHighlightProps> = ({ columns, rows, title
   );
 };
 
-export const rowHighlightCues: CueFn<RowHighlightProps> = ({ steps, rows }, { fps, durationInFrames }) =>
-  stepStarts(steps, fps, durationInFrames).flatMap((frame, i) => {
+export const rowHighlightCues: CueFn<RowHighlightProps> = ({ steps, rows }, { fps, durationInFrames, grid }) =>
+  stepStarts(steps, fps, durationInFrames, undefined, undefined, grid).flatMap((frame, i) => {
     const st = steps[i];
     const out: Array<{ frame: number; sound: "ding" | "thud" | "swoosh" | "glide" | "click" }> = [];
     if (st.order) {

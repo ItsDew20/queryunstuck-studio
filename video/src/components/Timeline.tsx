@@ -22,9 +22,9 @@ export interface TimelineProps {
 }
 
 export const Timeline: React.FC<TimelineProps> = ({ events, cumulative = true }) => {
-  const { frame, fps, durationInFrames } = useScene();
+  const { frame, fps, durationInFrames, grid } = useScene();
   const s = useScale();
-  const starts = stepStarts(events, fps, durationInFrames);
+  const starts = stepStarts(events, fps, durationInFrames, undefined, undefined, grid);
   const dense = events.length > 8;
   const gap = (dense ? 16 : 30) * s;
   const dot = (dense ? 52 : 72) * s;
@@ -113,5 +113,5 @@ export const Timeline: React.FC<TimelineProps> = ({ events, cumulative = true })
   );
 };
 
-export const timelineCues: CueFn<TimelineProps> = ({ events }, { fps, durationInFrames }) =>
-  stepStarts(events, fps, durationInFrames).map((f, i) => ({ frame: f, ...noteFor(i) }));
+export const timelineCues: CueFn<TimelineProps> = ({ events }, { fps, durationInFrames, grid }) =>
+  stepStarts(events, fps, durationInFrames, undefined, undefined, grid).map((f, i) => ({ frame: f, ...noteFor(i) }));

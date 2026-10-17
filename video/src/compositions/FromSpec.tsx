@@ -7,6 +7,8 @@ import { fonts } from "../fonts";
 import { enter, progress } from "../lib/anim";
 import { SceneProvider } from "../lib/scene";
 import { Cue, dedupe, minGapFrames, SfxTrack, tightestGap } from "../lib/sfx";
+import type { Grid } from "../lib/anim";
+import { beatFrames, musicFor, MusicTrack } from "../lib/music";
 import type { CodeBlock, Scene, Spec } from "../types";
 
 type Orientation = "portrait" | "landscape";
@@ -34,6 +36,10 @@ interface PlannedScene {
   durationInFrames: number;
   cues: Cue[];
   links: Links;
+  /** Music beat grid for this scene (undefined when there's no synced music). */
+  grid?: Grid;
+  /** True when crowded movement forced a slow-down (not just rounding to whole beats). */
+  stretched: boolean;
 }
 
 /** How a scene connects to its neighbours; continuations skip the fade and the whoosh. */
@@ -79,18 +85,31 @@ export const planScenes = (spec: Spec, fps: number): PlannedScene[] => {
   const pitches = linePitches(spec.scenes ?? []);
   const target = minGapFrames("swoosh", fps);
   const scenes = spec.scenes ?? [];
+  const music = musicFor(spec);
+  // With synced music, scenes start on whole beats and steps snap to eighth notes.
+  const beat = music?.sync ? beatFrames(music.bpm, fps) : 0;
   let from = 0;
+  let beatsSoFar = 0;
   return scenes.map((scene, i) => {
     const links = sceneLinks(scenes, i);
     const base = sceneFrames(scene, fps);
-    let d = base;
-    let cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d);
+    const lengthFor = (frames: number) => {
+      if (!beat) return { d: frames, beats: 0 };
+      const beats = Math.max(1, Math.round(frames / beat));
+      return { d: Math.round((beatsSoFar + beats) * beat) - Math.round(beatsSoFar * beat), beats };
+    };
+    const grid: Grid | undefined = beat ? { offset: from, step: beat / 2 } : undefined;
+    let { d, beats } = lengthFor(base);
+    let cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d, grid);
+    let stretched = false;
     for (let k = 1.05; k <= brand.audio.maxStretch + 1e-9 && tightestGap(cues, "swoosh") < target; k += 0.05) {
-      d = Math.round(base * k);
-      cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d);
+      ({ d, beats } = lengthFor(Math.round(base * k)));
+      cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d, grid);
+      stretched = true;
     }
-    const planned = { scene, from, durationInFrames: d, cues, links };
+    const planned = { scene, from, durationInFrames: d, cues, links, grid, stretched };
     from += d;
+    beatsSoFar += beats;
     return planned;
   });
 };
@@ -196,16 +215,21 @@ const Watermark: React.FC<{ o: Orientation }> = ({ o }) => {
   );
 };
 
+const GridCtx = React.createContext<Grid | undefined>(undefined);
+
 const Box: React.FC<{ r: Rect; o: Orientation; durationInFrames: number; children: React.ReactNode }> = ({
   r,
   o,
   durationInFrames,
   children,
-}) => (
-  <div style={{ position: "absolute", left: r.x, top: r.y, width: r.w, height: r.h }}>
-    <SceneProvider value={{ width: r.w, height: r.h, orientation: o, durationInFrames }}>{children}</SceneProvider>
-  </div>
-);
+}) => {
+  const grid = React.useContext(GridCtx);
+  return (
+    <div style={{ position: "absolute", left: r.x, top: r.y, width: r.w, height: r.h }}>
+      <SceneProvider value={{ width: r.w, height: r.h, orientation: o, durationInFrames, grid }}>{children}</SceneProvider>
+    </div>
+  );
+};
 
 const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, o, text }) => {
   const frame = useCurrentFrame();
@@ -349,10 +373,11 @@ const sceneCues = (
   pitches: LinePitches,
   fps: number,
   d: number,
+  grid?: Grid,
 ): Cue[] => {
   const { codeHighlight, sfx, props } = splitProps(scene);
   if (sfx === false) return [];
-  const ctx = { fps, durationInFrames: d };
+  const ctx = { fps, durationInFrames: d, grid };
   const block = scene.code_block !== undefined ? codeBlocks[scene.code_block] : undefined;
   const cues: Cue[] = wantsWhoosh(scene, index, links) ? [{ frame: 0, sound: "whoosh" }] : [];
   const name = scene.component;
@@ -387,7 +412,8 @@ const SceneView: React.FC<{
   links: Links;
   /** Previous scene, used to carry the code highlight across a continuation. */
   prev?: Scene;
-}> = ({ scene, codeBlocks, o, durationInFrames, links, prev }) => {
+  grid?: Grid;
+}> = ({ scene, codeBlocks, o, durationInFrames, links, prev, grid }) => {
   const frame = useCurrentFrame();
   const R = rects(o);
   const fadeIn = interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
@@ -459,21 +485,38 @@ const SceneView: React.FC<{
   return <AbsoluteFill style={{ opacity }}>{body}</AbsoluteFill>;
 };
 
+const SceneWithGrid: React.FC<React.ComponentProps<typeof SceneView>> = (props) => (
+  <GridCtx.Provider value={props.grid}>
+    <SceneView {...props} />
+  </GridCtx.Provider>
+);
+
 const SpecPlayer: React.FC<{ spec: Spec; o: Orientation }> = ({ spec, o }) => {
   const fps = o === "portrait" ? layout.reel.fps : layout.landscape.fps;
   const plan = planScenes(spec, fps);
   const end = plan.reduce((a, p) => a + p.durationInFrames, 0);
   const allCues = plan.flatMap((p) => p.cues.map((c) => ({ ...c, frame: c.frame + p.from })));
+  const finalCues = dedupe(allCues, fps, end);
+  const music = musicFor(spec);
   return (
     <AbsoluteFill>
       <Background />
-      {plan.map(({ scene, from, durationInFrames: d, links }, i) => (
+      {plan.map(({ scene, from, durationInFrames: d, links, grid }, i) => (
         <Sequence key={scene.id} from={from} durationInFrames={d} name={`${scene.id} · ${scene.component ?? "text"}`}>
-          <SceneView scene={scene} codeBlocks={spec.code_blocks ?? []} o={o} durationInFrames={d} links={links} prev={plan[i - 1]?.scene} />
+          <SceneWithGrid
+            scene={scene}
+            codeBlocks={spec.code_blocks ?? []}
+            o={o}
+            durationInFrames={d}
+            links={links}
+            prev={plan[i - 1]?.scene}
+            grid={grid}
+          />
         </Sequence>
       ))}
       <Watermark o={o} />
-      <SfxTrack cues={dedupe(allCues, fps, end)} fps={fps} />
+      <SfxTrack cues={finalCues} fps={fps} />
+      {music ? <MusicTrack music={music} cues={finalCues} total={end} fps={fps} /> : null}
     </AbsoluteFill>
   );
 };

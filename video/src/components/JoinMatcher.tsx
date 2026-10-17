@@ -1,7 +1,7 @@
 import React from "react";
 import { alpha, colors, semantic } from "../brand";
 import { fonts } from "../fonts";
-import { activeStep, linear, progress, stepStarts } from "../lib/anim";
+import { activeStep, linear, progress, stepStarts, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { Cell, TableView, useTableMetrics } from "../lib/table";
 import { Chip, useScale } from "../lib/ui";
@@ -31,6 +31,8 @@ export interface JoinMatcherProps {
 const LABEL_H = 110;
 /** Frames from a left row's start until its match result settles. */
 const SCAN = 14;
+/** Scan length: one grid step (an eighth note) when synced to music, so the result lands on the beat. */
+const scanFrames = (grid?: Grid) => (grid ? Math.max(8, grid.step) : SCAN);
 
 /** Indices of matching right rows for each left row (NULL never matches). */
 export const joinMatches = (left: JoinSide, right: JoinSide): number[][] => {
@@ -41,12 +43,12 @@ export const joinMatches = (left: JoinSide, right: JoinSide): number[][] => {
   );
 };
 
-export const joinStarts = (count: number, fps: number, durationInFrames: number) =>
-  stepStarts(Array.from({ length: count }, () => ({})), fps, durationInFrames, 0.6, 1.4);
+export const joinStarts = (count: number, fps: number, durationInFrames: number, grid?: Grid) =>
+  stepStarts(Array.from({ length: count }, () => ({})), fps, durationInFrames, 0.6, 1.4, grid);
 const NAME_H = 56;
 
 export const JoinMatcher: React.FC<JoinMatcherProps> = ({ left, right, joinType = "inner", label, showCount = true }) => {
-  const { frame, fps, durationInFrames, width, height } = useScene();
+  const { frame, fps, durationInFrames, width, height, grid } = useScene();
   const s = useScale();
   const gap = 90 * s;
   const tableMaxW = (width - gap) / 2;
@@ -66,27 +68,28 @@ export const JoinMatcher: React.FC<JoinMatcherProps> = ({ left, right, joinType 
   const tablesTop = (LABEL_H + NAME_H) * s;
 
   const matches = joinMatches(left, right);
-  const starts = joinStarts(left.rows.length, fps, durationInFrames);
+  const starts = joinStarts(left.rows.length, fps, durationInFrames, grid);
+  const scan = scanFrames(grid);
   const si = activeStep(starts, frame);
 
   const leftState = (i: number) => {
     if (i > si) return undefined;
-    if (i === si && frame < starts[i] + SCAN) return { color: semantic.active, p: progress(frame, starts[i], 6) };
+    if (i === si && frame < starts[i] + scan) return { color: semantic.active, p: progress(frame, starts[i], 6) };
     return matches[i].length
       ? { color: semantic.match, p: 1 }
       : { color: joinType === "left" ? semantic.pending : semantic.noMatch, p: 1 };
   };
 
   const resultCount = left.rows.reduce((acc, _, i) => {
-    if (i > si || (i === si && frame < starts[i] + SCAN)) return acc;
+    if (i > si || (i === si && frame < starts[i] + scan)) return acc;
     return acc + (matches[i].length || (joinType === "left" ? 1 : 0));
   }, 0);
 
   const rowY = (i: number) => tablesTop + 2 + rh * (i + 1) + rh / 2;
   const cur = si >= 0 ? si : -1;
   const curMatches = cur >= 0 ? matches[cur] : [];
-  const lineP = cur >= 0 ? linear(frame, starts[cur] + 4, SCAN - 4) : 0;
-  const settled = cur >= 0 && frame >= starts[cur] + SCAN;
+  const lineP = cur >= 0 ? linear(frame, starts[cur] + 4, scan - 4) : 0;
+  const settled = cur >= 0 && frame >= starts[cur] + scan;
   const lineColor = settled ? semantic.match : semantic.active;
 
   const nameStyle: React.CSSProperties = {
@@ -207,10 +210,10 @@ export const JoinMatcher: React.FC<JoinMatcherProps> = ({ left, right, joinType 
   );
 };
 
-export const joinMatcherCues: CueFn<JoinMatcherProps> = ({ left, right }, { fps, durationInFrames }) => {
+export const joinMatcherCues: CueFn<JoinMatcherProps> = ({ left, right }, { fps, durationInFrames, grid }) => {
   const matches = joinMatches(left, right);
-  return joinStarts(left.rows.length, fps, durationInFrames).flatMap((f, i) => [
+  return joinStarts(left.rows.length, fps, durationInFrames, grid).flatMap((f, i) => [
     { frame: f, sound: "blip" as const },
-    { frame: f + SCAN, sound: matches[i].length ? ("ding" as const) : ("thud" as const) },
+    { frame: Math.round(f + scanFrames(grid)), sound: matches[i].length ? ("ding" as const) : ("thud" as const) },
   ]);
 };

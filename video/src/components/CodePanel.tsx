@@ -49,7 +49,7 @@ export const CodePanel: React.FC<CodePanelProps> = ({
   showLineNumbers = true,
   maxFontSize = 46,
 }) => {
-  const { frame, fps, durationInFrames, width, height } = useScene();
+  const { frame, fps, durationInFrames, width, height, grid } = useScene();
   const lines = code.replace(/\s+$/, "").split("\n");
   const numW = String(lines.length).length;
   const gutter = showLineNumbers ? numW + 1 : 0;
@@ -63,7 +63,7 @@ export const CodePanel: React.FC<CodePanelProps> = ({
   // Hug the content and centre vertically instead of stretching to the whole box.
   const panelH = Math.min(height, HEADER + PAD * 2 + lines.length * lh + 4);
 
-  const starts = steps ? stepStarts(steps, fps, durationInFrames) : [];
+  const starts = steps ? stepStarts(steps, fps, durationInFrames, undefined, undefined, grid) : [];
   const si = steps ? activeStep(starts, frame) : -1;
   const before = initialLines ?? [];
   const active = new Set(steps ? (si >= 0 ? steps[si].lines : before) : (activeLines ?? []));
@@ -193,7 +193,7 @@ export const codePanelCues: CueFn<
     /** Pitch for a step (e.g. a line's pitch fixed across the whole video). Defaults to the step index. */
     noteOf?: (step: CodeStep, index: number) => number;
   }
-> = ({ code, steps, typeIn, noteOf }, { fps, durationInFrames }) => [
+> = ({ code, steps, typeIn, noteOf }, { fps, durationInFrames, grid }) => [
   ...(typeIn
     ? code
         .replace(/\s+$/, "")
@@ -202,7 +202,7 @@ export const codePanelCues: CueFn<
     : []),
   // Each highlight step climbs the scale, so a walkthrough sounds like progress.
   ...(steps
-    ? stepStarts(steps, fps, durationInFrames).map((f, i) => ({
+    ? stepStarts(steps, fps, durationInFrames, undefined, undefined, grid).map((f, i) => ({
         frame: f,
         ...noteFor(noteOf ? noteOf(steps[i], i) : i),
       }))

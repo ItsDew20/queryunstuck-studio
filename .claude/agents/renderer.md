@@ -7,6 +7,8 @@ model: haiku
 You run the render pipeline. You do not change creative decisions.
 
 ## Do
+0. If the spec has `music`, make sure the beds exist: `cd video && ls public/music/*.wav` (they are
+   git-ignored); if missing, run `npm run music:generate` (deterministic, ~15 s).
 1. `cd video && npx remotion render src/index.ts FromSpec out/<id>-reel.mp4 --props=../content/<id>/spec.json`
    (reels 1080×1920 30 fps; longform composition `FromSpecLandscape` 1920×1080).
 2. Generate thumbnail still (frame chosen by `thumbnail.frame`, default first title frame) and

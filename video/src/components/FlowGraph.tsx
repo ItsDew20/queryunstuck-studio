@@ -1,10 +1,10 @@
 import React from "react";
 import { alpha, colors, radius, semantic } from "../brand";
 import { fonts } from "../fonts";
-import { linear, pop, progress } from "../lib/anim";
+import { linear, pop, progress, snapToGrid, coarseGrid, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { useScale } from "../lib/ui";
-import type { CueFn } from "../lib/sfx";
+import { minGapFrames, type CueFn } from "../lib/sfx";
 
 export interface FlowNode {
   id: string;
@@ -37,13 +37,33 @@ export interface FlowGraphProps {
   dotSpeed?: number;
 }
 
-export const flowTiming = (nodeCount: number, reveal: boolean) => ({
-  nodeDelay: (i: number) => (reveal ? 4 + i * 6 : 0),
-  edgeDelay: (i: number) => (reveal ? 4 + nodeCount * 6 + i * 14 : 0),
-});
+export const flowTiming = (
+  nodeCount: number,
+  edgeCount: number,
+  reveal: boolean,
+  durationInFrames: number,
+  grid?: Grid,
+  fps = 30,
+) => {
+  if (!reveal) return { nodeDelay: () => 0, edgeDelay: () => 0 };
+  // Nodes pop in, then edges draw; with synced music every appearance snaps to the beat grid.
+  // Edges (each with a swoosh) use beat multiples that respect the swoosh minimum gap.
+  const nodes = snapToGrid(
+    Array.from({ length: nodeCount }, (_, i) => 4 + i * 6),
+    grid,
+    durationInFrames,
+  );
+  const firstEdge = (nodes[nodes.length - 1] ?? 0) + 6;
+  const edges = snapToGrid(
+    Array.from({ length: edgeCount }, (_, i) => firstEdge + i * 14),
+    coarseGrid(grid, minGapFrames("swoosh", fps)),
+    durationInFrames,
+  );
+  return { nodeDelay: (i: number) => nodes[i], edgeDelay: (i: number) => edges[i] };
+};
 
 export const FlowGraph: React.FC<FlowGraphProps> = ({ nodes, edges, reveal = true, dotSpeed = 1.6 }) => {
-  const { frame, fps, width, height } = useScene();
+  const { frame, fps, width, height, durationInFrames, grid } = useScene();
   const s = useScale();
   const nw = 330 * s;
   const nh = 140 * s;
@@ -53,7 +73,7 @@ export const FlowGraph: React.FC<FlowGraphProps> = ({ nodes, edges, reveal = tru
     y: pad.y + n.y * (height - pad.y * 2),
   });
   const byId = new Map(nodes.map((n, i) => [n.id, { n, i }]));
-  const { nodeDelay, edgeDelay } = flowTiming(nodes.length, reveal);
+  const { nodeDelay, edgeDelay } = flowTiming(nodes.length, edges.length, reveal, durationInFrames, grid, fps);
   const cycle = Math.round(dotSpeed * fps);
 
   // Point where the segment from centre a to b leaves a's rectangle.
@@ -170,8 +190,8 @@ export const FlowGraph: React.FC<FlowGraphProps> = ({ nodes, edges, reveal = tru
   );
 };
 
-export const flowGraphCues: CueFn<FlowGraphProps> = ({ nodes, edges, reveal = true }) => {
-  const { nodeDelay, edgeDelay } = flowTiming(nodes.length, reveal);
+export const flowGraphCues: CueFn<FlowGraphProps> = ({ nodes, edges, reveal = true }, { durationInFrames, grid, fps }) => {
+  const { nodeDelay, edgeDelay } = flowTiming(nodes.length, edges.length, reveal, durationInFrames, grid, fps);
   return [
     ...nodes.map((_, i) => ({ frame: nodeDelay(i), sound: "pop" as const })),
     ...edges.map((_, i) => ({ frame: edgeDelay(i), sound: "swoosh" as const, gain: 0.8 })),
