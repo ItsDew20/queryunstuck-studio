@@ -4,7 +4,7 @@
   "title": "SQL Query Execution Order, Visualized",
   "format": "reel-animated",
   "pillar": "data-analysis",
-  "status": "idea",
+  "status": "fact-checked",
   "audience_level": "beginner",
   "hook_options": [
     "You write SELECT first. The database reads it almost last.",
@@ -14,6 +14,194 @@
   "target_duration_sec": 35,
   "scheduled_for": "2026-10-20T19:00:00+05:30",
   "history": [
-    {"at": "2026-10-03T12:00:00+05:30", "agent": "setup", "action": "created example piece"}
+    {
+      "at": "2026-10-03T12:00:00+05:30",
+      "agent": "setup",
+      "action": "created example piece"
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "research.md and sources[] written; status researched"
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "script.md, scenes[] and code_blocks[] written; status scripted",
+      "note": "Hook adapted from option 1, scoped to 'after HAVING' (true in T-SQL and PostgreSQL docs regardless of step numbering). Framed as logical order with optimizer caveat; no universal alias-in-WHERE claim; LIMIT 1 for a visible cut; total 38.5 s."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "factcheck.md written; VERDICT: FAIL; status left scripted",
+      "note": "Code block verified (runner + independent DuckDB checks all match). Required fixes: s1 on-screen 'SQL processes it after HAVING.' -> 'SQL logically processes it after HAVING.' (unqualified line is a physical claim; T-SQL docs say order might vary). s2 'SELECT → DISTINCT → ORDER BY → LIMIT' -> 'SELECT → DISTINCT → ORDER BY → LIMIT/TOP' (LIMIT is non-standard; T-SQL uses TOP). Mirror in script.md."
+    },
+    {
+      "at": "2026-10-17T15:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "s1 line 2 now carries 'logically'; s2 line 2 ends LIMIT/TOP; s2 beat greys out DISTINCT. Hook unchanged (already says 'logically')."
+    },
+    {
+      "at": "2026-10-17T17:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "re-check after loop 1; factcheck.md rewritten; VERDICT: PASS; status fact-checked",
+      "note": "s1 'SQL logically processes it after HAVING.' and s2 '... ORDER BY → LIMIT/TOP' confirmed in spec.json and script.md; DISTINCT greyed in s2 beat. No new claims. Runner re-run: code_blocks[0] matches expected (Asha | 120), verified true."
+    }
+  ],
+  "sources": [
+    {
+      "claim": "T-SQL logical processing order is FROM, ON, JOIN, WHERE, GROUP BY, WITH CUBE/ROLLUP, HAVING, SELECT, DISTINCT, ORDER BY, TOP; aliases from SELECT can't be referenced by earlier clauses but can by ORDER BY; physical execution may vary",
+      "url": "https://learn.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql?view=sql-server-ver16",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "PostgreSQL SELECT evaluation sequence (FROM, WHERE, GROUP BY/HAVING, SELECT list, DISTINCT, set ops, ORDER BY, LIMIT/OFFSET)",
+      "url": "https://www.postgresql.org/docs/current/sql-select.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "PostgreSQL: output column names usable in ORDER BY and GROUP BY but not WHERE or HAVING; name clash resolved opposite ways in ORDER BY vs GROUP BY",
+      "url": "https://www.postgresql.org/docs/current/sql-select.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Window functions logically execute after WHERE, GROUP BY, HAVING and after aggregates; allowed only in SELECT list and ORDER BY",
+      "url": "https://www.postgresql.org/docs/current/tutorial-window.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Snowflake: WHERE predicates behave as if evaluated after FROM, optimizer may reorder if results unchanged",
+      "url": "https://docs.snowflake.com/en/sql-reference/constructs/where",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB supports reusable (lateral) column aliases, usable in WHERE, GROUP BY, HAVING but not JOIN ON",
+      "url": "https://duckdb.org/docs/current/sql/dialect/friendly_sql",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB QUALIFY filters window function results, sits after WINDOW and before ORDER BY, can reference SELECT aliases",
+      "url": "https://duckdb.org/docs/current/sql/query_syntax/qualify",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Worked example and DuckDB alias-in-WHERE behaviour executed locally in DuckDB 1.5.6 (project .venv)",
+      "url": "https://duckdb.org/docs/current/sql/dialect/friendly_sql",
+      "type": "secondary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "hook": "You write SELECT first. SQL logically processes it after HAVING.",
+  "scenes": [
+    {
+      "id": "s1-hook",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "You write SELECT first.",
+        "SQL logically processes it after HAVING."
+      ],
+      "beat": "Hook. Code panel shows the query; SELECT line glows, then visibly drops below the HAVING line.",
+      "narration": "You write SELECT first. Logically, SQL processes it after HAVING."
+    },
+    {
+      "id": "s2-order",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "FROM/JOIN → WHERE → GROUP BY → HAVING",
+        "SELECT → DISTINCT → ORDER BY → LIMIT/TOP",
+        "Logical order. The optimizer may reorder physically."
+      ],
+      "beat": "Timeline of the 8 logical steps builds left to right. DISTINCT is shown greyed out (this query has no DISTINCT), so the walkthrough numbers 1-7 stay consistent. Small caveat line fades in: this is the logical model, physical execution can differ.",
+      "narration": "This is the logical processing order. The optimizer can run things differently, but results must match this model."
+    },
+    {
+      "id": "s3-from-join",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "1. FROM + JOIN builds the rows",
+        "7 orders matched to 3 customers"
+      ],
+      "beat": "FROM/JOIN clause highlighted. Join matcher links each order to its customer; a 7-row working table appears.",
+      "narration": "Step one: FROM and JOIN build the working rows. Seven orders, each matched to a customer."
+    },
+    {
+      "id": "s4-where",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "2. WHERE drops rows",
+        "amount >= 20: the 10 and 15 go"
+      ],
+      "beat": "WHERE highlighted. Orders 106 (10) and 107 (15) are struck through and fade; 5 rows remain.",
+      "narration": "Step two: WHERE filters individual rows. Amounts ten and fifteen are gone."
+    },
+    {
+      "id": "s5-group-by",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "3. GROUP BY collapses rows",
+        "Asha 120 · Ben 50 · Chen 90"
+      ],
+      "beat": "GROUP BY highlighted. Surviving rows slide together by name and collapse into 3 group rows with sums.",
+      "narration": "Step three: GROUP BY collapses the rows into one per customer."
+    },
+    {
+      "id": "s6-having",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "4. HAVING drops whole groups",
+        "SUM > 50: Ben (50) is out"
+      ],
+      "beat": "HAVING highlighted. Ben's group row is struck through; Asha and Chen remain.",
+      "narration": "Step four: HAVING filters groups, not rows. Ben's total is exactly fifty, so he is out."
+    },
+    {
+      "id": "s7-select-order",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "5. SELECT computes and names: total",
+        "6. ORDER BY total DESC",
+        "ORDER BY can use the alias"
+      ],
+      "beat": "SELECT highlighted; column header becomes 'total'. Then ORDER BY highlighted; rows reorder to Asha 120, Chen 90.",
+      "narration": "Step five: SELECT computes the output and names it total. Only then can ORDER BY sort by that alias."
+    },
+    {
+      "id": "s8-limit",
+      "duration_sec": 3.5,
+      "on_screen_text": [
+        "7. LIMIT 1 keeps the top row",
+        "Result: Asha | 120"
+      ],
+      "beat": "LIMIT highlighted. Chen's row is struck through; Asha 120 remains as the final result.",
+      "narration": "Last, LIMIT one keeps the top row. Asha, one twenty."
+    },
+    {
+      "id": "s9-end",
+      "duration_sec": 4,
+      "on_screen_text": [
+        "Rows, then groups, then SELECT, then sort.",
+        "Save this for your next interview"
+      ],
+      "beat": "End card with one-line takeaway and save prompt; watermark queryunstuck.",
+      "narration": "Rows, then groups, then SELECT, then sort. Save this for your next interview."
+    }
+  ],
+  "code_blocks": [
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE customers (customer_id INTEGER, name VARCHAR, country VARCHAR);\nINSERT INTO customers VALUES (1,'Asha','IN'),(2,'Ben','US'),(3,'Chen','US');\nCREATE TABLE orders (order_id INTEGER, customer_id INTEGER, amount INTEGER);\nINSERT INTO orders VALUES (101,1,50),(102,1,70),(103,2,20),(104,2,30),(105,3,90),(106,3,10),(107,2,15);",
+      "code": "SELECT c.name, SUM(o.amount) AS total\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nWHERE o.amount >= 20\nGROUP BY c.name\nHAVING SUM(o.amount) > 50\nORDER BY total DESC\nLIMIT 1;",
+      "expected_output": "name | total\nAsha | 120",
+      "verified": true
+    }
   ]
 }
