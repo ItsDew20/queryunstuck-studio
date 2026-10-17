@@ -4,7 +4,7 @@
   "title": "SQL Query Execution Order, Visualized",
   "format": "reel-animated",
   "pillar": "data-analysis",
-  "status": "fact-checked",
+  "status": "qa-passed",
   "audience_level": "beginner",
   "hook_options": [
     "You write SELECT first. The database reads it almost last.",
@@ -47,6 +47,46 @@
       "agent": "fact-checker",
       "action": "re-check after loop 1; factcheck.md rewritten; VERDICT: PASS; status fact-checked",
       "note": "s1 'SQL logically processes it after HAVING.' and s2 '... ORDER BY → LIMIT/TOP' confirmed in spec.json and script.md; DISTINCT greyed in s2 beat. No new claims. Runner re-run: code_blocks[0] matches expected (Asha | 120), verified true."
+    },
+    {
+      "at": "2026-10-17T19:02:44+05:30",
+      "agent": "visual-director",
+      "action": "scenes[].component and props written; status storyboarded",
+      "note": "Data copied from code_blocks[0]. s4-s8 use RowHighlight; s5/s6 and s7/s8 share identical tables for continuity. Timeline cannot grey out DISTINCT; shown with detail 'not in this query'."
+    },
+    {
+      "at": "2026-10-17T19:05:22+05:30",
+      "agent": "visual-director",
+      "action": "s2 DISTINCT event set dim:true after engine fix; stills re-checked; status storyboarded"
+    },
+    {
+      "at": "2026-10-17T19:08:10+05:30",
+      "agent": "renderer",
+      "action": "render, timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 47.5s, file 4.9 MB. Duration 38.5s (within 20-60s limit). H.264 1080x1920 30fps + AAC. 11 caption cues, shortest 2.5s. Thumbnail frame 60 (2.0s into s1), shows hook text and HAVING highlight."
+    },
+    {
+      "at": "2026-10-17T19:11:21+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa.md written; QA: FAIL; status left rendered",
+      "note": "Blockers: s7 shows Ben again after HAVING dropped him; s7->s8 continuation blinks (3-row table flashes at s8 start). Owner: visual-director, then re-render."
+    },
+    {
+      "at": "2026-10-17T19:12:19+05:30",
+      "agent": "visual-director",
+      "action": "QA loop 1 fixes: s7/s8 tables now only Chen 90, Asha 120 (Ben stays dropped); s8 starts from s7 end state (step at -1 s, no blink); status storyboarded (needs re-render)"
+    },
+    {
+      "at": "2026-10-17T19:16:07+05:30",
+      "agent": "renderer",
+      "action": "re-render after QA loop 1; timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 32.2s, file 4.7 MB. Duration 38.507s (within 38.5 ±0.1 s tolerance). H.264 1080x1920 30fps + AAC. 11 caption cues, all validated (no overlaps, min 1.0s, max 2 lines, within scene windows). Thumbnail frame 60 confirms s1 text fully visible."
+    },
+    {
+      "at": "2026-10-17T19:18:28+05:30",
+      "agent": "qa-reviewer",
+      "action": "re-QA after loop 1; qa.md rewritten; QA: PASS; status qa-passed",
+      "note": "Both blockers fixed (Ben no longer reappears in s7; s7->s8 seamless). Only minor polish items remain."
     }
   ],
   "sources": [
@@ -109,7 +149,35 @@
         "SQL logically processes it after HAVING."
       ],
       "beat": "Hook. Code panel shows the query; SELECT line glows, then visibly drops below the HAVING line.",
-      "narration": "You write SELECT first. Logically, SQL processes it after HAVING."
+      "narration": "You write SELECT first. Logically, SQL processes it after HAVING.",
+      "component": "CodePanel",
+      "props": {
+        "steps": [
+          {
+            "lines": [
+              1
+            ],
+            "note": "SELECT: written first",
+            "at": 0.3
+          },
+          {
+            "lines": [
+              6
+            ],
+            "note": "HAVING runs before SELECT",
+            "at": 1.3
+          },
+          {
+            "lines": [
+              1
+            ],
+            "note": "SELECT: processed after HAVING",
+            "at": 2.2
+          }
+        ],
+        "title": "query.sql"
+      },
+      "code_block": 0
     },
     {
       "id": "s2-order",
@@ -120,7 +188,38 @@
         "Logical order. The optimizer may reorder physically."
       ],
       "beat": "Timeline of the 8 logical steps builds left to right. DISTINCT is shown greyed out (this query has no DISTINCT), so the walkthrough numbers 1-7 stay consistent. Small caveat line fades in: this is the logical model, physical execution can differ.",
-      "narration": "This is the logical processing order. The optimizer can run things differently, but results must match this model."
+      "narration": "This is the logical processing order. The optimizer can run things differently, but results must match this model.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "FROM/JOIN"
+          },
+          {
+            "label": "WHERE"
+          },
+          {
+            "label": "GROUP BY"
+          },
+          {
+            "label": "HAVING"
+          },
+          {
+            "label": "SELECT"
+          },
+          {
+            "label": "DISTINCT",
+            "detail": "not in this query",
+            "dim": true
+          },
+          {
+            "label": "ORDER BY"
+          },
+          {
+            "label": "LIMIT/TOP"
+          }
+        ]
+      }
     },
     {
       "id": "s3-from-join",
@@ -130,7 +229,91 @@
         "7 orders matched to 3 customers"
       ],
       "beat": "FROM/JOIN clause highlighted. Join matcher links each order to its customer; a 7-row working table appears.",
-      "narration": "Step one: FROM and JOIN build the working rows. Seven orders, each matched to a customer."
+      "narration": "Step one: FROM and JOIN build the working rows. Seven orders, each matched to a customer.",
+      "component": "JoinMatcher",
+      "props": {
+        "left": {
+          "name": "orders",
+          "columns": [
+            "order_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              50
+            ],
+            [
+              102,
+              1,
+              70
+            ],
+            [
+              103,
+              2,
+              20
+            ],
+            [
+              104,
+              2,
+              30
+            ],
+            [
+              105,
+              3,
+              90
+            ],
+            [
+              106,
+              3,
+              10
+            ],
+            [
+              107,
+              2,
+              15
+            ]
+          ],
+          "key": "customer_id"
+        },
+        "right": {
+          "name": "customers",
+          "columns": [
+            "customer_id",
+            "name",
+            "country"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              "IN"
+            ],
+            [
+              2,
+              "Ben",
+              "US"
+            ],
+            [
+              3,
+              "Chen",
+              "US"
+            ]
+          ],
+          "key": "customer_id"
+        },
+        "joinType": "inner",
+        "label": "JOIN ON o.customer_id = c.customer_id",
+        "codeHighlight": {
+          "activeLines": [
+            2,
+            3
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s4-where",
@@ -140,7 +323,72 @@
         "amount >= 20: the 10 and 15 go"
       ],
       "beat": "WHERE highlighted. Orders 106 (10) and 107 (15) are struck through and fade; 5 rows remain.",
-      "narration": "Step two: WHERE filters individual rows. Amounts ten and fifteen are gone."
+      "narration": "Step two: WHERE filters individual rows. Amounts ten and fifteen are gone.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "joined rows",
+        "columns": [
+          "order_id",
+          "name",
+          "amount"
+        ],
+        "rows": [
+          [
+            101,
+            "Asha",
+            50
+          ],
+          [
+            102,
+            "Asha",
+            70
+          ],
+          [
+            103,
+            "Ben",
+            20
+          ],
+          [
+            104,
+            "Ben",
+            30
+          ],
+          [
+            105,
+            "Chen",
+            90
+          ],
+          [
+            106,
+            "Chen",
+            10
+          ],
+          [
+            107,
+            "Ben",
+            15
+          ]
+        ],
+        "steps": [
+          {
+            "label": "WHERE amount >= 20",
+            "rows": [
+              5,
+              6
+            ],
+            "state": "noMatch",
+            "highlightCols": [
+              "amount"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            4
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s5-group-by",
@@ -150,7 +398,46 @@
         "Asha 120 · Ben 50 · Chen 90"
       ],
       "beat": "GROUP BY highlighted. Surviving rows slide together by name and collapse into 3 group rows with sums.",
-      "narration": "Step three: GROUP BY collapses the rows into one per customer."
+      "narration": "Step three: GROUP BY collapses the rows into one per customer.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "groups",
+        "columns": [
+          "name",
+          "SUM(amount)"
+        ],
+        "rows": [
+          [
+            "Asha",
+            120
+          ],
+          [
+            "Ben",
+            50
+          ],
+          [
+            "Chen",
+            90
+          ]
+        ],
+        "steps": [
+          {
+            "label": "GROUP BY name",
+            "rows": [
+              0,
+              1,
+              2
+            ],
+            "state": "active"
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            5
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s6-having",
@@ -160,7 +447,44 @@
         "SUM > 50: Ben (50) is out"
       ],
       "beat": "HAVING highlighted. Ben's group row is struck through; Asha and Chen remain.",
-      "narration": "Step four: HAVING filters groups, not rows. Ben's total is exactly fifty, so he is out."
+      "narration": "Step four: HAVING filters groups, not rows. Ben's total is exactly fifty, so he is out.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "groups",
+        "columns": [
+          "name",
+          "SUM(amount)"
+        ],
+        "rows": [
+          [
+            "Asha",
+            120
+          ],
+          [
+            "Ben",
+            50
+          ],
+          [
+            "Chen",
+            90
+          ]
+        ],
+        "steps": [
+          {
+            "label": "HAVING SUM > 50",
+            "rows": [
+              1
+            ],
+            "state": "noMatch"
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            6
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s7-select-order",
@@ -171,7 +495,66 @@
         "ORDER BY can use the alias"
       ],
       "beat": "SELECT highlighted; column header becomes 'total'. Then ORDER BY highlighted; rows reorder to Asha 120, Chen 90.",
-      "narration": "Step five: SELECT computes the output and names it total. Only then can ORDER BY sort by that alias."
+      "narration": "Step five: SELECT computes the output and names it total. Only then can ORDER BY sort by that alias.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "result",
+        "columns": [
+          "name",
+          "total"
+        ],
+        "rows": [
+          [
+            "Chen",
+            90
+          ],
+          [
+            "Asha",
+            120
+          ]
+        ],
+        "steps": [
+          {
+            "label": "SELECT SUM(amount) AS total",
+            "rows": [
+              0,
+              1
+            ],
+            "state": "active",
+            "highlightCols": [
+              "total"
+            ],
+            "at": 0.6
+          },
+          {
+            "label": "ORDER BY total DESC",
+            "order": [
+              1,
+              0
+            ],
+            "at": 2.6
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                1
+              ],
+              "note": "SELECT",
+              "at": 0.4
+            },
+            {
+              "lines": [
+                7
+              ],
+              "note": "ORDER BY",
+              "at": 2.6
+            }
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s8-limit",
@@ -181,7 +564,64 @@
         "Result: Asha | 120"
       ],
       "beat": "LIMIT highlighted. Chen's row is struck through; Asha 120 remains as the final result.",
-      "narration": "Last, LIMIT one keeps the top row. Asha, one twenty."
+      "narration": "Last, LIMIT one keeps the top row. Asha, one twenty.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "result",
+        "columns": [
+          "name",
+          "total"
+        ],
+        "rows": [
+          [
+            "Chen",
+            90
+          ],
+          [
+            "Asha",
+            120
+          ]
+        ],
+        "steps": [
+          {
+            "label": "ORDER BY total DESC",
+            "rows": [
+              0,
+              1
+            ],
+            "state": "active",
+            "highlightCols": [
+              "total"
+            ],
+            "order": [
+              1,
+              0
+            ],
+            "at": -1
+          },
+          {
+            "label": "LIMIT 1",
+            "rows": [
+              0
+            ],
+            "state": "noMatch",
+            "at": 0.9
+          },
+          {
+            "label": "LIMIT 1",
+            "order": [
+              1
+            ],
+            "at": 1.7
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            8
+          ]
+        }
+      },
+      "code_block": 0
     },
     {
       "id": "s9-end",
@@ -191,7 +631,12 @@
         "Save this for your next interview"
       ],
       "beat": "End card with one-line takeaway and save prompt; watermark queryunstuck.",
-      "narration": "Rows, then groups, then SELECT, then sort. Save this for your next interview."
+      "narration": "Rows, then groups, then SELECT, then sort. Save this for your next interview.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Rows, then groups, then SELECT, then sort.",
+        "cta": "Save this for your next interview"
+      }
     }
   ],
   "code_blocks": [
@@ -203,5 +648,14 @@
       "expected_output": "name | total\nAsha | 120",
       "verified": true
     }
-  ]
+  ],
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-001/reel.mp4",
+    "duration_sec": 38.5,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-001/thumbnail.png"
+  }
 }

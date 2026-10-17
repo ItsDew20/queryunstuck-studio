@@ -1,0 +1,52 @@
+1
+00:00:00,000 --> 00:00:03,000
+You write SELECT first.
+SQL logically processes it after HAVING.
+
+2
+00:00:03,000 --> 00:00:05,500
+FROM/JOIN → WHERE → GROUP BY → HAVING
+SELECT → DISTINCT → ORDER BY → LIMIT/TOP
+
+3
+00:00:05,500 --> 00:00:08,000
+Logical order. The optimizer may reorder physically.
+
+4
+00:00:08,000 --> 00:00:12,500
+1. FROM + JOIN builds the rows
+7 orders matched to 3 customers
+
+5
+00:00:12,500 --> 00:00:17,000
+2. WHERE drops rows
+amount >= 20: the 10 and 15 go
+
+6
+00:00:17,000 --> 00:00:21,500
+3. GROUP BY collapses rows
+Asha 120 · Ben 50 · Chen 90
+
+7
+00:00:21,500 --> 00:00:26,000
+4. HAVING drops whole groups
+SUM > 50: Ben (50) is out
+
+8
+00:00:26,000 --> 00:00:28,500
+5. SELECT computes and names: total
+6. ORDER BY total DESC
+
+9
+00:00:28,500 --> 00:00:31,000
+ORDER BY can use the alias
+
+10
+00:00:31,000 --> 00:00:34,500
+7. LIMIT 1 keeps the top row
+Result: Asha | 120
+
+11
+00:00:34,500 --> 00:00:38,500
+Rows, then groups, then SELECT, then sort.
+Save this for your next interview
