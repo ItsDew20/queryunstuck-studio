@@ -1,0 +1,25 @@
+{
+  "id": "qu-003",
+  "slug": "file-and-table-formats",
+  "title": "10 Must-Know File & Table Formats (CSV to Iceberg)",
+  "format": "reel-list",
+  "pillar": "data-engineering",
+  "status": "idea",
+  "audience_level": "beginner",
+  "hook": "CSV to Iceberg: 10 formats every data engineer gets asked about.",
+  "hook_options": [
+    "CSV to Iceberg: 10 formats every data engineer gets asked about.",
+    "Parquet is a file format. Iceberg is not. Here's the difference.",
+    "Save this before your next data engineering interview: 10 formats, one screen."
+  ],
+  "target_duration_sec": 25,
+  "scheduled_for": "2026-10-24T19:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic '10 Must-Know File Formats & Table Formats (CSV to Iceberg)' (data-engineering, list). Fits a single dense ListCard cheat-sheet; full list to be repeated in caption. Sat reel slot."
+    }
+  ]
+}

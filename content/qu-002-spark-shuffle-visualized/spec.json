@@ -1,0 +1,25 @@
+{
+  "id": "qu-002",
+  "slug": "spark-shuffle-visualized",
+  "title": "How a Spark Shuffle Works, Visualized",
+  "format": "reel-animated",
+  "pillar": "data-engineering",
+  "status": "idea",
+  "audience_level": "intermediate",
+  "hook": "Your JOIN isn't slow. Your shuffle is.",
+  "hook_options": [
+    "Your JOIN isn't slow. Your shuffle is.",
+    "One groupBy, and every row in your cluster changes machines.",
+    "What actually happens between Spark stages? Watch the rows move."
+  ],
+  "target_duration_sec": 40,
+  "scheduled_for": "2026-10-22T19:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic 'How a Spark shuffle works' (data-engineering, animated). Chosen because it animates as partitions moving between executors (PartitionGrid + FlowGraph) and is a common interview question. Thu reel slot."
+    }
+  ]
+}

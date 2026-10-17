@@ -1,0 +1,25 @@
+{
+  "id": "qu-004",
+  "slug": "ai-llm-concepts-for-data-engineers",
+  "title": "15 Must-Know AI/LLM Concepts for Data Engineers",
+  "format": "reel-list",
+  "pillar": "ai-ml",
+  "status": "idea",
+  "audience_level": "intermediate",
+  "hook": "Tokens, embeddings, RAG: 15 AI terms data engineers now get asked about.",
+  "hook_options": [
+    "Tokens, embeddings, RAG: 15 AI terms data engineers now get asked about.",
+    "You build the pipelines that feed LLMs. Know these 15 terms.",
+    "15 AI/LLM concepts on one screen. Screenshot it."
+  ],
+  "target_duration_sec": 30,
+  "scheduled_for": "2026-10-25T19:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic '15 Must-Know AI/LLM Concepts for Data Engineers' (ai-ml, list). Chosen to mix pillars this week (DA + 2x DE + AI/ML reels) and because it lists well as a single cheat-sheet. Sun reel slot."
+    }
+  ]
+}

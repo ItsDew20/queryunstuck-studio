@@ -1,0 +1,25 @@
+{
+  "id": "qu-005",
+  "slug": "clickstream-analytics-pipeline-design",
+  "title": "Designing a Clickstream Analytics Pipeline, End to End",
+  "format": "longform",
+  "pillar": "data-system-design",
+  "status": "idea",
+  "audience_level": "intermediate",
+  "hook": "Every click on a website becomes a row in a dashboard. Here's every step in between.",
+  "hook_options": [
+    "Every click on a website becomes a row in a dashboard. Here's every step in between.",
+    "Design a clickstream pipeline: the system design question, answered step by step.",
+    "From one click event to a gold table: Kafka, streaming, watermarks and partitions."
+  ],
+  "target_duration_sec": 900,
+  "scheduled_for": "2026-10-24T11:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic 'Designing a clickstream analytics pipeline' (data-system-design, longform). Chosen over 'Data Engineering was HARD until I learned these 20 concepts' because the rule is to bundle 4-6 reel-sized concepts. Planned chapters (each cuttable into a reel later, all existing backlog topics left unused for future reels): 1) Kafka topics, partitions and consumer groups; 2) Batch vs streaming; 3) Late-arriving data and watermarks; 4) Idempotent pipelines; 5) Medallion architecture (bronze/silver/gold); 6) Partition pruning. Uses FlowGraph, PartitionGrid, Timeline, Comparison. Sat longform slot."
+    }
+  ]
+}
