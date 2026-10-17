@@ -7,7 +7,7 @@ import { Chip, Fill, useScale } from "../lib/ui";
 import type { CueFn } from "../lib/sfx";
 
 export interface EndCardProps {
-  /** Big line, e.g. the one-sentence takeaway. */
+  /** Big line, e.g. the one-sentence takeaway. `\n` starts a new line. */
   headline?: string;
   /** Call to action, e.g. "Save this for your next interview". */
   cta?: string;
@@ -29,6 +29,7 @@ export const EndCard: React.FC<EndCardProps> = ({ headline, cta = "Follow for mo
             lineHeight: 1.12,
             color: colors.text,
             maxWidth: 940 * s,
+            whiteSpace: "pre-line",
             ...enter(pop(frame, fps), 40),
           }}
         >
