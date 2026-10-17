@@ -193,7 +193,13 @@ Output values are **computed**, never typed in by hand, so they cannot drift fro
 | `partitions` | string[] | required | Column labels, coloured from `partitionPalette` |
 | `items` | `{label, from, to?}[]` | required | Partition indices; `to` defaults to `from` |
 | `beforeLabel` / `afterLabel` | string | – | Caption switches when items start moving |
-| `moveAt` | number | ⅓ of the scene | Seconds when the move starts (staggered over ~35% of the scene) |
+| `moveAt` | number | ⅓ of the scene | Seconds when the move starts |
+| `moveSpan` | number | `0.35` | Fraction of the scene (0.1–0.8) over which partition-crossing moves are staggered |
+
+Only items that **cross partitions** are staggered and get a swoosh; items that just slide to a new
+slot inside their partition move together, silently, and items that don't change position stay
+put. With the 450 ms swoosh gap, a scene fits about `moveSpan × duration_sec / 0.45` crossings
+before the engine slows it down.
 | `colorByDestination` | boolean | `true` | `false` = source colour until halfway |
 
 ## Comparison

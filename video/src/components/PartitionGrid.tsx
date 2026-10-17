@@ -23,6 +23,8 @@ export interface PartitionGridProps {
   afterLabel?: string;
   /** Seconds from scene start when items begin moving. Default 1/3 of the scene. */
   moveAt?: number;
+  /** Fraction of the scene over which partition-crossing moves are staggered (0.1-0.8, default 0.35). */
+  moveSpan?: number;
   /** Colour items by destination partition from the start (default true). */
   colorByDestination?: boolean;
 }
@@ -30,14 +32,45 @@ export interface PartitionGridProps {
 /** Frames an item takes to travel to its new partition. */
 const MOVE_FRAMES = 18;
 
-export const partitionTiming = (count: number, moveAt: number | undefined, fps: number, durationInFrames: number) => {
-  const moveStart = Math.round((moveAt ?? durationInFrames / fps / 3) * fps);
-  const moveSpan = Math.max(1, Math.round(durationInFrames * 0.35));
-  return {
-    moveStart,
-    stagger: count > 1 ? moveSpan / count : 0,
-    appearAt: (i: number) => 4 + i * 2,
+/** Start and end (bin, slot) of every item: slots stack items in arrival order within a bin. */
+export const partitionSlots = (items: PartitionItem[], n: number) => {
+  const perBin = (key: "from" | "to") => {
+    const counts = new Array(n).fill(0);
+    return items.map((it) => {
+      const b = key === "to" ? (it.to ?? it.from) : it.from;
+      return { bin: b, slot: counts[b]++ };
+    });
   };
+  return { start: perBin("from"), end: perBin("to") };
+};
+
+/**
+ * Shared timing for visuals and sound. Only items that cross partitions are staggered (each gets a
+ * swoosh); items that merely slide to a new slot in the same partition move quietly together, and
+ * items that don't change position don't move at all.
+ */
+export const partitionTiming = (
+  items: PartitionItem[],
+  n: number,
+  moveAt: number | undefined,
+  moveSpan: number | undefined,
+  fps: number,
+  durationInFrames: number,
+) => {
+  const { start, end } = partitionSlots(items, n);
+  const moveStart = Math.round((moveAt ?? durationInFrames / fps / 3) * fps);
+  const span = Math.max(1, Math.round(durationInFrames * Math.min(0.8, Math.max(0.1, moveSpan ?? 0.35))));
+  const crossers = items.map((_, i) => i).filter((i) => start[i].bin !== end[i].bin);
+  const stagger = crossers.length > 1 ? span / crossers.length : 0;
+  const order = new Map(crossers.map((i, k) => [i, k]));
+  /** Frame item i starts moving, or null if it never moves. */
+  const moveStartFor = (i: number): number | null => {
+    if (order.has(i)) return moveStart + order.get(i)! * stagger;
+    if (start[i].slot !== end[i].slot) return moveStart; // quiet slide within its partition
+    return null;
+  };
+  const lastCross = crossers.length ? moveStart + (crossers.length - 1) * stagger : null;
+  return { start, end, moveStart, moveStartFor, crossers, lastCross, appearAt: (i: number) => 4 + i * 2 };
 };
 
 export const PartitionGrid: React.FC<PartitionGridProps> = ({
@@ -46,6 +79,7 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
   beforeLabel,
   afterLabel,
   moveAt,
+  moveSpan,
   colorByDestination = true,
 }) => {
   const { frame, fps, durationInFrames, width, height } = useScene();
@@ -58,15 +92,14 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
   const binTop = captionH + headerH;
   const binH = height - binTop;
 
-  const perBin = (key: "from" | "to") => {
-    const counts = new Array(n).fill(0);
-    return items.map((it) => {
-      const b = key === "to" ? (it.to ?? it.from) : it.from;
-      return { bin: b, slot: counts[b]++ };
-    });
-  };
-  const start = perBin("from");
-  const end = perBin("to");
+  const { start, end, moveStart, moveStartFor, appearAt } = partitionTiming(
+    items,
+    n,
+    moveAt,
+    moveSpan,
+    fps,
+    durationInFrames,
+  );
   const maxSlots = Math.max(
     ...partitions.map((_, b) => Math.max(start.filter((x) => x.bin === b).length, end.filter((x) => x.bin === b).length)),
     1,
@@ -74,8 +107,6 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
   const itemH = Math.min(84 * s, (binH - 24 * s) / maxSlots - 12 * s);
   const itemGap = 12 * s;
   const fs = Math.min(32 * s, itemH * 0.45);
-
-  const { moveStart, stagger, appearAt } = partitionTiming(items.length, moveAt, fps, durationInFrames);
 
   const place = (b: number, slot: number) => ({
     x: b * (colW + gap) + 14 * s,
@@ -139,7 +170,8 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
       ))}
       {items.map((it, i) => {
         const dest = it.to ?? it.from;
-        const t = progress(frame, moveStart + i * stagger, MOVE_FRAMES);
+        const ms = moveStartFor(i);
+        const t = ms === null ? 0 : progress(frame, ms, MOVE_FRAMES);
         const a = place(start[i].bin, start[i].slot);
         const z = place(end[i].bin, end[i].slot);
         const arc = Math.sin(t * Math.PI) * -40 * s;
@@ -179,12 +211,23 @@ export const PartitionGrid: React.FC<PartitionGridProps> = ({
   );
 };
 
-export const partitionGridCues: CueFn<PartitionGridProps> = ({ items, moveAt }, { fps, durationInFrames }) => {
-  const { moveStart, stagger, appearAt } = partitionTiming(items.length, moveAt, fps, durationInFrames);
+export const partitionGridCues: CueFn<PartitionGridProps> = (
+  { partitions, items, moveAt, moveSpan },
+  { fps, durationInFrames },
+) => {
+  const { moveStartFor, crossers, lastCross, appearAt } = partitionTiming(
+    items,
+    partitions.length,
+    moveAt,
+    moveSpan,
+    fps,
+    durationInFrames,
+  );
   return [
     ...items.map((_, i) => ({ frame: appearAt(i), sound: "tick" as const })),
-    ...items.map((_, i) => ({ frame: Math.round(moveStart + i * stagger), sound: "swoosh" as const })),
+    // One swoosh per item that actually crosses partitions; quiet slides and static items are silent.
+    ...crossers.map((i) => ({ frame: Math.round(moveStartFor(i)!), sound: "swoosh" as const })),
     // Everything has settled into its partition.
-    { frame: Math.round(moveStart + (items.length - 1) * stagger) + MOVE_FRAMES, sound: "snap" as const },
+    ...(lastCross !== null ? [{ frame: Math.round(lastCross) + MOVE_FRAMES, sound: "snap" as const }] : []),
   ];
 };
