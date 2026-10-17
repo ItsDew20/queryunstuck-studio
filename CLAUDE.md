@@ -16,12 +16,18 @@ YouTube (long-form + Shorts) and, later, the website. Tagline: "Data & AI Engine
 5. Never invent statistics, quotes, benchmarks or "X company uses Y" claims without a source.
 6. Visuals use only components in `video/src/components/` and tokens in `brand/brand.json`.
    No hard-coded colors or fonts.
+7. Scope engine-specific claims. If behaviour differs by engine or vendor, the on-screen line
+   names it ("In Spark…", "In DuckDB…", "in PostgreSQL and SQL Server"). No "always"/"never"
+   unless a source says so; on-screen text must stand alone (reels autoplay muted).
 
 ## Single source of truth
 - Each piece lives in `content/<id>/` and is driven by `spec.json`
   (schema: `schemas/content-spec.schema.json`).
 - Agents update `spec.json.status` when their stage is done and append to `history[]`.
-- Run `python scripts/validate_spec.py` before finishing any task. Fix all errors.
+  `history[].at` is the real current time from `date "+%Y-%m-%dT%H:%M:%S+05:30"`; never invent
+  one, and never edit earlier entries.
+- Run `.venv/bin/python scripts/validate_spec.py` before finishing any task (plain `python` may
+  lack the dependencies). Fix all errors.
 
 ## Pipeline & status flow
 idea → researched → scripted → fact-checked → storyboarded → rendered → qa-passed
