@@ -209,11 +209,15 @@ const Box: React.FC<{ r: Rect; o: Orientation; durationInFrames: number; childre
 
 const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, o, text }) => {
   const frame = useCurrentFrame();
-  const [title, definition] = text;
+  // Every on_screen_text line is fact-checked as on-screen copy, so all of them are drawn:
+  // [0] is the title, [1..3] are supporting lines (definition, caveat) in decreasing emphasis.
+  const [title, ...rest] = text;
+  const lines = rest.slice(0, 3);
   if (!title) return null;
   const portrait = o === "portrait";
+  const lineFs = (portrait ? [38, 34, 30] : [32, 30, 28])[Math.max(0, lines.length - 1)];
   // Montserrat Black averages ~0.66em per glyph; shrink long titles to one line where possible.
-  const maxFs = portrait ? 80 : 66;
+  const maxFs = (portrait ? 80 : 66) - (lines.length >= 2 ? 12 : 0);
   const titleFs = Math.max(portrait ? 54 : 46, Math.min(maxFs, r.w / (title.length * 0.66)));
   return (
     <div
@@ -243,21 +247,22 @@ const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, 
       >
         {title}
       </div>
-      {definition ? (
+      {lines.map((line, i) => (
         <div
+          key={i}
           style={{
-            marginTop: 18,
+            marginTop: i === 0 ? 16 : 6,
             fontFamily: fonts.body,
-            fontWeight: 600,
-            fontSize: portrait ? 38 : 32,
-            lineHeight: 1.3,
+            fontWeight: i === 0 ? 600 : 500,
+            fontSize: lineFs,
+            lineHeight: 1.25,
             color: colors.textMuted,
-            ...enter(progress(frame, 5, 12), 16),
+            ...enter(progress(frame, 5 + i * 4, 12), 16),
           }}
         >
-          {definition}
+          {line}
         </div>
-      ) : null}
+      ))}
     </div>
   );
 };

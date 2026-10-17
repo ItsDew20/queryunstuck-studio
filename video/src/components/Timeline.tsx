@@ -11,6 +11,8 @@ export interface TimelineEvent extends Timed {
   marker?: string;
   label: string;
   detail?: string;
+  /** De-emphasise a step that exists in general but not in this example (e.g. DISTINCT). */
+  dim?: boolean;
 }
 
 export interface TimelineProps {
@@ -44,10 +46,19 @@ export const Timeline: React.FC<TimelineProps> = ({ events, cumulative = true })
           const p = progress(frame, starts[i], 10);
           const next = starts[i + 1] ?? Infinity;
           const current = frame >= starts[i] && frame < next;
-          const lit = cumulative ? frame >= starts[i] : current;
-          const c = current ? colors.accent : lit ? semantic.match : semantic.pending;
+          const lit = !e.dim && (cumulative ? frame >= starts[i] : current);
+          const c = e.dim ? semantic.pending : current ? colors.accent : lit ? semantic.match : semantic.pending;
           return (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 28 * s, ...enter(Math.max(0.35, p), 0) }}>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 28 * s,
+                ...enter(Math.max(0.35, p), 0),
+                ...(e.dim ? { opacity: 0.45 * Math.max(0.35, p) } : {}),
+              }}
+            >
               <div
                 style={{
                   width: dot,

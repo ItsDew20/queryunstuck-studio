@@ -16,6 +16,8 @@ export interface ListCardProps {
   title?: string;
   items: Array<string | ListCardItem>;
   numbered?: boolean;
+  /** Number of the first item (default 1), so a list split over cards can continue: 5, 6, 7… */
+  start?: number;
   /** If true (default) items reveal one by one; false shows the full list at once (cheat-sheet). */
   stagger?: boolean;
   /** Index of an item to keep highlighted in the accent colour. */
@@ -34,7 +36,14 @@ export const listStarts = (count: number, stagger: boolean, fps: number, duratio
       )
     : Array.from({ length: count }, (_, i) => i * 2);
 
-export const ListCard: React.FC<ListCardProps> = ({ title, items, numbered = true, stagger = true, activeIndex }) => {
+export const ListCard: React.FC<ListCardProps> = ({
+  title,
+  items,
+  numbered = true,
+  start = 1,
+  stagger = true,
+  activeIndex,
+}) => {
   const { frame, fps, durationInFrames } = useScene();
   const s = useScale();
   const norm = items.map((it) => (typeof it === "string" ? { text: it } : it));
@@ -92,7 +101,7 @@ export const ListCard: React.FC<ListCardProps> = ({ title, items, numbered = tru
                     justifyContent: "center",
                   }}
                 >
-                  {i + 1}
+                  {start + i}
                 </div>
               ) : null}
               <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: fs, color: colors.text }}>

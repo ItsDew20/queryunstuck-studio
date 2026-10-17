@@ -9,7 +9,7 @@ piece's content: everything comes from `scene.props` in `spec.json`.
 | Scene | Portrait (1080×1920) | Landscape (1920×1080) |
 |---|---|---|
 | Full-frame components: `TitleCard`, `ListCard`, `EndCard` | whole safe area (below the watermark, above `safeBottom`) | whole safe area |
-| Any other component | `on_screen_text[0]` = title, `[1]` = one-line definition in **titleZone**; component in **animZone** | title in **titleZone**; component on the left of **contentZone** |
+| Any other component | `on_screen_text[0]` = title, `[1..3]` = supporting lines (definition, caveat) in **titleZone**, all drawn; component in **animZone** | title + lines in **titleZone**; component on the left of **contentZone** |
 | …with `code_block` set | synced `CodePanel` in **codeZone** (right inset = `safeRight`) | `CodePanel` on the right (`codeSplit` of the width) |
 | …without `code_block` | animZone extends down through codeZone | component uses the full contentZone |
 | `component: "CodePanel"` | title + panel across anim+code zones; `code`/`lang` default to `code_blocks[code_block]` | same, full contentZone |
@@ -104,6 +104,7 @@ scene length (`duration_sec`) controls the pace.
 | `title` | string | – | |
 | `items` | `(string \| {text, note?})[]` | required | `note` is muted text after the item |
 | `numbered` | boolean | `true` | Accent number badges |
+| `start` | number | `1` | First badge number, to continue a list across cards (e.g. `5`) |
 | `stagger` | boolean | `true` | `false` = whole list at once (reel-list cheat-sheet) |
 | `activeIndex` | number | – | Item kept highlighted |
 
@@ -202,7 +203,7 @@ Output values are **computed**, never typed in by hand, so they cannot drift fro
 ## Timeline
 | Prop | Type | Default | Notes |
 |---|---|---|---|
-| `events` | `{label, detail?, marker?, at?}[]` | required | `marker` defaults to 1-based index |
+| `events` | `{label, detail?, marker?, dim?, at?}[]` | required | `marker` defaults to 1-based index; `dim: true` greys out a step that isn't used in this example |
 | `cumulative` | boolean | `true` | Past events stay lit (green); current = accent |
 
 ## Callout
