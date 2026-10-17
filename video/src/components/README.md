@@ -80,6 +80,8 @@ muted; sound only reinforces what's on screen.
 
 ### Timing convention
 Components with sequential steps accept an optional `at` (seconds from scene start) on each step.
+A negative `at` (e.g. `-1`) applies that step instantly and silently before the scene begins, which is
+how a continuation scene opens in the previous scene's end state (e.g. already sorted).
 Without `at`, steps spread evenly between a ~0.5 s lead-in and a ~1.2 s hold at the end, so
 scene length (`duration_sec`) controls the pace.
 

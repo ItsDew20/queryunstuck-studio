@@ -369,7 +369,8 @@ const sceneCues = (
   } else {
     cues.push({ frame: 0, sound: "pop" });
   }
-  return cues.filter((c) => c.frame < d);
+  // Steps timed before the scene starts (at < 0) set an initial state silently.
+  return cues.filter((c) => c.frame >= 0 && c.frame < d);
 };
 
 /** Code lines highlighted at the end of a scene (last step, or its static activeLines). */
