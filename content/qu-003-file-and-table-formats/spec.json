@@ -4,7 +4,7 @@
   "title": "10 Must-Know File & Table Formats (CSV to Iceberg)",
   "format": "reel-list",
   "pillar": "data-engineering",
-  "status": "fact-checked",
+  "status": "qa-passed",
   "audience_level": "beginner",
   "hook": "Parquet is a file format. Iceberg is not. 10 formats, 25 seconds.",
   "hook_options": [
@@ -14,6 +14,15 @@
   ],
   "target_duration_sec": 25,
   "scheduled_for": "2026-10-24T19:00:00+05:30",
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-003/reel.mp4",
+    "duration_sec": 25,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 45,
+    "url": "https://media.queryunstuck.in/qu-003/thumbnail.png"
+  },
   "history": [
     {
       "at": "2026-10-17T10:00:00+05:30",
@@ -50,6 +59,24 @@
       "agent": "fact-checker",
       "action": "fact-check PASS (pass 2)",
       "note": "Loop 1 fixes confirmed: Arrow 'built for compute' (Arrow FAQ), Parquet 'built-in compression', Avro narration scoped to files, hook '10 formats, 25 seconds' (scenes sum to 25 s). All 20 on-screen lines supported; no new claims. No code_blocks. Non-blocking: hook_options[2] still says 'one screen'. Status -> fact-checked."
+    },
+    {
+      "at": "2026-10-17T19:02:36+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "TitleCard, 3 ListCards (numbers 1-10 in item text since ListCard cannot offset numbering; numbered=false), Comparison, EndCard."
+    },
+    {
+      "at": "2026-10-17T19:04:59+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Rendered in 22 seconds. Video: H.264 1080×1920 30fps, 25s, 2.87 MB. Audio: AAC 48kHz stereo. Duration matches target exactly. Thumbnail frame 45. Captions: 13 SRT cues with scene-based timing."
+    },
+    {
+      "at": "2026-10-17T19:07:07+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-passed",
+      "note": "QA PASS, no blockers; 7 minor issues in qa.md (small item description font ~34px, s3 heading hyphen wrap, first caption cue 0.667s, low loudness, s1 sparkle cluster). Public R2 file size matches local; peak -13.6 dB."
     }
   ],
   "sources": [
@@ -159,7 +186,17 @@
         "Iceberg is not.",
         "10 formats, 25 seconds."
       ],
-      "beat": "Hook: state the payoff (file vs table format, 10 formats) in the first 1.5 s."
+      "beat": "Hook: state the payoff (file vs table format, 10 formats) in the first 1.5 s.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Parquet is a file format. Iceberg is not.",
+        "subtitle": "10 formats, 25 seconds.",
+        "kicker": "Data Engineering",
+        "highlight": [
+          "Iceberg",
+          "not"
+        ]
+      }
     },
     {
       "id": "s2-row",
@@ -171,7 +208,31 @@
         "JSON Lines: one JSON value per line",
         "Avro: binary rows, schema embedded"
       ],
-      "beat": "List items 1-4 (row-based file formats). First line is the group header; items reveal one by one."
+      "beat": "List items 1-4 (row-based file formats). First line is the group header; items reveal one by one.",
+      "component": "ListCard",
+      "props": {
+        "title": "Row-based files",
+        "items": [
+          {
+            "text": "1. CSV",
+            "note": "plain-text rows, comma-separated"
+          },
+          {
+            "text": "2. JSON",
+            "note": "text format for structured data"
+          },
+          {
+            "text": "3. JSON Lines",
+            "note": "one JSON value per line"
+          },
+          {
+            "text": "4. Avro",
+            "note": "binary rows, schema embedded"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
     },
     {
       "id": "s3-columnar",
@@ -182,7 +243,27 @@
         "ORC: columnar file, created for Hive",
         "Arrow: columnar in memory, built for compute"
       ],
-      "beat": "List items 5-7, numbering continues at 5. Arrow, a columnar in-memory format built for compute."
+      "beat": "List items 5-7, numbering continues at 5. Arrow, a columnar in-memory format built for compute.",
+      "component": "ListCard",
+      "props": {
+        "title": "Columnar + in-memory",
+        "items": [
+          {
+            "text": "5. Parquet",
+            "note": "column-oriented file, built-in compression"
+          },
+          {
+            "text": "6. ORC",
+            "note": "columnar file, created for Hive"
+          },
+          {
+            "text": "7. Arrow",
+            "note": "columnar in memory, built for compute"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
     },
     {
       "id": "s4-table",
@@ -193,7 +274,27 @@
         "Iceberg: snapshots, schema evolution, time travel",
         "Hudi: upserts, deletes, incremental processing"
       ],
-      "beat": "List items 8-10, numbering continues at 8. Table formats are metadata layers over data files such as Parquet."
+      "beat": "List items 8-10, numbering continues at 8. Table formats are metadata layers over data files such as Parquet.",
+      "component": "ListCard",
+      "props": {
+        "title": "Table formats: metadata over data files",
+        "items": [
+          {
+            "text": "8. Delta Lake",
+            "note": "ACID transaction log"
+          },
+          {
+            "text": "9. Iceberg",
+            "note": "snapshots, schema evolution, time travel"
+          },
+          {
+            "text": "10. Hudi",
+            "note": "upserts, deletes, incremental processing"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
     },
     {
       "id": "s5-diff",
@@ -202,7 +303,24 @@
         "File format: how bytes sit in a file",
         "Table format: which files form the table"
       ],
-      "beat": "Core distinction, one idea: file format vs table format."
+      "beat": "Core distinction, one idea: file format vs table format.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "File format",
+          "points": [
+            "How bytes sit in a file"
+          ],
+          "tone": "active"
+        },
+        "right": {
+          "title": "Table format",
+          "points": [
+            "Which files form the table"
+          ],
+          "tone": "match"
+        }
+      }
     },
     {
       "id": "s6-end",
@@ -211,7 +329,12 @@
         "Files store data. Tables track files.",
         "Save this for your next interview"
       ],
-      "beat": "End: one-line takeaway + save CTA."
+      "beat": "End: one-line takeaway + save CTA.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Files store data. Tables track files.",
+        "cta": "Save this for your next interview"
+      }
     }
   ],
   "code_blocks": []
