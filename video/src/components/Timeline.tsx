@@ -56,7 +56,7 @@ export const Timeline: React.FC<TimelineProps> = ({ events, cumulative = true })
                 alignItems: "center",
                 gap: 28 * s,
                 ...enter(Math.max(0.35, p), 0),
-                ...(e.dim ? { opacity: 0.45 * Math.max(0.35, p) } : {}),
+                ...(e.dim ? { opacity: 0.7 * Math.max(0.35, p) } : {}),
               }}
             >
               <div
