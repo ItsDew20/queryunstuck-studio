@@ -4,7 +4,7 @@
   "title": "How a Spark Shuffle Works, Visualized",
   "format": "reel-animated",
   "pillar": "data-engineering",
-  "status": "fact-checked",
+  "status": "qa-passed",
   "audience_level": "intermediate",
   "hook": "Slow JOIN or GROUP BY? Check the shuffle.",
   "hook_options": [
@@ -15,6 +15,15 @@
   ],
   "target_duration_sec": 40,
   "scheduled_for": "2026-10-22T19:00:00+05:30",
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-002/reel.mp4",
+    "duration_sec": 42,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-002/thumbnail.png"
+  },
   "history": [
     {
       "at": "2026-10-17T10:00:00+05:30",
@@ -51,6 +60,54 @@
       "agent": "fact-checker",
       "action": "fact-checked",
       "note": "VERDICT: PASS (pass 2 after loop 1). All 7 loop-1 fixes confirmed against Spark 4.2.0 docs/source; s2 'Usually copied across executors and machines' matches RDD guide 'typically'. Narration and beats re-checked, no new unsupported claims. Code block 0 re-verified in DuckDB (A 21, B 32, C 23). Status -> fact-checked."
+    },
+    {
+      "at": "2026-10-17T19:02:44+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "Components assigned for all 9 scenes. s1 TitleCard; s2-s4 PartitionGrid (s4 labelled illustrative); s5 FlowGraph (map outputs to reduce tasks); s6 DataTable with code highlight; s7 Callout; s8 ListCard; s9 EndCard. Machine boxes from beats not expressible in PartitionGrid."
+    },
+    {
+      "at": "2026-10-17T19:05:50+05:30",
+      "agent": "visual-director",
+      "action": "re-checked stills after engine fix",
+      "note": "Re-rendered all 9 stills with 3-line title zones; no collisions or clipping. s5 FlowGraph unobstructed. s7 Callout changed to avoid repeating the now-visible third title line (text only; on_screen_text untouched). Status stays storyboarded."
+    },
+    {
+      "at": "2026-10-17T19:30:00+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Rendered in 49.4 seconds. Duration 47.5 s (stretched: s2-define 5→7.5s, s4-map 6→9s). File size 5.8 MB, H.264 1080x1920 30fps + AAC. All checks passed."
+    },
+    {
+      "at": "2026-10-17T19:13:05+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa failed",
+      "note": "QA: FAIL. Blockers: (1) 47.5 s exceeds 45 s max (s2 5->7.5, s4 6->9 auto-stretch); fix: s2 items 9->3 (B·20 0->2, A·7 stay, C·6 2->0) keeps s2 at 5 s, total 45.0 s; moveAt does not help (span fixed 35%). (2) captions.srt overflow lines placed in the wrong scene; regenerate. Minors in qa.md. Status stays rendered."
+    },
+    {
+      "at": "2026-10-17T19:15:39+05:30",
+      "agent": "visual-director",
+      "action": "storyboard fixes after QA loop 1",
+      "note": "s4 moveSpan 0.6 (6 crossings) to avoid auto-stretch; neutral R0/R1/R2 headers, key mapping in afterLabel, illustrative kept. s8 ListCard items now exactly on_screen_text. s9 headline = the two spec lines joined by a space (EndCard collapses newlines, no subline prop). Status back to storyboarded for re-render."
+    },
+    {
+      "at": "2026-10-17T19:16:26+05:30",
+      "agent": "orchestrator",
+      "action": "s9 EndCard headline split into its two on-screen lines",
+      "note": "EndCard now honours \\n (pre-line); text unchanged, no added punctuation."
+    },
+    {
+      "at": "2026-10-17T19:19:07+05:30",
+      "agent": "renderer",
+      "action": "re-rendered after QA loop 1",
+      "note": "Render time: 35s. Duration 42s (no stretching; all scenes fit). s2-s9 changes applied: s4 moveSpan 0.6 (6 crossings), s8/s9 props updated. Captions regenerated (15 cues, all rules pass). H.264 1080x1920 30fps + AAC, 5.7 MB. All checks passed."
+    },
+    {
+      "at": "2026-10-17T19:20:36+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa passed",
+      "note": "QA: PASS on loop 1 re-render. 42.0 s (no stretch); captions verified programmatically against timeline; s2 swooshes match 2 moving rows; copy, data and audio verified. Minor items only, see qa.md."
     }
   ],
   "sources": [
@@ -141,7 +198,15 @@
         "Slow JOIN or GROUP BY?",
         "Check the shuffle."
       ],
-      "beat": "Payoff in first 1.5 s: point at the shuffle as the thing to check. Rows on a grid start to jitter between partitions."
+      "beat": "Payoff in first 1.5 s: point at the shuffle as the thing to check. Rows on a grid start to jitter between partitions.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Slow JOIN or GROUP BY?",
+        "subtitle": "Check the shuffle.",
+        "highlight": [
+          "shuffle"
+        ]
+      }
     },
     {
       "id": "s2-define",
@@ -150,7 +215,58 @@
         "Shuffle = regroup data across partitions",
         "Usually copied across executors and machines"
       ],
-      "beat": "Definition. Rows in 3 partitions on 2 machine boxes; a few rows lift and cross the gap."
+      "beat": "Definition. Rows in 3 partitions on 2 machine boxes; a few rows lift and cross the gap.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0",
+          "P1",
+          "P2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "C·5",
+            "from": 0
+          },
+          {
+            "label": "A·7",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "C·12",
+            "from": 1
+          },
+          {
+            "label": "B·3",
+            "from": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2
+          },
+          {
+            "label": "A·4",
+            "from": 2
+          },
+          {
+            "label": "C·6",
+            "from": 2,
+            "to": 0
+          }
+        ],
+        "beforeLabel": "Rows in 3 partitions",
+        "afterLabel": "Some rows cross to other partitions"
+      }
     },
     {
       "id": "s3-setup",
@@ -161,7 +277,60 @@
         "All A rows must meet"
       ],
       "beat": "Show P0/P1/P2 with the 9 orders; A, B, C scattered in every partition. SQL panel shows code_blocks[0].",
-      "code_block": 0
+      "code_block": 0,
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0",
+          "P1",
+          "P2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0
+          },
+          {
+            "label": "C·5",
+            "from": 0
+          },
+          {
+            "label": "A·7",
+            "from": 1
+          },
+          {
+            "label": "C·12",
+            "from": 1
+          },
+          {
+            "label": "B·3",
+            "from": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2
+          },
+          {
+            "label": "A·4",
+            "from": 2
+          },
+          {
+            "label": "C·6",
+            "from": 2
+          }
+        ],
+        "beforeLabel": "Customer · amount",
+        "moveAt": 60,
+        "codeHighlight": {
+          "activeLines": [
+            3
+          ]
+        }
+      }
     },
     {
       "id": "s4-map",
@@ -171,7 +340,66 @@
         "target = hash(key) mod N",
         "Illustrative: A→R0, B→R1, C→R2"
       ],
-      "beat": "Each map task tags each row with a target partition, sorts by target and writes one file. Assignments are illustrative, no real hash values."
+      "beat": "Each map task tags each row with a target partition, sorts by target and writes one file. Assignments are illustrative, no real hash values.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "R0",
+          "R1",
+          "R2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0,
+            "to": 1
+          },
+          {
+            "label": "C·5",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "A·7",
+            "from": 1,
+            "to": 0
+          },
+          {
+            "label": "C·12",
+            "from": 1,
+            "to": 2
+          },
+          {
+            "label": "B·3",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2,
+            "to": 1
+          },
+          {
+            "label": "A·4",
+            "from": 2,
+            "to": 0
+          },
+          {
+            "label": "C·6",
+            "from": 2,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Illustrative: map tasks tag each row with a target",
+        "afterLabel": "Illustrative: A→R0, B→R1, C→R2",
+        "colorByDestination": true,
+        "moveSpan": 0.6
+      }
     },
     {
       "id": "s5-reduce",
@@ -181,7 +409,113 @@
         "Each task pulls its blocks from the map outputs",
         "Often over the network"
       ],
-      "beat": "R0 pulls all A rows from P0, P1, P2; R1 pulls B; R2 pulls C. Arrows fan in across machines."
+      "beat": "R0 pulls all A rows from P0, P1, P2; R1 pulls B; R2 pulls C. Arrows fan in across machines.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "p0",
+            "label": "P0",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.12
+          },
+          {
+            "id": "p1",
+            "label": "P1",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.5
+          },
+          {
+            "id": "p2",
+            "label": "P2",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.88
+          },
+          {
+            "id": "r0",
+            "label": "R0",
+            "sublabel": "pulls A",
+            "x": 0.86,
+            "y": 0.12,
+            "tone": "active"
+          },
+          {
+            "id": "r1",
+            "label": "R1",
+            "sublabel": "pulls B",
+            "x": 0.86,
+            "y": 0.5,
+            "tone": "active"
+          },
+          {
+            "id": "r2",
+            "label": "R2",
+            "sublabel": "pulls C",
+            "x": 0.86,
+            "y": 0.88,
+            "tone": "active"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p0",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p1",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p2",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p0",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p1",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p2",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p0",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          },
+          {
+            "from": "p1",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          },
+          {
+            "from": "p2",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          }
+        ]
+      }
     },
     {
       "id": "s6-result",
@@ -191,7 +525,50 @@
         "A = 21 · B = 32 · C = 23"
       ],
       "beat": "Reduce partitions sum their rows; result table appears matching the SQL output.",
-      "code_block": 0
+      "code_block": 0,
+      "component": "DataTable",
+      "props": {
+        "columns": [
+          "customer_id",
+          "total"
+        ],
+        "rows": [
+          [
+            "A",
+            21
+          ],
+          [
+            "B",
+            32
+          ],
+          [
+            "C",
+            23
+          ]
+        ],
+        "title": "result",
+        "highlightCols": [
+          "total"
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                1,
+                2,
+                3
+              ],
+              "note": "SUM per key"
+            },
+            {
+              "lines": [
+                4
+              ],
+              "note": "ORDER BY"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s7-cost",
@@ -201,7 +578,13 @@
         "disk I/O + serialization + network I/O",
         "Spills add more disk and GC"
       ],
-      "beat": "Three cost badges light up on the arrows from s5; a spill icon drops to disk."
+      "beat": "Three cost badges light up on the arrows from s5; a spill icon drops to disk.",
+      "component": "Callout",
+      "props": {
+        "text": "Intermediate shuffle files are kept on disk",
+        "tone": "warning",
+        "label": "Cost"
+      }
     },
     {
       "id": "s8-fix",
@@ -211,7 +594,16 @@
         "AQE merges small shuffle partitions",
         "AQE splits skewed join partitions"
       ],
-      "beat": "Broadcast: small table (by estimated size) copied to every executor, big side stays put. Then tiny partitions merge, one fat partition splits."
+      "beat": "Broadcast: small table (by estimated size) copied to every executor, big side stays put. Then tiny partitions merge, one fat partition splits.",
+      "component": "ListCard",
+      "props": {
+        "title": "Fixes",
+        "items": [
+          "Small side? Broadcast it (auto ≤ 10 MB by default)",
+          "AQE merges small shuffle partitions",
+          "AQE splits skewed join partitions"
+        ]
+      }
     },
     {
       "id": "s9-end",
@@ -221,7 +613,12 @@
         "usually across machines",
         "Save this for your next interview"
       ],
-      "beat": "One-line takeaway + save CTA. Watermark queryunstuck."
+      "beat": "One-line takeaway + save CTA. Watermark queryunstuck.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Shuffle = rows regrouped across partitions\nusually across machines",
+        "cta": "Save this for your next interview"
+      }
     }
   ],
   "code_blocks": [
