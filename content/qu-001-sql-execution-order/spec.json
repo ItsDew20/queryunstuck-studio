@@ -87,6 +87,12 @@
       "agent": "qa-reviewer",
       "action": "re-QA after loop 1; qa.md rewritten; QA: PASS; status qa-passed",
       "note": "Both blockers fixed (Ben no longer reappears in s7; s7->s8 seamless). Only minor polish items remain."
+    },
+    {
+      "at": "2026-10-17T22:29:57+05:30",
+      "agent": "composer",
+      "action": "scored piece: music bed drift, gain -11 dB, duck 4 dB, beat sync on; status unchanged (qa-passed)",
+      "note": "Compared study (72 BPM, 37.5 s, shortens s3-s6 and s9), calm (66 BPM, 39.1 s, shortens hook s1 to 2.73 s), focus (78 BPM, 40.0 s, drums), drift/rain (60 BPM, 41.0 s): none stretched, no off-beat cues. 35 cues/38.5 s = ~55 cues/min (dense) -> no-drum bed, gain -11. Drift chosen: every scene >= original length, clean 0.5 s step grid, no rain noise over the SFX. Needs re-render and re-QA (music/beat sync changes timing)."
     }
   ],
   "sources": [
@@ -657,5 +663,12 @@
   "thumbnail": {
     "frame": 60,
     "url": "https://media.queryunstuck.in/qu-001/thumbnail.png"
+  },
+  "music": {
+    "bed": "drift",
+    "gain_db": -11,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense SFX (~55 cues/min) needs a sparse bed without drums. Drift (60 BPM ambient drone, rare bells) stays out of the way of notes/dings, and its 0.5 s grid keeps every scene at or above its QA-passed length (41.0 s, none stretched, no off-beat cues)."
   }
 }

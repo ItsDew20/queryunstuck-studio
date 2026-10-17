@@ -77,6 +77,12 @@
       "agent": "qa-reviewer",
       "action": "qa-passed",
       "note": "QA PASS, no blockers; 7 minor issues in qa.md (small item description font ~34px, s3 heading hyphen wrap, first caption cue 0.667s, low loudness, s1 sparkle cluster). Public R2 file size matches local; peak -13.6 dB."
+    },
+    {
+      "at": "2026-10-17T22:30:02+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Bed calm (66 BPM, -12 dB, duck 4, sync on). 20 cues / 25.47 s = 47 cues/min (dense, so no drums). Compared study 72 (25.0 s, hook cut to 1.67 s, uneven s3), drift/rain 60 (25.0 s, 0.5 s gap between items 2 and 3), flow 88 (24.53 s, uneven s2), focus 78 (26.17 s, drums). calm keeps item gaps >= 0.9 s. No scene stretched; only pop/sparkle micro-sounds off-beat. Total 25.47 s (reel-list 15-30 s). Needs re-render and re-QA (music/beat sync changes timing)."
     }
   ],
   "sources": [
@@ -337,5 +343,12 @@
       }
     }
   ],
-  "code_blocks": []
+  "code_blocks": [],
+  "music": {
+    "bed": "calm",
+    "gain_db": -12,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense list (47 cues/min), so a drum-free pad bed sits under the rising notes. At 66 BPM item reveals land 0.9-1.4 s apart, the most even spacing tested, so each card reads without rush. -12 dB keeps it just audible."
+  }
 }

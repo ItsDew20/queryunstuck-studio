@@ -108,6 +108,12 @@
       "agent": "qa-reviewer",
       "action": "qa passed",
       "note": "QA: PASS on loop 1 re-render. 42.0 s (no stretch); captions verified programmatically against timeline; s2 swooshes match 2 moving rows; copy, data and audio verified. Minor items only, see qa.md."
+    },
+    {
+      "at": "2026-10-17T22:30:34+05:30",
+      "agent": "composer",
+      "action": "scored piece: music bed drift, gain -12 dB, duck 4 dB, beat sync on; status unchanged (qa-passed)",
+      "note": "Music: drift 60 BPM, -12 dB, duck 4, sync on. 48 cues in 43 s (~67/min, dense) so a drumless bed. All 8 beds stretch s5-reduce (FlowGraph 6 pops + 9 edges do not fit 6 s on any beat grid); drift/rain give the smallest total (s5 6->7 s, 43 s). Visual-director: please set s5-reduce duration_sec to 7 so this is planned rather than auto-stretched. Needs re-render and re-QA (music/beat sync changes timing)."
     }
   ],
   "sources": [
@@ -630,5 +636,12 @@
       "expected_output": "customer_id | total\nA | 21\nB | 32\nC | 23",
       "verified": true
     }
-  ]
+  ],
+  "music": {
+    "bed": "drift",
+    "gain_db": -12,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense piece (~67 cues/min): drift is a sparse drumless drone with rare bells that stays under the swooshes. At 60 BPM every scene starts on a whole second and only s5 needs 1 s more for its 9 edges (43 s total, within 45 s)."
+  }
 }
