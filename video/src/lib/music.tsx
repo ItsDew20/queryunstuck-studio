@@ -2,7 +2,7 @@
 // played under the whole video, ducked under each sound effect. Its tempo defines the beat grid
 // that scene changes and steps snap to, so effects land on the beat by construction.
 import React from "react";
-import { Html5Audio, staticFile } from "remotion";
+import { Html5Audio, Sequence, staticFile } from "remotion";
 import { brand } from "../brand";
 import manifest from "../../public/music/manifest.json";
 import type { Cue } from "./sfx";
@@ -10,6 +10,8 @@ import type { Spec } from "../types";
 
 export interface MusicSettings {
   bed: string;
+  /** Exact-length track for this piece (public/music/pieces/<id>.wav), if rendered. */
+  track?: string;
   bpm: number;
   gainDb: number;
   duckDb: number;
@@ -17,6 +19,8 @@ export interface MusicSettings {
 }
 
 type BedInfo = { bpm: number; beats_per_bar: number; seconds: number };
+
+export const bedLoopSeconds = (bed: string): number => (manifest as Record<string, BedInfo>)[bed]?.seconds ?? 0;
 
 /** Resolved music settings for a spec, or null when the piece has no (known) bed. */
 export const musicFor = (spec: Spec): MusicSettings | null => {
@@ -26,6 +30,7 @@ export const musicFor = (spec: Spec): MusicSettings | null => {
   if (!info) return null;
   return {
     bed: m.bed,
+    track: m.track,
     bpm: info.bpm,
     gainDb: m.gain_db ?? brand.audio.musicGainDb,
     duckDb: m.duck_db ?? brand.audio.duckDb,
@@ -70,11 +75,23 @@ export const MusicTrack: React.FC<{ music: MusicSettings; cues: Cue[]; total: nu
   fps,
 }) => {
   const vols = musicVolumes(music, cues, total, fps);
+  const at = (f: number) => vols[Math.max(0, Math.min(total - 1, f))];
+  if (music.track) {
+    // Preferred: one track rendered at exactly the video's length, ending on a resolving chord.
+    return <Html5Audio src={staticFile(`music/${music.track}`)} volume={(f) => at(f)} />;
+  }
+  // Fallback: lay copies of the seamless loop end to end. Each copy's volume uses composition
+  // frames (copy start + local frame), so fades never restart at a loop point.
+  const loopFrames = Math.round(bedLoopSeconds(music.bed) * fps);
+  if (loopFrames <= 0) return null;
+  const copies = Math.ceil(total / loopFrames);
   return (
-    <Html5Audio
-      src={staticFile(`music/${music.bed}.wav`)}
-      loop
-      volume={(f) => vols[Math.max(0, Math.min(total - 1, f))]}
-    />
+    <>
+      {Array.from({ length: copies }, (_, k) => (
+        <Sequence key={k} from={k * loopFrames} durationInFrames={Math.min(loopFrames, total - k * loopFrames)} layout="none">
+          <Html5Audio src={staticFile(`music/${music.bed}.wav`)} volume={(f) => at(k * loopFrames + f)} />
+        </Sequence>
+      ))}
+    </>
   );
 };

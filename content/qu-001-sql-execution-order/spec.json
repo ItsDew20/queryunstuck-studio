@@ -669,6 +669,7 @@
     "gain_db": -11,
     "duck_db": 4,
     "sync": true,
-    "rationale": "Dense SFX (~55 cues/min) needs a sparse bed without drums. Drift (60 BPM ambient drone, rare bells) stays out of the way of notes/dings, and its 0.5 s grid keeps every scene at or above its QA-passed length (41.0 s, none stretched, no off-beat cues)."
+    "rationale": "Dense SFX (~55 cues/min) needs a sparse bed without drums. Drift (60 BPM ambient drone, rare bells) stays out of the way of notes/dings, and its 0.5 s grid keeps every scene at or above its QA-passed length (41.0 s, none stretched, no off-beat cues).",
+    "track": "pieces/qu-001.wav"
   }
 }

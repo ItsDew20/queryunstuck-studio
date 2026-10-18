@@ -262,6 +262,11 @@
         "rationale": {
           "type": "string",
           "maxLength": 300
+        },
+        "track": {
+          "type": "string",
+          "pattern": "^pieces/[a-z0-9-]+\\.wav$",
+          "description": "Exact-length track rendered by video/scripts/render_music.py (git-ignored, regenerable)"
         }
       }
     },

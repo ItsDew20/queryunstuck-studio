@@ -642,6 +642,7 @@
     "gain_db": -12,
     "duck_db": 4,
     "sync": true,
-    "rationale": "Dense piece (~67 cues/min): drift is a sparse drumless drone with rare bells that stays under the swooshes. At 60 BPM every scene starts on a whole second and only s5 needs 1 s more for its 9 edges (43 s total, within 45 s)."
+    "rationale": "Dense piece (~67 cues/min): drift is a sparse drumless drone with rare bells that stays under the swooshes. At 60 BPM every scene starts on a whole second and only s5 needs 1 s more for its 9 edges (43 s total, within 45 s).",
+    "track": "pieces/qu-002.wav"
   }
 }

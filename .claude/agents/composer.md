@@ -29,7 +29,11 @@ music section of `video/src/components/README.md`.
    total must stay within the format limits (reel-animated 25-45 s, reel-list 15-30 s). If a busy
    scene stretches, try another bed tempo first; if no bed fits, ask the visual-director (via
    history note) to reduce simultaneous movers, or set `sync: false` for that piece as a last resort.
-4. Set `music` in spec.json: `{bed, gain_db, duck_db, sync, rationale}`. Defaults (`gain_db` -10,
+4. Set `music` in spec.json: `{bed, gain_db, duck_db, sync, rationale}`, then render the piece's own
+   track at exactly the video length (tiles the bed and ends on a resolving chord on the last
+   downbeat): `cd video && ../.venv/bin/python scripts/render_music.py ../content/<id>/spec.json`
+   (sets `music.track`). Never rely on looping: every video gets a track of its own length.
+   `gain_db`, `duck_db` defaults Defaults (`gain_db` -10,
    `duck_db` 4) are the house level; only go quieter for dense pieces (down to -14) or slightly
    louder for very sparse ones (up to -8). Never louder than -8.
 5. If no existing bed fits, you may add a new mood to `video/scripts/gen_music.py` (original

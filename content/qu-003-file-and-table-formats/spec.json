@@ -349,6 +349,7 @@
     "gain_db": -12,
     "duck_db": 4,
     "sync": true,
-    "rationale": "Dense list (47 cues/min), so a drum-free pad bed sits under the rising notes. At 66 BPM item reveals land 0.9-1.4 s apart, the most even spacing tested, so each card reads without rush. -12 dB keeps it just audible."
+    "rationale": "Dense list (47 cues/min), so a drum-free pad bed sits under the rising notes. At 66 BPM item reveals land 0.9-1.4 s apart, the most even spacing tested, so each card reads without rush. -12 dB keeps it just audible.",
+    "track": "pieces/qu-003.wav"
   }
 }
