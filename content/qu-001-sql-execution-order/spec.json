@@ -93,6 +93,18 @@
       "agent": "composer",
       "action": "scored piece: music bed drift, gain -11 dB, duck 4 dB, beat sync on; status unchanged (qa-passed)",
       "note": "Compared study (72 BPM, 37.5 s, shortens s3-s6 and s9), calm (66 BPM, 39.1 s, shortens hook s1 to 2.73 s), focus (78 BPM, 40.0 s, drums), drift/rain (60 BPM, 41.0 s): none stretched, no off-beat cues. 35 cues/38.5 s = ~55 cues/min (dense) -> no-drum bed, gain -11. Drift chosen: every scene >= original length, clean 0.5 s step grid, no rain noise over the SFX. Needs re-render and re-QA (music/beat sync changes timing)."
+    },
+    {
+      "at": "2026-10-19T11:32:04+05:30",
+      "agent": "renderer",
+      "action": "re-render with music (drift) + beat sync; timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 61.5s, file 4.8 MB. Duration 41.0s (drift bed at 60 BPM, all scenes beat-aligned, none stretched, within 25-45s limit). H.264 1080x1920 30fps + AAC (mean -29.4 dB, max -10.2 dB). 9 caption cues, all validated (no overlaps, min 1.0s, max 2 lines, entirely within scene windows). Thumbnail frame 60 (2.0s into s1), both hook text lines fully visible."
+    },
+    {
+      "at": "2026-10-19T11:36:14+05:30",
+      "agent": "qa-reviewer",
+      "action": "re-QA after music bed + beat sync (41.0 s); qa.md rewritten; QA: PASS; status qa-passed",
+      "note": "Captions verified programmatically; no music dips; clean fade ending; nothing off-beat; s7->s8 seamless; only minor polish items remain."
     }
   ],
   "sources": [
@@ -657,7 +669,7 @@
   ],
   "render": {
     "reel_url": "https://media.queryunstuck.in/qu-001/reel.mp4",
-    "duration_sec": 38.5,
+    "duration_sec": 41,
     "srt_path": "captions.srt"
   },
   "thumbnail": {
