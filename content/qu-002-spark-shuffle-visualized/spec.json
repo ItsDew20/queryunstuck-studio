@@ -4,7 +4,7 @@
   "title": "How a Spark Shuffle Works, Visualized",
   "format": "reel-animated",
   "pillar": "data-engineering",
-  "status": "qa-passed",
+  "status": "copy-ready",
   "audience_level": "intermediate",
   "hook": "Slow JOIN or GROUP BY? Check the shuffle.",
   "hook_options": [
@@ -132,6 +132,12 @@
       "agent": "qa-reviewer",
       "action": "qa passed",
       "note": "QA: PASS. Captions blocker resolved (make_captions.py: 15 cues, 24/24 lines verified against timeline, public file identical). Music bed/ducking/fade, beat sync, 43.0 s length, copy, data, public video size all verified. Minor items only, see qa.md."
+    },
+    {
+      "at": "2026-10-19T11:35:41+05:30",
+      "agent": "copywriter",
+      "action": "copy written",
+      "note": "caption.md (Instagram) and youtube.md (Short, #shorts in title 1 and description). Wording limited to factcheck.md PASS text; hash(key) mod N labelled illustrative; no broadcast/AQE claims beyond sources."
     }
   ],
   "sources": [
