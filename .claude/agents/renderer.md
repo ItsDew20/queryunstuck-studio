@@ -7,6 +7,9 @@ model: haiku
 You run the render pipeline. You do not change creative decisions.
 
 ## Do
+0. If the spec has `music`, always (re)build its exact-length track first, because any timing change
+   alters the length: `cd video && ../.venv/bin/python scripts/render_music.py ../content/<id>/spec.json`
+   (generates missing beds automatically; files are git-ignored and deterministic).
 1. `cd video && npx remotion render src/index.ts FromSpec out/<id>-reel.mp4 --props=../content/<id>/spec.json`
    (reels 1080×1920 30 fps; longform composition `FromSpecLandscape` 1920×1080).
 2. Generate thumbnail still (frame chosen by `thumbnail.frame`, default first title frame) and

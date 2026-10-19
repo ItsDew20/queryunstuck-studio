@@ -1,2 +1,13 @@
 # Filled by content-strategist. One entry per week.
-weeks: []
+weeks:
+  - week_of: "2026-10-19"
+    week_end: "2026-10-25"
+    timezone: "Asia/Kolkata"
+    longform_week: true
+    notes: "No analytics reports yet; planned from backlog/topics.yaml only. Reels: 2 reel-animated, 2 reel-list, 2 of 4 on data-engineering."
+    pieces:
+      - {id: qu-001, format: reel-animated, pillar: data-analysis, title: "SQL Query Execution Order, Visualized", scheduled_for: "2026-10-20T19:00:00+05:30"}
+      - {id: qu-002, format: reel-animated, pillar: data-engineering, title: "How a Spark Shuffle Works, Visualized", scheduled_for: "2026-10-22T19:00:00+05:30"}
+      - {id: qu-005, format: longform, pillar: data-system-design, title: "Designing a Clickstream Analytics Pipeline, End to End", scheduled_for: "2026-10-24T11:00:00+05:30"}
+      - {id: qu-003, format: reel-list, pillar: data-engineering, title: "10 Must-Know File & Table Formats (CSV to Iceberg)", scheduled_for: "2026-10-24T19:00:00+05:30"}
+      - {id: qu-004, format: reel-list, pillar: ai-ml, title: "15 Must-Know AI/LLM Concepts for Data Engineers", scheduled_for: "2026-10-25T19:00:00+05:30"}

@@ -94,7 +94,7 @@
   },
   "audio": {
     "sfxEnabled": true,
-    "sfxVolume": 0.6,
+    "sfxVolume": 0.8,
     "dedupeMs": 150,
     "mix": {
       "whoosh": 0.3,
@@ -118,6 +118,11 @@
     "minGapMs": {
       "swoosh": 450
     },
-    "maxStretch": 1.5
+    "maxStretch": 1.5,
+    "musicEnabled": true,
+    "musicGainDb": -10,
+    "duckDb": 4,
+    "musicFadeInSec": 0.8,
+    "musicFadeOutSec": 1.5
   }
 }

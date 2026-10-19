@@ -41,6 +41,7 @@ Any agent may set `blocked` with a reason in `history[]`.
 | script | scriptwriter | `script.md`, `scenes[]` (text), `code_blocks[]` |
 | verify | fact-checker | `factcheck.md` (must end with `VERDICT: PASS` or `VERDICT: FAIL`) |
 | storyboard | visual-director | `scenes[].component` + `props` |
+| score | composer | `music` (original bed, level, beat sync); status stays `storyboarded` |
 | animate | animator | composition in `video/src/compositions/` (only if new layout needed) |
 | render | renderer | `render.reel_url` / `render.longform_url`, `thumbnail` |
 | qa | qa-reviewer | `qa.md` (must end with `QA: PASS` or `QA: FAIL`) |

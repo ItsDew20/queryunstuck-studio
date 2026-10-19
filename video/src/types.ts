@@ -49,5 +49,6 @@ export interface Spec {
   history: unknown[];
   scenes?: Scene[];
   code_blocks?: CodeBlock[];
+  music?: { bed: string; gain_db?: number; duck_db?: number; sync?: boolean; rationale?: string; track?: string };
   [key: string]: unknown;
 }

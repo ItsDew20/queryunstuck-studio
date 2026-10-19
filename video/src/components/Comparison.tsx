@@ -1,7 +1,7 @@
 import React from "react";
 import { alpha, colors, semantic } from "../brand";
 import { fonts } from "../fonts";
-import { enter, progress, stepStarts } from "../lib/anim";
+import { enter, progress, stepStarts, type Grid } from "../lib/anim";
 import { useScene } from "../lib/scene";
 import { Card, Fill, useScale } from "../lib/ui";
 import type { CueFn } from "../lib/sfx";
@@ -23,14 +23,14 @@ export interface ComparisonProps {
 const toneColor = (t?: ComparisonSide["tone"]) => (t ? semantic[t] : colors.border);
 
 /** Point i of both columns appears at starts[i]; the verdict at starts[n]. */
-export const comparisonStarts = (n: number, hasVerdict: boolean, fps: number, durationInFrames: number) =>
-  stepStarts(Array.from({ length: n + (hasVerdict ? 1 : 0) }, () => ({})), fps, durationInFrames, 0.5, 1.2);
+export const comparisonStarts = (n: number, hasVerdict: boolean, fps: number, durationInFrames: number, grid?: Grid) =>
+  stepStarts(Array.from({ length: n + (hasVerdict ? 1 : 0) }, () => ({})), fps, durationInFrames, 0.5, 1.2, grid);
 
 export const Comparison: React.FC<ComparisonProps> = ({ left, right, verdict }) => {
-  const { frame, fps, durationInFrames } = useScene();
+  const { frame, fps, durationInFrames, grid } = useScene();
   const s = useScale();
   const n = Math.max(left.points.length, right.points.length);
-  const starts = comparisonStarts(n, !!verdict, fps, durationInFrames);
+  const starts = comparisonStarts(n, !!verdict, fps, durationInFrames, grid);
   const column = (side: ComparisonSide, dir: number) => {
     const c = toneColor(side.tone);
     return (
@@ -99,9 +99,9 @@ export const Comparison: React.FC<ComparisonProps> = ({ left, right, verdict }) 
   );
 };
 
-export const comparisonCues: CueFn<ComparisonProps> = ({ left, right, verdict }, { fps, durationInFrames }) => {
+export const comparisonCues: CueFn<ComparisonProps> = ({ left, right, verdict }, { fps, durationInFrames, grid }) => {
   const n = Math.max(left.points.length, right.points.length);
-  const starts = comparisonStarts(n, !!verdict, fps, durationInFrames);
+  const starts = comparisonStarts(n, !!verdict, fps, durationInFrames, grid);
   return [
     { frame: 0, sound: "slide" as const },
     ...starts.slice(0, n).map((f) => ({ frame: f, sound: "tick" as const })),
