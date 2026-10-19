@@ -27,42 +27,42 @@ target = hash(key) mod N
 Illustrative: A→R0, B→R1, C→R2
 
 7
-00:00:19,000 --> 00:00:22,000
+00:00:19,000 --> 00:00:22,500
 Reduce side: fetch your blocks
 Each task pulls its blocks from the map outputs
 
 8
-00:00:22,000 --> 00:00:25,000
+00:00:22,500 --> 00:00:26,000
 Often over the network
 
 9
-00:00:25,000 --> 00:00:29,000
+00:00:26,000 --> 00:00:30,000
 Now each key is in one place
 A = 21 · B = 32 · C = 23
 
 10
-00:00:29,000 --> 00:00:31,500
+00:00:30,000 --> 00:00:32,500
 Why it's expensive:
 disk I/O + serialization + network I/O
 
 11
-00:00:31,500 --> 00:00:34,000
+00:00:32,500 --> 00:00:35,000
 Spills add more disk and GC
 
 12
-00:00:34,000 --> 00:00:36,500
+00:00:35,000 --> 00:00:37,500
 Small side? Broadcast it (auto ≤ 10 MB by default)
 AQE merges small shuffle partitions
 
 13
-00:00:36,500 --> 00:00:39,000
+00:00:37,500 --> 00:00:40,000
 AQE splits skewed join partitions
 
 14
-00:00:39,000 --> 00:00:40,500
+00:00:40,000 --> 00:00:41,500
 Shuffle = rows regrouped across partitions
 usually across machines
 
 15
-00:00:40,500 --> 00:00:42,000
+00:00:41,500 --> 00:00:43,000
 Save this for your next interview
