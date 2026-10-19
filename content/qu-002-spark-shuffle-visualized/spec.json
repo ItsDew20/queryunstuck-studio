@@ -1,0 +1,678 @@
+{
+  "id": "qu-002",
+  "slug": "spark-shuffle-visualized",
+  "title": "How a Spark Shuffle Works, Visualized",
+  "format": "reel-animated",
+  "pillar": "data-engineering",
+  "status": "in-review",
+  "audience_level": "intermediate",
+  "hook": "Slow JOIN or GROUP BY? Check the shuffle.",
+  "hook_options": [
+    "Slow JOIN or GROUP BY? Check the shuffle.",
+    "Your JOIN isn't slow. Your shuffle is.",
+    "One groupBy, and every row in your cluster changes machines.",
+    "What actually happens between Spark stages? Watch the rows move."
+  ],
+  "target_duration_sec": 40,
+  "scheduled_for": "2026-10-22T19:00:00+05:30",
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-002/reel.mp4",
+    "duration_sec": 43,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-002/thumbnail.png"
+  },
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic 'How a Spark shuffle works' (data-engineering, animated). Chosen because it animates as partitions moving between executors (PartitionGrid + FlowGraph) and is a common interview question. Thu reel slot."
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "researched",
+      "note": "research.md + 9 primary sources (Spark 4.2.0 docs). UNVERIFIED: DISTINCT/ORDER BY triggering shuffle not on fetched pages; DataFrame coalesce behavior; filter/project early is advice. Hook defensible for shuffle joins only; broadcast joins avoid shuffling the large side."
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "scripted",
+      "note": "script.md + 9 scenes (42 s) + 1 DuckDB code block. Hook scoped to \"Slow JOIN? Often, it's the shuffle.\" (broadcast joins avoid shuffling the large side). Left out UNVERIFIED items: DISTINCT/ORDER BY shuffles, coalesce behaviour, map-side partial aggregation, narrow/wide stage-boundary framing. Hash assignments shown as illustrative only. No Spark-only code block."
+    },
+    {
+      "at": "2026-10-17T15:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check failed",
+      "note": "VERDICT: FAIL. Code block 0 verified in DuckDB (A 21, B 32, C 23). Required fixes: s5 'every map file' and 'Over the network' overgeneralised (zero-size blocks skipped, local blocks read locally, AQE readers read subsets); s9 'regrouped by key, across machines' overgeneralised (repartition is not by key; machines only typically); s8 '< 10 MB' should be '<= 10 MB' by estimated size, default; s2 'Rows get copied between executors' needs 'usually'; hook 'Often, it's the shuffle' is an unsourced frequency claim and spec.hook differs from s1 text. Added 4 primary Spark v4.2.0 source-code sources (HashPartitioner, HashPartitioning, canBroadcastBySize, ShuffleBlockFetcherIterator). Status left at scripted. See factcheck.md."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "Applied factcheck.md fixes 1-7: hook/s1 -> 'Slow JOIN or GROUP BY? Check the shuffle.' (spec.hook matches); s2 'Usually copied across executors and machines'; s5 'Each task pulls its blocks from the map outputs' + 'Often over the network'; s8 'auto ≤ 10 MB by default'; s9 'regrouped across partitions, usually across machines'. script.md narration updated. sources[] and verified untouched. Duration unchanged at 42 s."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "fact-checked",
+      "note": "VERDICT: PASS (pass 2 after loop 1). All 7 loop-1 fixes confirmed against Spark 4.2.0 docs/source; s2 'Usually copied across executors and machines' matches RDD guide 'typically'. Narration and beats re-checked, no new unsupported claims. Code block 0 re-verified in DuckDB (A 21, B 32, C 23). Status -> fact-checked."
+    },
+    {
+      "at": "2026-10-17T19:02:44+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "Components assigned for all 9 scenes. s1 TitleCard; s2-s4 PartitionGrid (s4 labelled illustrative); s5 FlowGraph (map outputs to reduce tasks); s6 DataTable with code highlight; s7 Callout; s8 ListCard; s9 EndCard. Machine boxes from beats not expressible in PartitionGrid."
+    },
+    {
+      "at": "2026-10-17T19:05:50+05:30",
+      "agent": "visual-director",
+      "action": "re-checked stills after engine fix",
+      "note": "Re-rendered all 9 stills with 3-line title zones; no collisions or clipping. s5 FlowGraph unobstructed. s7 Callout changed to avoid repeating the now-visible third title line (text only; on_screen_text untouched). Status stays storyboarded."
+    },
+    {
+      "at": "2026-10-17T19:30:00+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Rendered in 49.4 seconds. Duration 47.5 s (stretched: s2-define 5→7.5s, s4-map 6→9s). File size 5.8 MB, H.264 1080x1920 30fps + AAC. All checks passed."
+    },
+    {
+      "at": "2026-10-17T19:13:05+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa failed",
+      "note": "QA: FAIL. Blockers: (1) 47.5 s exceeds 45 s max (s2 5->7.5, s4 6->9 auto-stretch); fix: s2 items 9->3 (B·20 0->2, A·7 stay, C·6 2->0) keeps s2 at 5 s, total 45.0 s; moveAt does not help (span fixed 35%). (2) captions.srt overflow lines placed in the wrong scene; regenerate. Minors in qa.md. Status stays rendered."
+    },
+    {
+      "at": "2026-10-17T19:15:39+05:30",
+      "agent": "visual-director",
+      "action": "storyboard fixes after QA loop 1",
+      "note": "s4 moveSpan 0.6 (6 crossings) to avoid auto-stretch; neutral R0/R1/R2 headers, key mapping in afterLabel, illustrative kept. s8 ListCard items now exactly on_screen_text. s9 headline = the two spec lines joined by a space (EndCard collapses newlines, no subline prop). Status back to storyboarded for re-render."
+    },
+    {
+      "at": "2026-10-17T19:16:26+05:30",
+      "agent": "orchestrator",
+      "action": "s9 EndCard headline split into its two on-screen lines",
+      "note": "EndCard now honours \\n (pre-line); text unchanged, no added punctuation."
+    },
+    {
+      "at": "2026-10-17T19:19:07+05:30",
+      "agent": "renderer",
+      "action": "re-rendered after QA loop 1",
+      "note": "Render time: 35s. Duration 42s (no stretching; all scenes fit). s2-s9 changes applied: s4 moveSpan 0.6 (6 crossings), s8/s9 props updated. Captions regenerated (15 cues, all rules pass). H.264 1080x1920 30fps + AAC, 5.7 MB. All checks passed."
+    },
+    {
+      "at": "2026-10-17T19:20:36+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa passed",
+      "note": "QA: PASS on loop 1 re-render. 42.0 s (no stretch); captions verified programmatically against timeline; s2 swooshes match 2 moving rows; copy, data and audio verified. Minor items only, see qa.md."
+    },
+    {
+      "at": "2026-10-17T22:30:34+05:30",
+      "agent": "composer",
+      "action": "scored piece: music bed drift, gain -12 dB, duck 4 dB, beat sync on; status unchanged (qa-passed)",
+      "note": "Music: drift 60 BPM, -12 dB, duck 4, sync on. 48 cues in 43 s (~67/min, dense) so a drumless bed. All 8 beds stretch s5-reduce (FlowGraph 6 pops + 9 edges do not fit 6 s on any beat grid); drift/rain give the smallest total (s5 6->7 s, 43 s). Visual-director: please set s5-reduce duration_sec to 7 so this is planned rather than auto-stretched. Needs re-render and re-QA (music/beat sync changes timing)."
+    },
+    {
+      "at": "2026-10-19T11:31:31+05:30",
+      "agent": "renderer",
+      "action": "re-rendered",
+      "note": "Re-render with music (drift) + beat sync. Render time: 65.2 s. Duration: 43 s (s5-reduce stretched from 6 to 7 s by beat sync, as planned). File size: 5.8 MB, H.264 1080x1920 30fps + AAC. All checks passed."
+    },
+    {
+      "at": "2026-10-19T11:33:58+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa failed",
+      "note": "QA: FAIL on music + beat-sync render (43.0 s). Blocker: captions.srt has 9 cues and drops the 3rd on_screen_text line of s3, s4, s5, s7, s8, s9; renderer must split 3-line scenes into two sequential cues. Music (bed under effects, ducking, clean fade-out, no dips), beat sync (only pop/tick off-beat), length, copy, data and public size all pass. Status reset to rendered."
+    },
+    {
+      "at": "2026-10-19T11:34:43+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa passed",
+      "note": "QA: PASS. Captions blocker resolved (make_captions.py: 15 cues, 24/24 lines verified against timeline, public file identical). Music bed/ducking/fade, beat sync, 43.0 s length, copy, data, public video size all verified. Minor items only, see qa.md."
+    },
+    {
+      "at": "2026-10-19T11:35:41+05:30",
+      "agent": "copywriter",
+      "action": "copy written",
+      "note": "caption.md (Instagram) and youtube.md (Short, #shorts in title 1 and description). Wording limited to factcheck.md PASS text; hash(key) mod N labelled illustrative; no broadcast/AQE claims beyond sources."
+    },
+    {
+      "at": "2026-10-19T11:37:20+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-002"
+    }
+  ],
+  "sources": [
+    {
+      "claim": "Shuffle is Spark's mechanism for re-distributing data grouped differently across partitions; copies data across executors/machines (Spark 4.2.0 docs)",
+      "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html#shuffle-operations",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Map tasks organize data, reduce tasks aggregate; map results held in memory, sorted by target partition and written to a single file; reduce tasks read relevant sorted blocks",
+      "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html#shuffle-operations",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Operations that can cause shuffle: repartition/coalesce, ByKey ops (except counting), joins (join, cogroup)",
+      "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html#shuffle-operations",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Shuffle is expensive: disk I/O, data serialization, network I/O; spills to disk add I/O and GC; intermediate shuffle files kept on disk (spark.local.dir)",
+      "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html#shuffle-operations",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "BROADCAST hint syntax (SQL and DataFrame) and spark.sql.autoBroadcastJoinThreshold default 10485760 (10 MB), -1 disables",
+      "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "spark.sql.shuffle.partitions default 200 (number of partitions when shuffling for joins or aggregations)",
+      "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "AQE: spark.sql.adaptive.enabled default true; coalescePartitions.enabled default true; advisoryPartitionSizeInBytes 64 MB",
+      "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "AQE skew join: skewJoin.enabled default true; splits (and replicates if needed) skewed partitions in sort-merge join",
+      "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "AQE converts sort-merge join to broadcast hash join when runtime stats of a join side are below the threshold",
+      "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "RDD HashPartitioner: getPartition = Utils.nonNegativeMod(key.hashCode, numPartitions) (Spark v4.2.0 source)",
+      "url": "https://github.com/apache/spark/blob/v4.2.0/core/src/main/scala/org/apache/spark/Partitioner.scala",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Spark SQL HashPartitioning: partitionIdExpression = Pmod(Murmur3Hash(expressions), numPartitions); rows with equal key values go to the same partition (Spark v4.2.0 source)",
+      "url": "https://github.com/apache/spark/blob/v4.2.0/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/plans/physical/partitioning.scala",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "canBroadcastBySize: plan.stats.sizeInBytes >= 0 && sizeInBytes <= autoBroadcastJoinThreshold (inclusive, based on size statistics/estimates; adaptive threshold for runtime stats) (Spark v4.2.0 source)",
+      "url": "https://github.com/apache/spark/blob/v4.2.0/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/optimizer/joins.scala",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "ShuffleBlockFetcherIterator: local and host-local blocks are read without a remote fetch; zero-sized blocks are excluded from fetching (Spark v4.2.0 source)",
+      "url": "https://github.com/apache/spark/blob/v4.2.0/core/src/main/scala/org/apache/spark/storage/ShuffleBlockFetcherIterator.scala",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1-hook",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "Slow JOIN or GROUP BY?",
+        "Check the shuffle."
+      ],
+      "beat": "Payoff in first 1.5 s: point at the shuffle as the thing to check. Rows on a grid start to jitter between partitions.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Slow JOIN or GROUP BY?",
+        "subtitle": "Check the shuffle.",
+        "highlight": [
+          "shuffle"
+        ]
+      }
+    },
+    {
+      "id": "s2-define",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "Shuffle = regroup data across partitions",
+        "Usually copied across executors and machines"
+      ],
+      "beat": "Definition. Rows in 3 partitions on 2 machine boxes; a few rows lift and cross the gap.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0",
+          "P1",
+          "P2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "C·5",
+            "from": 0
+          },
+          {
+            "label": "A·7",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "C·12",
+            "from": 1
+          },
+          {
+            "label": "B·3",
+            "from": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2
+          },
+          {
+            "label": "A·4",
+            "from": 2
+          },
+          {
+            "label": "C·6",
+            "from": 2,
+            "to": 0
+          }
+        ],
+        "beforeLabel": "Rows in 3 partitions",
+        "afterLabel": "Some rows cross to other partitions"
+      }
+    },
+    {
+      "id": "s3-setup",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "9 orders, 3 partitions",
+        "GROUP BY customer_id",
+        "All A rows must meet"
+      ],
+      "beat": "Show P0/P1/P2 with the 9 orders; A, B, C scattered in every partition. SQL panel shows code_blocks[0].",
+      "code_block": 0,
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0",
+          "P1",
+          "P2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0
+          },
+          {
+            "label": "C·5",
+            "from": 0
+          },
+          {
+            "label": "A·7",
+            "from": 1
+          },
+          {
+            "label": "C·12",
+            "from": 1
+          },
+          {
+            "label": "B·3",
+            "from": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2
+          },
+          {
+            "label": "A·4",
+            "from": 2
+          },
+          {
+            "label": "C·6",
+            "from": 2
+          }
+        ],
+        "beforeLabel": "Customer · amount",
+        "moveAt": 60,
+        "codeHighlight": {
+          "activeLines": [
+            3
+          ]
+        }
+      }
+    },
+    {
+      "id": "s4-map",
+      "duration_sec": 6,
+      "on_screen_text": [
+        "Map side: route rows by key",
+        "target = hash(key) mod N",
+        "Illustrative: A→R0, B→R1, C→R2"
+      ],
+      "beat": "Each map task tags each row with a target partition, sorts by target and writes one file. Assignments are illustrative, no real hash values.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "R0",
+          "R1",
+          "R2"
+        ],
+        "items": [
+          {
+            "label": "A·10",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "B·20",
+            "from": 0,
+            "to": 1
+          },
+          {
+            "label": "C·5",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "A·7",
+            "from": 1,
+            "to": 0
+          },
+          {
+            "label": "C·12",
+            "from": 1,
+            "to": 2
+          },
+          {
+            "label": "B·3",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "B·9",
+            "from": 2,
+            "to": 1
+          },
+          {
+            "label": "A·4",
+            "from": 2,
+            "to": 0
+          },
+          {
+            "label": "C·6",
+            "from": 2,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Illustrative: map tasks tag each row with a target",
+        "afterLabel": "Illustrative: A→R0, B→R1, C→R2",
+        "colorByDestination": true,
+        "moveSpan": 0.6
+      }
+    },
+    {
+      "id": "s5-reduce",
+      "duration_sec": 6,
+      "on_screen_text": [
+        "Reduce side: fetch your blocks",
+        "Each task pulls its blocks from the map outputs",
+        "Often over the network"
+      ],
+      "beat": "R0 pulls all A rows from P0, P1, P2; R1 pulls B; R2 pulls C. Arrows fan in across machines.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "p0",
+            "label": "P0",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.12
+          },
+          {
+            "id": "p1",
+            "label": "P1",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.5
+          },
+          {
+            "id": "p2",
+            "label": "P2",
+            "sublabel": "map output",
+            "x": 0.14,
+            "y": 0.88
+          },
+          {
+            "id": "r0",
+            "label": "R0",
+            "sublabel": "pulls A",
+            "x": 0.86,
+            "y": 0.12,
+            "tone": "active"
+          },
+          {
+            "id": "r1",
+            "label": "R1",
+            "sublabel": "pulls B",
+            "x": 0.86,
+            "y": 0.5,
+            "tone": "active"
+          },
+          {
+            "id": "r2",
+            "label": "R2",
+            "sublabel": "pulls C",
+            "x": 0.86,
+            "y": 0.88,
+            "tone": "active"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p0",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p1",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p2",
+            "to": "r0",
+            "dots": 1,
+            "colorIndex": 0
+          },
+          {
+            "from": "p0",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p1",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p2",
+            "to": "r1",
+            "dots": 1,
+            "colorIndex": 1
+          },
+          {
+            "from": "p0",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          },
+          {
+            "from": "p1",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          },
+          {
+            "from": "p2",
+            "to": "r2",
+            "dots": 1,
+            "colorIndex": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "s6-result",
+      "duration_sec": 4,
+      "on_screen_text": [
+        "Now each key is in one place",
+        "A = 21 · B = 32 · C = 23"
+      ],
+      "beat": "Reduce partitions sum their rows; result table appears matching the SQL output.",
+      "code_block": 0,
+      "component": "DataTable",
+      "props": {
+        "columns": [
+          "customer_id",
+          "total"
+        ],
+        "rows": [
+          [
+            "A",
+            21
+          ],
+          [
+            "B",
+            32
+          ],
+          [
+            "C",
+            23
+          ]
+        ],
+        "title": "result",
+        "highlightCols": [
+          "total"
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                1,
+                2,
+                3
+              ],
+              "note": "SUM per key"
+            },
+            {
+              "lines": [
+                4
+              ],
+              "note": "ORDER BY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s7-cost",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "Why it's expensive:",
+        "disk I/O + serialization + network I/O",
+        "Spills add more disk and GC"
+      ],
+      "beat": "Three cost badges light up on the arrows from s5; a spill icon drops to disk.",
+      "component": "Callout",
+      "props": {
+        "text": "Intermediate shuffle files are kept on disk",
+        "tone": "warning",
+        "label": "Cost"
+      }
+    },
+    {
+      "id": "s8-fix",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "Small side? Broadcast it (auto ≤ 10 MB by default)",
+        "AQE merges small shuffle partitions",
+        "AQE splits skewed join partitions"
+      ],
+      "beat": "Broadcast: small table (by estimated size) copied to every executor, big side stays put. Then tiny partitions merge, one fat partition splits.",
+      "component": "ListCard",
+      "props": {
+        "title": "Fixes",
+        "items": [
+          "Small side? Broadcast it (auto ≤ 10 MB by default)",
+          "AQE merges small shuffle partitions",
+          "AQE splits skewed join partitions"
+        ]
+      }
+    },
+    {
+      "id": "s9-end",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "Shuffle = rows regrouped across partitions",
+        "usually across machines",
+        "Save this for your next interview"
+      ],
+      "beat": "One-line takeaway + save CTA. Watermark queryunstuck.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Shuffle = rows regrouped across partitions\nusually across machines",
+        "cta": "Save this for your next interview"
+      }
+    }
+  ],
+  "code_blocks": [
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE orders (order_id INTEGER, customer_id VARCHAR, amount INTEGER);\nINSERT INTO orders VALUES\n (1,'A',10),(2,'B',20),(3,'C',5),\n (4,'A',7),(5,'C',12),(6,'B',3),\n (7,'B',9),(8,'A',4),(9,'C',6);",
+      "code": "SELECT customer_id, SUM(amount) AS total\nFROM orders\nGROUP BY customer_id\nORDER BY customer_id;",
+      "expected_output": "customer_id | total\nA | 21\nB | 32\nC | 23",
+      "verified": true
+    }
+  ],
+  "music": {
+    "bed": "drift",
+    "gain_db": -12,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense piece (~67 cues/min): drift is a sparse drumless drone with rare bells that stays under the swooshes. At 60 BPM every scene starts on a whole second and only s5 needs 1 s more for its 9 edges (43 s total, within 45 s).",
+    "track": "pieces/qu-002.wav"
+  }
+}

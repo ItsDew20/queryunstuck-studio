@@ -1,0 +1,68 @@
+1
+00:00:00,000 --> 00:00:03,000
+Slow JOIN or GROUP BY?
+Check the shuffle.
+
+2
+00:00:03,000 --> 00:00:08,000
+Shuffle = regroup data across partitions
+Usually copied across executors and machines
+
+3
+00:00:08,000 --> 00:00:10,500
+9 orders, 3 partitions
+GROUP BY customer_id
+
+4
+00:00:10,500 --> 00:00:13,000
+All A rows must meet
+
+5
+00:00:13,000 --> 00:00:16,000
+Map side: route rows by key
+target = hash(key) mod N
+
+6
+00:00:16,000 --> 00:00:19,000
+Illustrative: A→R0, B→R1, C→R2
+
+7
+00:00:19,000 --> 00:00:22,500
+Reduce side: fetch your blocks
+Each task pulls its blocks from the map outputs
+
+8
+00:00:22,500 --> 00:00:26,000
+Often over the network
+
+9
+00:00:26,000 --> 00:00:30,000
+Now each key is in one place
+A = 21 · B = 32 · C = 23
+
+10
+00:00:30,000 --> 00:00:32,500
+Why it's expensive:
+disk I/O + serialization + network I/O
+
+11
+00:00:32,500 --> 00:00:35,000
+Spills add more disk and GC
+
+12
+00:00:35,000 --> 00:00:37,500
+Small side? Broadcast it (auto ≤ 10 MB by default)
+AQE merges small shuffle partitions
+
+13
+00:00:37,500 --> 00:00:40,000
+AQE splits skewed join partitions
+
+14
+00:00:40,000 --> 00:00:41,500
+Shuffle = rows regrouped across partitions
+usually across machines
+
+15
+00:00:41,500 --> 00:00:43,000
+Save this for your next interview
