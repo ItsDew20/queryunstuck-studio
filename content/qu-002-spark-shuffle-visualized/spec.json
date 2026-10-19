@@ -4,7 +4,7 @@
   "title": "How a Spark Shuffle Works, Visualized",
   "format": "reel-animated",
   "pillar": "data-engineering",
-  "status": "copy-ready",
+  "status": "in-review",
   "audience_level": "intermediate",
   "hook": "Slow JOIN or GROUP BY? Check the shuffle.",
   "hook_options": [
@@ -138,6 +138,12 @@
       "agent": "copywriter",
       "action": "copy written",
       "note": "caption.md (Instagram) and youtube.md (Short, #shorts in title 1 and description). Wording limited to factcheck.md PASS text; hash(key) mod N labelled illustrative; no broadcast/AQE claims beyond sources."
+    },
+    {
+      "at": "2026-10-19T11:37:20+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-002"
     }
   ],
   "sources": [
