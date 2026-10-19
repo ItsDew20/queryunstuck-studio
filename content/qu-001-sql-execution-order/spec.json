@@ -4,7 +4,7 @@
   "title": "SQL Query Execution Order, Visualized",
   "format": "reel-animated",
   "pillar": "data-analysis",
-  "status": "qa-passed",
+  "status": "in-review",
   "audience_level": "beginner",
   "hook_options": [
     "You write SELECT first. The database reads it almost last.",
@@ -105,6 +105,24 @@
       "agent": "qa-reviewer",
       "action": "re-QA after music bed + beat sync (41.0 s); qa.md rewritten; QA: PASS; status qa-passed",
       "note": "Captions verified programmatically; no music dips; clean fade ending; nothing off-beat; s7->s8 seamless; only minor polish items remain."
+    },
+    {
+      "at": "2026-10-19T11:36:56+05:30",
+      "agent": "copywriter",
+      "action": "caption.md and youtube.md written; status copy-ready",
+      "note": "Claims limited to factcheck.md PASS: logical order only, LIMIT/TOP scoped, only alias claim is ORDER BY can use SELECT alias."
+    },
+    {
+      "at": "2026-10-19T11:37:41+05:30",
+      "agent": "orchestrator",
+      "action": "copy fix",
+      "note": "YouTube title option 2 said SELECT 'Runs' after HAVING; fact-check requires logical framing. Now 'SQL Logical Order: Why SELECT Comes After HAVING'."
+    },
+    {
+      "at": "2026-10-19T11:37:53+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-001"
     }
   ],
   "sources": [
