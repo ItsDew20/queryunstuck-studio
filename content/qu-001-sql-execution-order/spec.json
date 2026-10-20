@@ -12,7 +12,7 @@
     "The order SQL actually runs your query in"
   ],
   "target_duration_sec": 35,
-  "scheduled_for": "2026-10-20T19:00:00+05:30",
+  "scheduled_for": "2026-10-21T11:00:00+05:30",
   "history": [
     {
       "at": "2026-10-03T12:00:00+05:30",
@@ -123,6 +123,12 @@
       "agent": "orchestrator",
       "action": "opened review PR",
       "note": "branch content/qu-001"
+    },
+    {
+      "at": "2026-10-20T21:35:35+05:30",
+      "agent": "orchestrator",
+      "action": "rescheduled",
+      "note": "2026-10-20T19:00:00+05:30 -> 2026-10-21T11:00:00+05:30 (missed Tue slot; owner request)"
     }
   ],
   "sources": [
