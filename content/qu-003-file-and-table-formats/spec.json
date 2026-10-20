@@ -1,0 +1,378 @@
+{
+  "id": "qu-003",
+  "slug": "file-and-table-formats",
+  "title": "10 Must-Know File & Table Formats (CSV to Iceberg)",
+  "format": "reel-list",
+  "pillar": "data-engineering",
+  "status": "in-review",
+  "audience_level": "beginner",
+  "hook": "Parquet is a file format. Iceberg is not. 10 formats, 25 seconds.",
+  "hook_options": [
+    "CSV to Iceberg: 10 formats every data engineer gets asked about.",
+    "Parquet is a file format. Iceberg is not. Here's the difference.",
+    "Save this before your next data engineering interview: 10 formats, one screen."
+  ],
+  "target_duration_sec": 25,
+  "scheduled_for": "2026-10-24T19:00:00+05:30",
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-003/reel.mp4",
+    "duration_sec": 25.467,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 45,
+    "url": "https://media.queryunstuck.in/qu-003/thumbnail.png"
+  },
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic '10 Must-Know File Formats & Table Formats (CSV to Iceberg)' (data-engineering, list). Fits a single dense ListCard cheat-sheet; full list to be repeated in caption. Sat reel slot."
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "research complete",
+      "note": "10 formats chosen (CSV, JSON, JSON Lines, Avro, Parquet, ORC, Arrow, Delta, Iceberg, Hudi); research.md + 12 primary sources."
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "script complete",
+      "note": "script.md + 6 scenes (25 s): hook, 3 ListCard groups (row-based 1-4, columnar/in-memory 5-7, table formats 8-10), file-vs-table distinction, end card. No code blocks. Hook switched to option 2 with '10 formats, 25 seconds.' Only sourced claims; researcher's UNVERIFIED items omitted."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check FAIL",
+      "note": "19 of 20 on-screen lines supported. Blocking: s3 'Arrow: columnar in memory, not storage' is overstated (Arrow FAQ: IPC file format / Feather v2 is on-disk). Replace with 'Arrow: columnar in memory, built for compute' and fix narration/beat. No code_blocks; run_snippet had nothing to execute. Status left at scripted. See factcheck.md."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "s3 Arrow line -> 'Arrow: columnar in memory, built for compute' (blocking; narration + beat updated). Parquet line -> 'built-in compression'. s2 narration -> 'Avro files, which embed their schema'. Hook/s1 -> '10 formats, 25 seconds.' Total still 25 s."
+    },
+    {
+      "at": "2026-10-17T17:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check PASS (pass 2)",
+      "note": "Loop 1 fixes confirmed: Arrow 'built for compute' (Arrow FAQ), Parquet 'built-in compression', Avro narration scoped to files, hook '10 formats, 25 seconds' (scenes sum to 25 s). All 20 on-screen lines supported; no new claims. No code_blocks. Non-blocking: hook_options[2] still says 'one screen'. Status -> fact-checked."
+    },
+    {
+      "at": "2026-10-17T19:02:36+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "TitleCard, 3 ListCards (numbers 1-10 in item text since ListCard cannot offset numbering; numbered=false), Comparison, EndCard."
+    },
+    {
+      "at": "2026-10-17T19:04:59+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Rendered in 22 seconds. Video: H.264 1080×1920 30fps, 25s, 2.87 MB. Audio: AAC 48kHz stereo. Duration matches target exactly. Thumbnail frame 45. Captions: 13 SRT cues with scene-based timing."
+    },
+    {
+      "at": "2026-10-17T19:07:07+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-passed",
+      "note": "QA PASS, no blockers; 7 minor issues in qa.md (small item description font ~34px, s3 heading hyphen wrap, first caption cue 0.667s, low loudness, s1 sparkle cluster). Public R2 file size matches local; peak -13.6 dB."
+    },
+    {
+      "at": "2026-10-17T22:30:02+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Bed calm (66 BPM, -12 dB, duck 4, sync on). 20 cues / 25.47 s = 47 cues/min (dense, so no drums). Compared study 72 (25.0 s, hook cut to 1.67 s, uneven s3), drift/rain 60 (25.0 s, 0.5 s gap between items 2 and 3), flow 88 (24.53 s, uneven s2), focus 78 (26.17 s, drums). calm keeps item gaps >= 0.9 s. No scene stretched; only pop/sparkle micro-sounds off-beat. Total 25.47 s (reel-list 15-30 s). Needs re-render and re-QA (music/beat sync changes timing)."
+    },
+    {
+      "at": "2026-10-19T11:40:22+05:30",
+      "agent": "renderer",
+      "action": "re-rendered with music + beat sync",
+      "note": "Music bed generated (calm, 25.467s). Video rendered with music: H.264 1080x1920 30fps, 25.467s, 2.8 MB. Audio: AAC 48kHz, peak -11.1 dB, mean -30.7 dB (audible music bed). Captions: 10 SRT cues, 19 lines, verified (min 1.83s cue duration). on_screen_text adjusted for s1 to group title lines. All files uploaded to R2 (reel.mp4, thumbnail.png frame 45, captions.srt)."
+    },
+    {
+      "at": "2026-10-20T21:28:44+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa passed (music + beat sync re-render)",
+      "note": "No blockers. Public reel/thumbnail/captions identical to local (hash/diff). 25.472 s H.264+AAC, peak -11.1 dBFS, music bed continuous under effects with clean fade. Captions verified (10 cues, in order, min 1.83 s). Minor: s3 heading hyphen break, subtitle orphan wraps, s5 title orphan, two close sparkles in hook. See qa.md."
+    },
+    {
+      "at": "2026-10-20T21:29:43+05:30",
+      "agent": "copywriter",
+      "action": "copy ready",
+      "note": "caption.md (993 chars, all 10 formats numbered, file vs table takeaway, 4+1 hashtags) and youtube.md (3 titles, #shorts, 13 tags, 13 distinct sources, website link). Fact-checked wording only; hook 'one screen' option not used."
+    },
+    {
+      "at": "2026-10-20T21:30:07+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-003"
+    }
+  ],
+  "sources": [
+    {
+      "claim": "CSV: RFC 4180 is Informational, not a standard; optional header, comma delimiter, double-quote quoting",
+      "url": "https://www.rfc-editor.org/rfc/rfc4180",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "JSON is a lightweight, text-based, language-independent data interchange format",
+      "url": "https://www.rfc-editor.org/rfc/rfc8259",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "JSON Lines: UTF-8, one JSON value per line, newline-separated",
+      "url": "https://jsonlines.org/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Avro container files embed a schema, binary encoding, compressible blocks; schema resolution lets newer schema read old data",
+      "url": "https://avro.apache.org/docs/current/specification/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Parquet is an open source, column-oriented data file format with compression and encoding schemes",
+      "url": "https://parquet.apache.org/docs/overview/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "ORC is a self-describing, type-aware columnar file format for Hadoop; indexes enable predicate pushdown; created for Hive",
+      "url": "https://orc.apache.org/docs/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Arrow defines a language-independent columnar memory format; zero-copy reads",
+      "url": "https://arrow.apache.org/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Delta Lake: ACID transactions, time travel, schema enforcement, MERGE/update/delete",
+      "url": "https://docs.delta.io/latest/delta-intro.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Delta protocol: table = data files + _delta_log transaction log; readers see a consistent snapshot",
+      "url": "https://github.com/delta-io/delta/blob/master/PROTOCOL.md",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Iceberg: table format with schema evolution, time travel, hidden partitioning, multi-engine access",
+      "url": "https://iceberg.apache.org/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Iceberg spec: tables over immutable Parquet, Avro, ORC data files; metadata files track snapshots; atomic swap commits",
+      "url": "https://iceberg.apache.org/spec/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Hudi: upserts/deletes, incremental processing, COPY_ON_WRITE and MERGE_ON_READ table types",
+      "url": "https://hudi.apache.org/docs/overview",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Arrow is primarily an in-memory format, but also defines the Arrow IPC file format (Feather v2) for on-disk storage; not prioritised for long-term archival",
+      "url": "https://arrow.apache.org/faq/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Avro spec (raw): object container file header requires avro.schema; single-object encoding carries only a schema fingerprint",
+      "url": "https://raw.githubusercontent.com/apache/avro/main/doc/content/en/docs/++version++/Specification/_index.md",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Iceberg spec (raw): table format tracks individual data files; snapshots; full schema evolution; Parquet/Avro/ORC data files",
+      "url": "https://raw.githubusercontent.com/apache/iceberg/main/format/spec.md",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Delta protocol (raw): data files + transaction log in _delta_log; ACID semantics",
+      "url": "https://raw.githubusercontent.com/delta-io/delta/master/PROTOCOL.md",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1-hook",
+      "duration_sec": 2,
+      "on_screen_text": [
+        "Parquet is a file format. Iceberg is not.",
+        "10 formats, 25 seconds."
+      ],
+      "beat": "Hook: state the payoff (file vs table format, 10 formats) in the first 1.5 s.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Parquet is a file format. Iceberg is not.",
+        "subtitle": "10 formats, 25 seconds.",
+        "kicker": "Data Engineering",
+        "highlight": [
+          "Iceberg",
+          "not"
+        ]
+      }
+    },
+    {
+      "id": "s2-row",
+      "duration_sec": 6,
+      "on_screen_text": [
+        "Row-based files",
+        "CSV: plain-text rows, comma-separated",
+        "JSON: text format for structured data",
+        "JSON Lines: one JSON value per line",
+        "Avro: binary rows, schema embedded"
+      ],
+      "beat": "List items 1-4 (row-based file formats). First line is the group header; items reveal one by one.",
+      "component": "ListCard",
+      "props": {
+        "title": "Row-based files",
+        "items": [
+          {
+            "text": "1. CSV",
+            "note": "plain-text rows, comma-separated"
+          },
+          {
+            "text": "2. JSON",
+            "note": "text format for structured data"
+          },
+          {
+            "text": "3. JSON Lines",
+            "note": "one JSON value per line"
+          },
+          {
+            "text": "4. Avro",
+            "note": "binary rows, schema embedded"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
+    },
+    {
+      "id": "s3-columnar",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "Columnar + in-memory",
+        "Parquet: column-oriented file, built-in compression",
+        "ORC: columnar file, created for Hive",
+        "Arrow: columnar in memory, built for compute"
+      ],
+      "beat": "List items 5-7, numbering continues at 5. Arrow, a columnar in-memory format built for compute.",
+      "component": "ListCard",
+      "props": {
+        "title": "Columnar + in-memory",
+        "items": [
+          {
+            "text": "5. Parquet",
+            "note": "column-oriented file, built-in compression"
+          },
+          {
+            "text": "6. ORC",
+            "note": "columnar file, created for Hive"
+          },
+          {
+            "text": "7. Arrow",
+            "note": "columnar in memory, built for compute"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
+    },
+    {
+      "id": "s4-table",
+      "duration_sec": 6,
+      "on_screen_text": [
+        "Table formats: metadata over data files",
+        "Delta Lake: ACID transaction log",
+        "Iceberg: snapshots, schema evolution, time travel",
+        "Hudi: upserts, deletes, incremental processing"
+      ],
+      "beat": "List items 8-10, numbering continues at 8. Table formats are metadata layers over data files such as Parquet.",
+      "component": "ListCard",
+      "props": {
+        "title": "Table formats: metadata over data files",
+        "items": [
+          {
+            "text": "8. Delta Lake",
+            "note": "ACID transaction log"
+          },
+          {
+            "text": "9. Iceberg",
+            "note": "snapshots, schema evolution, time travel"
+          },
+          {
+            "text": "10. Hudi",
+            "note": "upserts, deletes, incremental processing"
+          }
+        ],
+        "numbered": false,
+        "stagger": true
+      }
+    },
+    {
+      "id": "s5-diff",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "File format: how bytes sit in a file",
+        "Table format: which files form the table"
+      ],
+      "beat": "Core distinction, one idea: file format vs table format.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "File format",
+          "points": [
+            "How bytes sit in a file"
+          ],
+          "tone": "active"
+        },
+        "right": {
+          "title": "Table format",
+          "points": [
+            "Which files form the table"
+          ],
+          "tone": "match"
+        }
+      }
+    },
+    {
+      "id": "s6-end",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "Files store data. Tables track files.",
+        "Save this for your next interview"
+      ],
+      "beat": "End: one-line takeaway + save CTA.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Files store data. Tables track files.",
+        "cta": "Save this for your next interview"
+      }
+    }
+  ],
+  "code_blocks": [],
+  "music": {
+    "bed": "calm",
+    "gain_db": -12,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense list (47 cues/min), so a drum-free pad bed sits under the rising notes. At 66 BPM item reveals land 0.9-1.4 s apart, the most even spacing tested, so each card reads without rush. -12 dB keeps it just audible.",
+    "track": "pieces/qu-003.wav"
+  }
+}
