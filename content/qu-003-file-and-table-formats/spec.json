@@ -4,7 +4,7 @@
   "title": "10 Must-Know File & Table Formats (CSV to Iceberg)",
   "format": "reel-list",
   "pillar": "data-engineering",
-  "status": "qa-passed",
+  "status": "in-review",
   "audience_level": "beginner",
   "hook": "Parquet is a file format. Iceberg is not. 10 formats, 25 seconds.",
   "hook_options": [
@@ -95,6 +95,18 @@
       "agent": "qa-reviewer",
       "action": "qa passed (music + beat sync re-render)",
       "note": "No blockers. Public reel/thumbnail/captions identical to local (hash/diff). 25.472 s H.264+AAC, peak -11.1 dBFS, music bed continuous under effects with clean fade. Captions verified (10 cues, in order, min 1.83 s). Minor: s3 heading hyphen break, subtitle orphan wraps, s5 title orphan, two close sparkles in hook. See qa.md."
+    },
+    {
+      "at": "2026-10-20T21:29:43+05:30",
+      "agent": "copywriter",
+      "action": "copy ready",
+      "note": "caption.md (993 chars, all 10 formats numbered, file vs table takeaway, 4+1 hashtags) and youtube.md (3 titles, #shorts, 13 tags, 13 distinct sources, website link). Fact-checked wording only; hook 'one screen' option not used."
+    },
+    {
+      "at": "2026-10-20T21:30:07+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-003"
     }
   ],
   "sources": [
