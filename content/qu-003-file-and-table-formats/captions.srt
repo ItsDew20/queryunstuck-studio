@@ -1,58 +1,48 @@
 1
-00:00:00,000 --> 00:00:00,667
-Parquet is a file format.
-Iceberg is not.
-
-2
-00:00:00,667 --> 00:00:02,000
+00:00:00,000 --> 00:00:01,833
+Parquet is a file format. Iceberg is not.
 10 formats, 25 seconds.
 
-3
-00:00:02,000 --> 00:00:03,600
+2
+00:00:01,833 --> 00:00:03,944
 Row-based files
-1. CSV: plain-text rows, comma-separated
+CSV: plain-text rows, comma-separated
+
+3
+00:00:03,944 --> 00:00:06,056
+JSON: text format for structured data
+JSON Lines: one JSON value per line
 
 4
-00:00:03,600 --> 00:00:05,200
-2. JSON: text format for structured data
-3. JSON Lines: one JSON value per line
+00:00:06,056 --> 00:00:08,167
+Avro: binary rows, schema embedded
 
 5
-00:00:05,200 --> 00:00:08,000
-4. Avro: binary rows, schema embedded
+00:00:08,167 --> 00:00:10,900
+Columnar + in-memory
+Parquet: column-oriented file, built-in compression
 
 6
-00:00:08,000 --> 00:00:09,367
-Columnar + in-memory
-5. Parquet: column-oriented file, built-in compression
+00:00:10,900 --> 00:00:13,633
+ORC: columnar file, created for Hive
+Arrow: columnar in memory, built for compute
 
 7
-00:00:09,367 --> 00:00:10,733
-6. ORC: columnar file, created for Hive
+00:00:13,633 --> 00:00:16,816
+Table formats: metadata over data files
+Delta Lake: ACID transaction log
 
 8
-00:00:10,733 --> 00:00:13,000
-7. Arrow: columnar in memory, built for compute
+00:00:16,816 --> 00:00:20,000
+Iceberg: snapshots, schema evolution, time travel
+Hudi: upserts, deletes, incremental processing
 
 9
-00:00:13,000 --> 00:00:15,667
-Table formats: metadata over data files
-8. Delta Lake: ACID transaction log
-
-10
-00:00:15,667 --> 00:00:17,333
-9. Iceberg: snapshots, schema evolution, time travel
-
-11
-00:00:17,333 --> 00:00:19,000
-10. Hudi: upserts, deletes, incremental processing
-
-12
-00:00:19,000 --> 00:00:22,000
+00:00:20,000 --> 00:00:22,733
 File format: how bytes sit in a file
 Table format: which files form the table
 
-13
-00:00:22,000 --> 00:00:25,000
+10
+00:00:22,733 --> 00:00:25,467
 Files store data. Tables track files.
 Save this for your next interview
