@@ -4,7 +4,7 @@
   "title": "How a Spark Shuffle Works, Visualized",
   "format": "reel-animated",
   "pillar": "data-engineering",
-  "status": "in-review",
+  "status": "approved",
   "audience_level": "intermediate",
   "hook": "Slow JOIN or GROUP BY? Check the shuffle.",
   "hook_options": [
@@ -150,6 +150,12 @@
       "agent": "renderer",
       "action": "re-render (subtler watermark)",
       "note": "Render time 50.7s, file 5.4 MB. Duration 43.0s (unchanged). H.264 1080x1920 30fps + AAC. 15 caption cues, all validated. Thumbnail frame 60 confirms title fully visible. All files uploaded to R2."
+    },
+    {
+      "at": "2026-10-21T07:11:37+00:00",
+      "agent": "github-actions",
+      "action": "approved",
+      "note": "PR #10 merged"
     }
   ],
   "sources": [
