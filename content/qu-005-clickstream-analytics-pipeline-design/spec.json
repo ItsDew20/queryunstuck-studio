@@ -1,0 +1,2389 @@
+{
+  "id": "qu-005",
+  "slug": "clickstream-analytics-pipeline-design",
+  "title": "Designing a Clickstream Analytics Pipeline, End to End",
+  "format": "longform",
+  "pillar": "data-system-design",
+  "status": "in-review",
+  "audience_level": "intermediate",
+  "hook": "Every click becomes a dashboard number. Here are the 6 design steps in between.",
+  "hook_options": [
+    "Every click on a website becomes a row in a dashboard. Here's every step in between.",
+    "Design a clickstream pipeline: the system design question, answered step by step.",
+    "From one click event to a gold table: Kafka, streaming, watermarks and partitions."
+  ],
+  "target_duration_sec": 943,
+  "scheduled_for": "2026-10-24T11:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic 'Designing a clickstream analytics pipeline' (data-system-design, longform). Chosen over 'Data Engineering was HARD until I learned these 20 concepts' because the rule is to bundle 4-6 reel-sized concepts. Planned chapters (each cuttable into a reel later, all existing backlog topics left unused for future reels): 1) Kafka topics, partitions and consumer groups; 2) Batch vs streaming; 3) Late-arriving data and watermarks; 4) Idempotent pipelines; 5) Medallion architecture (bronze/silver/gold); 6) Partition pruning. Uses FlowGraph, PartitionGrid, Timeline, Comparison. Sat longform slot."
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "researched",
+      "note": "research.md 559 words. Runnable SQL (DuckDB 1.5.6): ON CONFLICT dedupe (tested), ROW_NUMBER dedupe, bronze/silver/gold GROUP BY, COPY PARTITION_BY + filtered query. Conceptual only: Kafka partitions/consumer groups, batch vs streaming, watermark behaviour. Iceberg partitioning page unreadable via fetch so cut; Flink cut."
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "scripted",
+      "note": "script.md + 42 scenes (940s, 1868 narration words) across cold open, intro, 6 chapters, recap, CTA to queryunstuck.in (no newsletter promise). Each chapter opens with its own hook and ends with a takeaway so it can be cut into a reel. 8 DuckDB SQL blocks on the shared 9-row events table; block 2 (watermark arithmetic) is labelled illustration, not engine behaviour; block 7 (partition filter) is needs_manual_check because pruning only happens on partitioned storage, the in-memory run just proves the query. No COPY/PARTITION_BY (writes files). Batch vs streaming kept to definitions, event time and replayable sources; no latency/cost claims. Iceberg, Flink, throughput numbers and company usage left out."
+    },
+    {
+      "at": "2026-10-17T15:00:20+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check FAIL",
+      "note": "VERDICT: FAIL. 8/8 DuckDB blocks verified (block 7 needs_manual_check correct; no block writes files). Watermark: script correct (2m40s behind max event time 09:06:40: 10-min guaranteed, 2-min best effort); research.md section 3 erratum noted. 9 required fixes: s01 append-only framing; s12 Spark-scope; s19 watermark sentence wrong for 2-min case; s21 'will run twice/retries guarantee'; s24 key-based dedupe scoped to DuckDB (BigQuery keys unenforced); s25 exactly-once scoped to Spark; s26 dropDuplicates with watermark must include event_time or use dropDuplicatesWithinWatermark; s38 'Nothing skipped' -> 'No partition skipped'; s40 recap says gold partitioned, chapter 6 partitions silver. Status left scripted."
+    },
+    {
+      "at": "2026-10-17T15:03:21+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "Applied all 9 required fixes (s01 append-only framing, s12 Spark scope, s19 watermark sentence, s21 'assume runs twice', s24 DuckDB enforced key, s25 Spark exactly-once scope, s26 dedupe on event_id + event_time / dropDuplicatesWithinWatermark, s38 'No partition skipped', s40 silver partitioned by event_date) plus optional s00, s14, s35 wording and ORDER BY ingest_time in block 3 (output unchanged: 8 | 8). Mirrored in script.md. sources[] and verified flags untouched. Total 943 s."
+    },
+    {
+      "at": "2026-10-17T15:04:18+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check FAIL (loop 2)",
+      "note": "VERDICT: FAIL. All 9 loop-1 fixes confirmed (spec + script.md); research.md watermark erratum confirmed fixed. Re-ran snippets: 8/8 verified incl. changed block 3 (8|8); block 7 needs_manual_check retained; no disk writes; on-screen numbers unchanged at 943 s. New s25/s26/s00/s14 wording supported (dropDuplicatesWithinWatermark is on the cited Spark APIs page). One blocking issue: s35 'Partition pruning isn't automatic' contradicts DuckDB/BigQuery docs (pruning is automatic given a qualifying filter). Fix: on-screen 'Pruning needs a filter on the partition column.' / 'Miss it, and no partition is skipped.'; narration 'Partition pruning only kicks in when your query filters on the partition column.' Status left scripted."
+    },
+    {
+      "at": "2026-10-17T15:05:24+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failure (loop 2)",
+      "note": "s35 hook reworded so it no longer implies pruning isn't automatic: on-screen 'Pruning needs a filter on the partition column.' / 'Miss it, and no partition is skipped.'; narration 'Partition pruning only kicks in when your query filters on the partition column.' Duration kept at 10 s; nothing else changed. Mirrored in script.md."
+    },
+    {
+      "at": "2026-10-17T15:06:07+05:30",
+      "agent": "fact-checker",
+      "action": "fact-checked (PASS, loop 3)",
+      "note": "VERDICT: PASS after 2 fix loops. s35 loop-2 fix confirmed in spec.json and script.md; diff vs original scripted spec shows only the loop-1/loop-2 fixes, duration tweaks (943 s) and block 3 ORDER BY. Re-ran snippets: 8/8 OK and verified; block 7 needs_manual_check retained (in-memory table cannot show pruning); no disk writes; on-screen numbers match outputs. Watermark ruling: script correct (2m40s behind 09:06:40: 10-min guaranteed, 2-min best effort); research.md corrected. Non-blocking: don't present bytes-scanned bar as measured; don't reintroduce removed wording in copy."
+    },
+    {
+      "at": "2026-10-21T13:00:54+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "All 42 scenes given component + props; shared 9-row events table, numbers match verified blocks. s26 Spark dedupe shown as Callout (no unverified code). s37 FlowGraph shows skipped partitions, no bytes-scanned bar."
+    },
+    {
+      "at": "2026-10-21T13:14:25+05:30",
+      "agent": "visual-director",
+      "action": "storyboard revision",
+      "note": "s36: removed unverified filler rows (only e1-e8 move into 10-19). s40: ListCard overlapped watermark and overflowed with a title, so switched to Timeline of the 6 recap lines (no overlap). Takeaway callout text capitalised."
+    },
+    {
+      "at": "2026-10-21T13:15:49+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Scored: drift bed, 60 BPM, gain -13 dB, duck 4 dB, sync on. 193 cues / 15.72 min = 12.3 cues/min (sparse) but narration-led longform, so a quiet drumless ambient bed was chosen over pulse beds. Compared study/calm/drift/rain/night/focus/flow: calm stretched 3 scenes (+37.9 s); drift and rain keep all 42 scene lengths unchanged (total 943 s), with only pop/tick/sparkle off-beat; drift picked over rain so no rain noise sits under voice-over. Track pieces/qu-005.wav rendered at 943.000 s, resolving at 940 s. Status unchanged."
+    },
+    {
+      "at": "2026-10-21T13:38:24+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Landscape longform (1920x1080 30fps, 943s, 28290 frames). Render time: 13 min 36 sec. File: 81.4 MB. Music: drift bed (943.000s, -13 dB, sync). H.264 + AAC. Audio: peak -10.5 dB, mean -32.6 dB. Captions: 70 cues, 120 lines verified. Thumbnail frame 60 (2s cold-open hook, title fully drawn). All files uploaded to R2."
+    },
+    {
+      "at": "2026-10-21T13:45:55+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-failed",
+      "note": "QA FAIL (3 blockers). s05 and s36: PartitionGrid start state stacks all events inside a labelled partition (user 102 / 10-17) for ~4 s, showing wrong placement. s25: sink -> source 'replay' arrow unsupported by sources. Everything else passed: 120/120 on-screen lines exact, captions 70 cues in order and public = local, numbers match factcheck, other FlowGraph arrows supported, audio peak -10.5 dBFS with steady bed, public video size = local. Minor issues in qa.md. Status stays rendered."
+    },
+    {
+      "at": "2026-10-21T13:46:57+05:30",
+      "agent": "visual-director",
+      "action": "storyboard revision (QA loop 1)",
+      "note": "s04/s05/s36 items appear directly in their partition (from=to); s25 replay edge removed; s33 gold 'rebuilt' label removed; code panel titles set to 'DuckDB SQL'."
+    },
+    {
+      "at": "2026-10-21T14:00:58+05:30",
+      "agent": "renderer",
+      "action": "rendered (QA loop 1)",
+      "note": "Longform landscape (1920x1080 30fps, 943s, 28290 frames). Render time: 30 min. File: 78 MB local, 81.4 MB uploaded. Music: drift bed (943.000s, -13 dB, sync). H.264 + AAC. Audio: peak -10.5 dB, mean -32.6 dB. Captions: 70 cues, 120 lines verified. Thumbnail frame 60 (title fully drawn). All files uploaded to R2."
+    },
+    {
+      "at": "2026-10-21T14:04:53+05:30",
+      "agent": "renderer",
+      "action": "re-uploaded corrected render (QA loop 1)",
+      "note": "Correction: the previous entry verified and uploaded the 13:30 file, which was rendered before the loop-1 fixes. The post-fix render (started 13:49, finished 14:03) is now uploaded: 943.0 s, 80,501,306 bytes, peak -10.5 dB, mean -32.6 dB. Checked frames: s05 starts with events in their correct partitions; s25 shows source -> Spark job -> sink with no replay arrow. Thumbnail (frame 60) and captions (70 cues, 120/120 lines) were regenerated and re-uploaded; public sizes match local."
+    },
+    {
+      "at": "2026-10-21T14:06:54+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-passed",
+      "note": "QA loop 2 PASS on the 14:03 render (80,501,306 bytes = public, 943.0 s). Loop-1 blockers fixed: s05 and s36 PartitionGrid items now start in their own partitions, s25 replay arrow removed (source -> job -> sink). Regression pass clean: 120/120 on-screen lines, 70 captions in order (public = local), numbers match factcheck, all FlowGraph arrows supported, title zones no longer collide, audio peak -10.5 dBFS with steady bed. Minor only: s25 short edges crowd read/write labels, s37 stacked nodes tight, small code/table text. See qa.md."
+    },
+    {
+      "at": "2026-10-21T14:08:00+05:30",
+      "agent": "copywriter",
+      "action": "copy-ready",
+      "note": "youtube.md (3 titles, 8 chapters from landscape timeline, sources) and optional promo caption.md written; wording matches fact-checked on-screen lines. Newsletter/Discord links are TBD placeholders in brand.json."
+    },
+    {
+      "at": "2026-10-21T14:08:46+05:30",
+      "agent": "orchestrator",
+      "action": "in-review",
+      "note": "youtube.md: removed the TBD newsletter/Discord placeholder lines (no links yet). Opening PR content/qu-005."
+    },
+    {
+      "at": "2026-10-22T01:09:21+05:30",
+      "agent": "audience-panel",
+      "action": "viewer-final",
+      "note": "Final watch of the 943 s longform (contact sheets fps=1/3, hook and chapter frames). VIEWER: FAIL: mean overall 3.3, hook 4.0, 0/3 would finish; longest still 26.4 s vs 5 s limit, 10.9 events/min vs 20; no voice. Top fixes: voice track, open on the 4-vs-3 clicks stakes, kill held stills, pause-and-guess interview beats, cut to about 10 min. Status unchanged."
+    }
+  ],
+  "sources": [
+    {
+      "claim": "Topics are partitioned across brokers; same key goes to same partition; consumers read a topic-partition in written order (ordering is per partition)",
+      "url": "https://kafka.apache.org/43/getting-started/introduction/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Each partition is consumed by exactly one consumer within a subscribing consumer group; consumer position is one offset per partition",
+      "url": "https://kafka.apache.org/43/design/design/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Kafka idempotent producer: broker dedupes resends using producer ID and sequence number",
+      "url": "https://kafka.apache.org/43/design/design/",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Event time is the time embedded in the data; Structured Streaming end-to-end exactly-once needs replayable sources (offsets, checkpoints) and idempotent sinks",
+      "url": "https://spark.apache.org/docs/latest/streaming/getting-started.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Watermark = max event time seen minus late threshold; data under the threshold is never dropped (strict), later data best effort; dropDuplicates with watermark",
+      "url": "https://spark.apache.org/docs/latest/streaming/apis-on-dataframes-and-datasets.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Bronze = raw unvalidated data; silver = cleaned, validated, deduplicated; gold = aggregated data for analytics and reporting",
+      "url": "https://docs.databricks.com/aws/en/lakehouse/medallion",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "BigQuery partition pruning: a qualifying filter on the partitioning column scans matching partitions and skips the rest, reducing bytes processed",
+      "url": "https://docs.cloud.google.com/bigquery/docs/partitioned-tables",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB pushes filters on Hive partition keys down into files (pruning)",
+      "url": "https://duckdb.org/docs/current/data/partitioning/hive_partitioning.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB INSERT ... ON CONFLICT DO NOTHING/DO UPDATE requires UNIQUE or PRIMARY KEY constraint",
+      "url": "https://duckdb.org/docs/current/sql/statements/insert.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s00-cold-open",
+      "chapter": "Cold open",
+      "duration_sec": 25,
+      "beat": "Title line lands in the first second; a single click dot travels left to right through six labelled boxes and ends as a number on a dashboard tile.",
+      "on_screen_text": [
+        "Every click becomes a dashboard number",
+        "6 steps in between",
+        "Kafka, streaming, watermarks",
+        "Idempotency, medallion, pruning"
+      ],
+      "narration": "Every click on a website becomes a number on a dashboard. Between the click and the number are six design decisions worth knowing cold: Kafka partitions, batch versus streaming, late data and watermarks, idempotent writes, bronze, silver and gold, and partition pruning. We'll build the whole pipeline on one nine-row table, and every query you see was actually run.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Kafka partitions"
+          },
+          {
+            "label": "Batch or streaming"
+          },
+          {
+            "label": "Late data and watermarks"
+          },
+          {
+            "label": "Idempotent writes"
+          },
+          {
+            "label": "Bronze, silver, gold"
+          },
+          {
+            "label": "Partition pruning"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s01-what-is-clickstream",
+      "chapter": "Intro: clickstream events",
+      "duration_sec": 30,
+      "beat": "A page view, a click and a purchase each drop out of a browser icon as a row card; the two timestamp fields highlight one after the other.",
+      "on_screen_text": [
+        "Clickstream: one row per user action",
+        "event_id, user_id, event_type",
+        "event_time: when it happened",
+        "ingest_time: when we received it"
+      ],
+      "narration": "A clickstream is the log of what users do: page views, clicks, purchases. Each action becomes one event. We treat events as append-only: a click that happened, happened. So every action is a new row. Two timestamps matter. event_time is when the action happened. ingest_time is when our pipeline received it. Keep those two apart, because half of this video depends on the gap between them.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (3 of 9 rows)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_time",
+          "ingest_time"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "event_time: when it happened",
+            "highlightCols": [
+              "event_time"
+            ]
+          },
+          {
+            "label": "ingest_time: when we received it",
+            "highlightCols": [
+              "ingest_time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "s02-events-table",
+      "chapter": "Intro: clickstream events",
+      "duration_sec": 43,
+      "beat": "DataTable of all 9 rows in arrival order; the second copy of event 3 flashes, then event 6 slides to the bottom with its arrival time highlighted.",
+      "on_screen_text": [
+        "Our events table: 9 rows, 8 events",
+        "Event 3 arrives twice (a retry)",
+        "Event 6 arrives 17 min 40 s late"
+      ],
+      "narration": "Here's the table we'll use for the whole video, in the order rows arrived. Three users: 101, 102 and 103. Most events land about a second after they happen. Two rows are trouble. Event 3, a click by user 102, shows up twice, the second copy 44 seconds after the first, like a retry. And event 6, a purchase by user 101, happened at 09:04 but only arrived at 09:21:40. Nine rows, but only eight real events. Every chapter fixes one problem in this table.",
+      "code_block": 0,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (arrival order)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at",
+          "arrived_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10",
+            "09:01:11"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:01"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:45"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15",
+            "09:03:16"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20",
+            "09:05:21"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00",
+            "09:21:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 3 arrives twice (44 s apart)",
+            "rows": [
+              2,
+              4
+            ]
+          },
+          {
+            "label": "Event 6: 17 min 40 s late",
+            "reset": true,
+            "rows": [
+              8
+            ],
+            "highlightCols": [
+              "arrived_at"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5
+              ],
+              "note": "ORDER BY ingest_time"
+            },
+            {
+              "lines": [
+                3
+              ],
+              "note": "arrived_at"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s03-kafka-hook",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 13,
+      "beat": "Hook card; the word 'topic' is struck through and replaced by 'partition'.",
+      "on_screen_text": [
+        "Kafka doesn't order your topic.",
+        "It orders each partition."
+      ],
+      "narration": "Kafka does not keep your whole topic in order. It keeps each partition in order. That one sentence answers a lot of Kafka interview questions.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Kafka doesn't order your topic.",
+        "subtitle": "It orders each partition.",
+        "kicker": "1. Kafka",
+        "highlight": [
+          "partition"
+        ]
+      }
+    },
+    {
+      "id": "s04-kafka-partitions",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 31,
+      "beat": "PartitionGrid: a 'clicks' topic splits into three partition lanes on three broker boxes; events drop into lanes and stay in sequence inside each lane.",
+      "on_screen_text": [
+        "Topic: a named stream of events",
+        "Split into partitions across brokers",
+        "One partition: read in the order written",
+        "Across partitions: no order promised"
+      ],
+      "narration": "Our click events land in a Kafka topic, say one called clicks. A topic is split into partitions, and those partitions are spread across the brokers in the cluster. Inside one partition, a consumer reads events in exactly the order they were written. Across partitions there's no such promise. An event in partition zero and an event in partition two have no defined order relative to each other.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "Partition 0",
+          "Partition 1",
+          "Partition 2"
+        ],
+        "items": [
+          {
+            "label": "A",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "B",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "C",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "D",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "E",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "F",
+            "from": 2,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Topic: clicks",
+        "afterLabel": "Ordered inside each partition only"
+      }
+    },
+    {
+      "id": "s05-kafka-keys",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 34,
+      "beat": "Events colour-coded by user_id route into lanes; all of user 101's events stack in one lane in sequence: page_view, click, purchase.",
+      "on_screen_text": [
+        "Same key, same partition",
+        "Key = user_id",
+        "User 101: view, click, purchase in order"
+      ],
+      "narration": "So how do you get the order you actually need? With the key. Events with the same key go to the same partition. If we key by user_id, every event from user 101 lands in the same partition, and a consumer reads page view, then click, then purchase, in the order they were written. Different users can sit on different partitions, and that's fine, because 'what did this user do next' is a per-user question.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0: user 101",
+          "P1: user 102",
+          "P2: user 103"
+        ],
+        "items": [
+          {
+            "label": "e1 view",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "e2 view",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "e3 click",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "e4 click",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "e5 view",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e6 buy",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "e7 click",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e8 buy",
+            "from": 1,
+            "to": 1
+          }
+        ],
+        "beforeLabel": "Events in arrival order",
+        "afterLabel": "Key = user_id: same user, same partition"
+      }
+    },
+    {
+      "id": "s06-consumer-groups",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 30,
+      "beat": "Three consumer boxes in one group each attach to one partition lane; an offset pointer ticks forward on each lane.",
+      "on_screen_text": [
+        "Consumer group: consumers sharing a topic",
+        "Each partition: one consumer in the group",
+        "Position: one offset per partition"
+      ],
+      "narration": "Now reading. Consumers subscribe as a consumer group. Within the group, each partition is consumed by exactly one consumer. That's how Kafka splits the work, and it's why per-partition order survives: one partition, one reader in the group. The group's position is small: one offset per partition, which marks how far it has read. Remember that offset. It's what makes replay possible in chapter four.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "p0",
+            "label": "Partition 0",
+            "x": 0.17,
+            "y": 0.15,
+            "sublabel": "offset"
+          },
+          {
+            "id": "p1",
+            "label": "Partition 1",
+            "x": 0.17,
+            "y": 0.5,
+            "sublabel": "offset"
+          },
+          {
+            "id": "p2",
+            "label": "Partition 2",
+            "x": 0.17,
+            "y": 0.85,
+            "sublabel": "offset"
+          },
+          {
+            "id": "a",
+            "label": "Consumer A",
+            "x": 0.83,
+            "y": 0.15,
+            "sublabel": "one group",
+            "tone": "match"
+          },
+          {
+            "id": "b",
+            "label": "Consumer B",
+            "x": 0.83,
+            "y": 0.5,
+            "sublabel": "one group",
+            "tone": "match"
+          },
+          {
+            "id": "c",
+            "label": "Consumer C",
+            "x": 0.83,
+            "y": 0.85,
+            "sublabel": "one group",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p0",
+            "to": "a",
+            "colorIndex": 0
+          },
+          {
+            "from": "p1",
+            "to": "b",
+            "colorIndex": 1
+          },
+          {
+            "from": "p2",
+            "to": "c",
+            "colorIndex": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "s07-kafka-interview",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 19,
+      "beat": "Comparison: left 'whole topic ordered' with a red cross, right 'ordered per partition, keyed by user_id' with a tick.",
+      "on_screen_text": [
+        "Q: How do you keep a user's events in order?",
+        "A: key by user_id",
+        "Order is per partition, not per topic"
+      ],
+      "narration": "Interview version. 'How do you guarantee a user's events are processed in order?' Key the events by user_id. Same key, same partition. Ordering is per partition, not per topic, and one consumer in the group reads each partition.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Whole topic",
+          "tone": "noMatch",
+          "points": [
+            "No order promised",
+            "Across partitions"
+          ]
+        },
+        "right": {
+          "title": "Per partition",
+          "tone": "match",
+          "points": [
+            "Key by user_id",
+            "Same key, same partition"
+          ]
+        },
+        "verdict": "Order is per partition, not per topic"
+      }
+    },
+    {
+      "id": "s08-kafka-takeaway",
+      "chapter": "1. Kafka topics, partitions, consumer groups",
+      "duration_sec": 11,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: order lives in the partition",
+        "Pick the key that matches your question"
+      ],
+      "narration": "Takeaway: order lives in the partition, so pick the key that matches the question you need answered in order.",
+      "component": "Callout",
+      "props": {
+        "text": "Order lives in the partition",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Pick the key that matches your question"
+      }
+    },
+    {
+      "id": "s09-batch-hook",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 8,
+      "beat": "Hook card with two clocks: 'event_time' and 'ingest_time'.",
+      "on_screen_text": [
+        "Batch or streaming?",
+        "First decide which clock you trust."
+      ],
+      "narration": "Batch or streaming? Before you pick, decide which clock your numbers follow.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Batch or streaming?",
+        "subtitle": "First decide which clock you trust.",
+        "kicker": "2. Batch vs streaming",
+        "highlight": [
+          "clock"
+        ]
+      }
+    },
+    {
+      "id": "s10-batch-vs-stream",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 25,
+      "beat": "Comparison: left a bucket of rows processed once and closed; right a conveyor of rows processed continuously.",
+      "on_screen_text": [
+        "Batch: process what has landed, then stop",
+        "Streaming: keep processing as events arrive",
+        "Same events, different trigger"
+      ],
+      "narration": "Batch means: take the events that have already landed, say all of yesterday, process them, and finish. Streaming means the job keeps running and processes events as they arrive. Same events, same business logic. The difference is when the work runs, and how much of the data has shown up when it runs.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Batch",
+          "tone": "active",
+          "points": [
+            "Process what has landed",
+            "Then stop"
+          ]
+        },
+        "right": {
+          "title": "Streaming",
+          "tone": "active",
+          "points": [
+            "Keep processing as events arrive",
+            "Job keeps running"
+          ]
+        },
+        "verdict": "Same events, different trigger"
+      }
+    },
+    {
+      "id": "s11-event-time-lag",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 41,
+      "beat": "DataTable with event_at, arrived_at and lag columns; the lag column fills in row by row and event 6's 0:17:40 is highlighted.",
+      "on_screen_text": [
+        "Event time: the time inside the data",
+        "Ingest time: when it reached us",
+        "Event 6: 17 min 40 s between them"
+      ],
+      "narration": "This is where the clocks matter. Spark's docs define event time as the time embedded in the data itself, not the time it arrived. Look at the lag column. Most events arrive a second after they happen. Event 6, a purchase, took seventeen minutes and forty seconds. A batch job that runs after it has landed simply sees it. A streaming job counting purchases per minute has to decide what to do when a 09:04 purchase shows up at 09:21.",
+      "code_block": 1,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (event time vs ingest time)",
+        "columns": [
+          "event_id",
+          "event_type",
+          "event_at",
+          "arrived_at",
+          "lag"
+        ],
+        "rows": [
+          [
+            1,
+            "page_view",
+            "09:00:05",
+            "09:00:06",
+            "0:00:01"
+          ],
+          [
+            2,
+            "page_view",
+            "09:01:10",
+            "09:01:11",
+            "0:00:01"
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            "09:02:01",
+            "0:00:01"
+          ],
+          [
+            4,
+            "click",
+            "09:02:30",
+            "09:02:31",
+            "0:00:01"
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            "09:02:45",
+            "0:00:45"
+          ],
+          [
+            5,
+            "page_view",
+            "09:03:15",
+            "09:03:16",
+            "0:00:01"
+          ],
+          [
+            7,
+            "click",
+            "09:05:20",
+            "09:05:21",
+            "0:00:01"
+          ],
+          [
+            8,
+            "purchase",
+            "09:06:40",
+            "09:06:41",
+            "0:00:01"
+          ],
+          [
+            6,
+            "purchase",
+            "09:04:00",
+            "09:21:40",
+            "0:17:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "lag = ingest_time - event_time",
+            "highlightCols": [
+              "lag"
+            ]
+          },
+          {
+            "label": "Event 6: 17 min 40 s",
+            "rows": [
+              8
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                4
+              ],
+              "note": "lag"
+            },
+            {
+              "lines": [
+                2,
+                3
+              ],
+              "note": "two clocks"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s12-replayable",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 23,
+      "beat": "FlowGraph: Kafka offsets feed a checkpoint box; the job box crashes, restarts, and resumes from the checkpoint marker.",
+      "on_screen_text": [
+        "Spark tracks how far each stream has read",
+        "Offsets + checkpoints: a replayable source",
+        "Restart: pick up from the checkpoint"
+      ],
+      "narration": "A streaming job also has to survive restarts. Spark Structured Streaming tracks how far it has read with source offsets and checkpoints, so after a failure the source can be replayed from where the job was. Hold on to that. It's half of exactly-once in chapter four.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "s",
+            "label": "Kafka source",
+            "x": 0.17,
+            "y": 0.18,
+            "sublabel": "offsets"
+          },
+          {
+            "id": "j",
+            "label": "Spark streaming job",
+            "x": 0.83,
+            "y": 0.18,
+            "sublabel": "fails",
+            "tone": "noMatch"
+          },
+          {
+            "id": "c",
+            "label": "Checkpoint",
+            "x": 0.83,
+            "y": 0.82,
+            "sublabel": "how far it read",
+            "tone": "active"
+          },
+          {
+            "id": "r",
+            "label": "Job restarts",
+            "x": 0.17,
+            "y": 0.82,
+            "sublabel": "resumes from checkpoint",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "j",
+            "label": "read"
+          },
+          {
+            "from": "j",
+            "to": "c",
+            "label": "save offsets"
+          },
+          {
+            "from": "c",
+            "to": "r",
+            "label": "resume from"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s13-batch-interview",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 28,
+      "beat": "Callout: a question bubble 'freshness?' points to two cards, batch and streaming; both cards share a footer 'GROUP BY event_time'.",
+      "on_screen_text": [
+        "Ask first: how fresh must the numbers be?",
+        "Let the requirement pick the mode",
+        "Either way: count by event_time"
+      ],
+      "narration": "In an interview, don't declare a winner. Ask how fresh the numbers need to be, and let that requirement pick the mode. We won't quote cost or latency figures here, because those depend on your system. What doesn't depend on your system: if you bucket by arrival time instead of event time, a late purchase lands in the wrong minute.",
+      "component": "Callout",
+      "props": {
+        "text": "Ask first: how fresh must the numbers be?",
+        "tone": "tip",
+        "label": "Interview tip",
+        "detail": "Let the requirement pick the mode. Either way, bucket by event_time."
+      }
+    },
+    {
+      "id": "s14-batch-takeaway",
+      "chapter": "2. Batch vs streaming",
+      "duration_sec": 11,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: ask how fresh it needs to be",
+        "Event time picks the bucket"
+      ],
+      "narration": "Takeaway: ask how fresh the numbers need to be, and let that pick the mode. Event time picks the bucket.",
+      "component": "Callout",
+      "props": {
+        "text": "Ask how fresh it needs to be",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Event time picks the bucket"
+      }
+    },
+    {
+      "id": "s15-wm-hook",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 10,
+      "beat": "Hook card; a late row approaches a dashed watermark line and pauses.",
+      "on_screen_text": [
+        "Late data isn't automatically dropped.",
+        "The watermark decides."
+      ],
+      "narration": "Late data is not automatically dropped. A watermark decides, and it doesn't use the wall clock.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Late data isn't automatically dropped.",
+        "subtitle": "The watermark decides.",
+        "kicker": "3. Late data",
+        "highlight": [
+          "watermark"
+        ]
+      }
+    },
+    {
+      "id": "s16-wm-why",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 21,
+      "beat": "Timeline: a 09:00-09:10 window box stays open while dots keep trickling in from the right.",
+      "on_screen_text": [
+        "When is the 09:00 window finished?",
+        "A straggler could always show up",
+        "Threshold: how late can data be?"
+      ],
+      "narration": "Say you count purchases per ten-minute window. When is the 09:00 window finished? A straggler could always show up. A job that never ends can't wait forever, so Spark asks you for a threshold: how late can data be and still be counted?",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Window 09:00 to 09:10 opens"
+          },
+          {
+            "label": "Rows keep arriving"
+          },
+          {
+            "label": "A straggler could still show up"
+          },
+          {
+            "label": "Threshold: how late can data be?",
+            "detail": "and still be counted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s17-wm-rule",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 30,
+      "beat": "Timeline: a 'max event time' marker moves right; a watermark line trails it by the threshold; rows left of the line turn amber, not red.",
+      "on_screen_text": [
+        "watermark = max event time seen - threshold",
+        "Less late than threshold: guaranteed",
+        "Later than that: best effort, may drop"
+      ],
+      "narration": "Here's the rule from the Spark docs. The watermark is the maximum event time the engine has seen, minus your threshold. Data that is less late than the threshold is guaranteed to be processed. Data later than that may be dropped, or may still be counted. Spark only promises best effort there. So never say 'late data is dropped'. Say 'data beyond the watermark isn't guaranteed'.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Max event time seen",
+            "detail": "moves forward with newer events"
+          },
+          {
+            "label": "Watermark = max event time - threshold"
+          },
+          {
+            "label": "Less late than threshold",
+            "detail": "guaranteed to be processed"
+          },
+          {
+            "label": "Later than that",
+            "detail": "best effort: may drop, may count"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s18-wm-walkthrough",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 42,
+      "beat": "CodePanel with the query; DataTable fills in arrival order; event 6's 'behind' cell pulses, then its t_10min and t_2min cells light up green and amber.",
+      "on_screen_text": [
+        "Illustration in SQL, not Spark itself",
+        "Event 6 arrives: max seen is 09:06:40",
+        "Only 2 min 40 s behind in event time",
+        "10 min threshold: guaranteed",
+        "2 min threshold: best effort"
+      ],
+      "narration": "Let's run the rule on our table as plain SQL. This illustrates the arithmetic; it is not Spark's engine. Go through events in arrival order and track the max event time seen so far. When event 6 finally arrives at 09:21:40, the latest event time seen is 09:06:40, from event 8. Event 6 happened at 09:04. So it's only two minutes forty seconds behind in event time. With a ten-minute threshold, it's inside: guaranteed. With a two-minute threshold, it's outside: best effort.",
+      "code_block": 2,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events + watermark arithmetic (SQL illustration)",
+        "columns": [
+          "event_id",
+          "event_at",
+          "max_seen_at",
+          "behind",
+          "t_10min",
+          "t_2min"
+        ],
+        "rows": [
+          [
+            1,
+            "09:00:05",
+            "09:00:05",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            2,
+            "09:01:10",
+            "09:01:10",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            3,
+            "09:02:00",
+            "09:02:00",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            4,
+            "09:02:30",
+            "09:02:30",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            3,
+            "09:02:00",
+            "09:02:30",
+            "0:00:30",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            5,
+            "09:03:15",
+            "09:03:15",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            7,
+            "09:05:20",
+            "09:05:20",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            8,
+            "09:06:40",
+            "09:06:40",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            6,
+            "09:04:00",
+            "09:06:40",
+            "0:02:40",
+            "guaranteed",
+            "best effort"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 6: only 2 min 40 s behind max event time",
+            "rows": [
+              8
+            ],
+            "highlightCols": [
+              "behind"
+            ]
+          },
+          {
+            "label": "10 min threshold: guaranteed",
+            "highlightCols": [
+              "t_10min"
+            ],
+            "state": "match"
+          },
+          {
+            "label": "2 min threshold: best effort",
+            "highlightCols": [
+              "t_2min"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                3
+              ],
+              "note": "max event time seen"
+            },
+            {
+              "lines": [
+                9
+              ],
+              "note": "behind"
+            },
+            {
+              "lines": [
+                10,
+                11
+              ],
+              "note": "10 min: guaranteed"
+            },
+            {
+              "lines": [
+                12,
+                13
+              ],
+              "note": "2 min: best effort"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s19-wm-trap",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 26,
+      "beat": "Comparison: left '17 min 40 s delay (wall clock)', right '2 min 40 s behind (event time)'; the right one gets the tick.",
+      "on_screen_text": [
+        "Lateness is measured in event time",
+        "Not wall-clock delay",
+        "Watermark moves only with newer events"
+      ],
+      "narration": "That's the trap. Event 6 was delayed seventeen minutes on the wall clock, but the watermark is built from event times. Nothing newer than 09:06:40 had arrived, so the watermark was still 09:06:40 minus the threshold. What counts is how far behind the latest event time a row is, not how long it spent in transit.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Wall clock",
+          "tone": "noMatch",
+          "points": [
+            "Event 6: 17 min 40 s",
+            "Not used"
+          ]
+        },
+        "right": {
+          "title": "Event time",
+          "tone": "match",
+          "points": [
+            "Event 6: 2 min 40 s",
+            "Behind max seen"
+          ]
+        },
+        "verdict": "Watermark moves only with newer events"
+      }
+    },
+    {
+      "id": "s20-wm-takeaway",
+      "chapter": "3. Late data and watermarks",
+      "duration_sec": 9,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: watermark = max event time - threshold",
+        "Inside: guaranteed. Outside: best effort."
+      ],
+      "narration": "Takeaway: watermark equals max event time minus threshold. Inside it, guaranteed. Outside it, best effort.",
+      "component": "Callout",
+      "props": {
+        "text": "Watermark = max event time - threshold",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Inside: guaranteed. Outside: best effort."
+      }
+    },
+    {
+      "id": "s21-idem-hook",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 9,
+      "beat": "Hook card; a 'run' button is pressed twice and the output counter stays the same.",
+      "on_screen_text": [
+        "Assume your pipeline runs twice.",
+        "Make twice look like once."
+      ],
+      "narration": "Assume your pipeline runs twice. Retries make it likely. Make twice look exactly like once.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Assume your pipeline runs twice.",
+        "subtitle": "Make twice look like once.",
+        "kicker": "4. Idempotent pipelines",
+        "highlight": [
+          "twice",
+          "once"
+        ]
+      }
+    },
+    {
+      "id": "s22-idem-definition",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 24,
+      "beat": "RowHighlight on the events table: both copies of event 3 glow, with '44 s apart' between them.",
+      "on_screen_text": [
+        "Idempotent: run twice = run once",
+        "Retries and replays are normal",
+        "Event 3 already arrived twice"
+      ],
+      "narration": "Idempotent means running a step twice gives the same result as running it once. You need it because retries are normal: a network blip, a producer resend, a job replayed from its last checkpoint. Our table already shows it. Event 3, the click by user 102, arrived twice, 44 seconds apart.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (arrival order)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at",
+          "arrived_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10",
+            "09:01:11"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:01"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:45"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15",
+            "09:03:16"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20",
+            "09:05:21"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00",
+            "09:21:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 3 arrived twice",
+            "rows": [
+              2,
+              4
+            ]
+          },
+          {
+            "label": "44 s apart: a retry",
+            "rows": [
+              4
+            ],
+            "state": "noMatch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s23-idem-producer",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 31,
+      "beat": "FlowGraph: producer sends message seq 7, times out, resends seq 7; the broker box stamps the second copy 'duplicate' and keeps one.",
+      "on_screen_text": [
+        "Kafka idempotent producer",
+        "Producer ID + sequence number",
+        "Broker spots the resend and dedupes it"
+      ],
+      "narration": "Kafka handles one source of duplicates for you. With the idempotent producer, each producer has an ID and every message it sends carries a sequence number. If it resends after a timeout, the broker recognises the same producer ID and sequence number and dedupes it. But that only covers producer retries into Kafka. Duplicates can still come from elsewhere, so the sink has to defend itself too.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Producer sends",
+            "x": 0.17,
+            "y": 0.17,
+            "sublabel": "ID + seq 7"
+          },
+          {
+            "id": "b",
+            "label": "Timeout, resends",
+            "x": 0.17,
+            "y": 0.83,
+            "sublabel": "ID + seq 7 again",
+            "tone": "pending"
+          },
+          {
+            "id": "k",
+            "label": "Broker",
+            "x": 0.83,
+            "y": 0.5,
+            "sublabel": "dedupes the resend",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "k",
+            "label": "seq 7"
+          },
+          {
+            "from": "b",
+            "to": "k",
+            "label": "seq 7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s24-idem-on-conflict",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 46,
+      "beat": "CodePanel with the CREATE TABLE and both INSERTs; a row counter runs 0 -> 8 on the first load and stays at 8 on the retry.",
+      "on_screen_text": [
+        "DuckDB: PRIMARY KEY (event_id)",
+        "INSERT ... ON CONFLICT DO NOTHING",
+        "Load 9 rows, then retry the load",
+        "Result: 8 rows, one per event"
+      ],
+      "narration": "In DuckDB, the cleanest guard is an enforced key. Give the table a primary key on event_id and insert with ON CONFLICT DO NOTHING. In DuckDB, ON CONFLICT needs a primary key or unique constraint to check against. We load all nine raw rows, then run the exact same load again, like a retried job. The duplicate copy of event 3 is skipped the first time, and the whole retry is skipped the second time. Eight rows, eight unique events. Run it a third time and nothing changes. That's idempotent.",
+      "code_block": 3,
+      "component": "DataTable",
+      "props": {
+        "title": "events_clean (after load + retry): 8 rows",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00"
+          ]
+        ],
+        "highlightCols": [
+          "event_id"
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                2
+              ],
+              "note": "PRIMARY KEY (event_id)"
+            },
+            {
+              "lines": [
+                6,
+                7,
+                8
+              ],
+              "note": "load: duplicate skipped"
+            },
+            {
+              "lines": [
+                9,
+                10,
+                11
+              ],
+              "note": "retry: all skipped"
+            },
+            {
+              "lines": [
+                12,
+                13,
+                14
+              ],
+              "note": "8 rows, 8 unique"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s25-exactly-once",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 20,
+      "beat": "FlowGraph: source box labelled 'replayable' and sink box labelled 'idempotent' light up; a replay arrow loops back without changing the sink's row count.",
+      "on_screen_text": [
+        "Spark exactly-once: two ingredients",
+        "1. Replayable source (offsets, checkpoints)",
+        "2. Idempotent sink",
+        "Replay safely, write safely"
+      ],
+      "narration": "Spark's docs describe how Structured Streaming can ensure end-to-end exactly-once: replayable sources, tracked with offsets and checkpoints, plus idempotent sinks. The source lets you redo work after a failure. The sink makes redoing it harmless. In Spark, it's those two properties together.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "s",
+            "label": "Replayable source",
+            "x": 0.1,
+            "y": 0.5,
+            "sublabel": "offsets, checkpoints",
+            "tone": "match"
+          },
+          {
+            "id": "k",
+            "label": "Idempotent sink",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "row count unchanged",
+            "tone": "match"
+          },
+          {
+            "id": "j",
+            "label": "Spark job",
+            "x": 0.5,
+            "y": 0.5
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "j",
+            "label": "read"
+          },
+          {
+            "from": "j",
+            "to": "k",
+            "label": "write"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s26-stream-dedupe",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 12,
+      "beat": "CodePanel shows withWatermark(\"event_time\", ...).dropDuplicates(\"event_id\", \"event_time\") next to a watermark line.",
+      "on_screen_text": [
+        "Inside the stream: dropDuplicates",
+        "With watermark: key on event_id + event_time"
+      ],
+      "narration": "You can also dedupe inside the stream. With a watermark, Spark dedupes on event_id plus event time, or with dropDuplicatesWithinWatermark on event_id.",
+      "component": "Callout",
+      "props": {
+        "text": "With a watermark: dropDuplicates on event_id + event_time",
+        "tone": "info",
+        "label": "Spark",
+        "detail": "Or dropDuplicatesWithinWatermark on event_id"
+      }
+    },
+    {
+      "id": "s27-idem-takeaway",
+      "chapter": "4. Idempotent pipelines",
+      "duration_sec": 9,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: assume every step runs twice",
+        "Key on event_id. Make the sink idempotent."
+      ],
+      "narration": "Takeaway: assume every step runs twice. Key on event_id, and make the sink idempotent.",
+      "component": "Callout",
+      "props": {
+        "text": "Assume every step runs twice",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Key on event_id. Make the sink idempotent."
+      }
+    },
+    {
+      "id": "s28-medallion-hook",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 9,
+      "beat": "Hook card; a dashboard tile shows 4, which flips to 3.",
+      "on_screen_text": [
+        "Your dashboard says 4 clicks.",
+        "There were 3."
+      ],
+      "narration": "Your dashboard says four clicks. There were three. Here's the layering that fixes it.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Your dashboard says 4 clicks.",
+        "subtitle": "There were 3.",
+        "kicker": "5. Medallion architecture",
+        "highlight": [
+          "4",
+          "3"
+        ]
+      }
+    },
+    {
+      "id": "s29-medallion-layers",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 20,
+      "beat": "FlowGraph: three stacked layers, bronze, silver, gold, fill in from left to right.",
+      "on_screen_text": [
+        "Bronze: raw, unvalidated, as it arrived",
+        "Silver: cleaned, validated, deduplicated",
+        "Gold: aggregated for dashboards and BI"
+      ],
+      "narration": "The medallion architecture, as Databricks describes it, has three layers. Bronze holds raw, unvalidated data, as it arrived. Silver is cleaned, validated and deduplicated. Gold is aggregated, business-level data for analytics and reporting. Our nine-row events table, duplicate and all, is bronze.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "b",
+            "label": "Bronze",
+            "x": 0.1,
+            "y": 0.5,
+            "sublabel": "raw, as it arrived",
+            "tone": "pending"
+          },
+          {
+            "id": "s",
+            "label": "Silver",
+            "x": 0.5,
+            "y": 0.5,
+            "sublabel": "cleaned, deduplicated",
+            "tone": "active"
+          },
+          {
+            "id": "g",
+            "label": "Gold",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "aggregated for BI",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "b",
+            "to": "s"
+          },
+          {
+            "from": "s",
+            "to": "g"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s30-bronze-count",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 18,
+      "beat": "CodePanel + DataTable; the click count of 4 is circled and both event 3 rows are traced back to it.",
+      "on_screen_text": [
+        "Count clicks straight from bronze",
+        "click: 4 (event 3 counted twice)"
+      ],
+      "narration": "Count straight from bronze and you get four clicks. The retry of event 3 is counted twice. That's the four from the hook.",
+      "code_block": 4,
+      "component": "DataTable",
+      "props": {
+        "title": "bronze: rows per event_type",
+        "columns": [
+          "event_type",
+          "bronze_rows"
+        ],
+        "rows": [
+          [
+            "click",
+            4
+          ],
+          [
+            "page_view",
+            3
+          ],
+          [
+            "purchase",
+            2
+          ]
+        ],
+        "highlightRows": [
+          0
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                3
+              ],
+              "note": "bronze: raw events"
+            },
+            {
+              "lines": [
+                4
+              ],
+              "note": "click = 4"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s31-silver",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 33,
+      "beat": "CodePanel; the two event 3 rows get rn 1 and 2; rn 2 fades out and the table shrinks to 8 rows.",
+      "on_screen_text": [
+        "ROW_NUMBER() per event_id",
+        "Keep rn = 1: the first arrival",
+        "9 rows in, 8 rows out"
+      ],
+      "narration": "Silver removes the duplicate. ROW_NUMBER, partitioned by event_id and ordered by ingest_time, numbers every copy of an event. Keep row number one, the first arrival, and drop the rest. Nine rows in, eight out. Unlike ON CONFLICT, this is just a query, so it needs no constraint, and you can rerun it from bronze whenever your cleaning rules change.",
+      "code_block": 5,
+      "component": "RowHighlight",
+      "props": {
+        "title": "bronze + rn (ROW_NUMBER per event_id)",
+        "columns": [
+          "event_id",
+          "event_type",
+          "event_at",
+          "rn"
+        ],
+        "rows": [
+          [
+            1,
+            "page_view",
+            "09:00:05",
+            1
+          ],
+          [
+            2,
+            "page_view",
+            "09:01:10",
+            1
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            1
+          ],
+          [
+            4,
+            "click",
+            "09:02:30",
+            1
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            2
+          ],
+          [
+            5,
+            "page_view",
+            "09:03:15",
+            1
+          ],
+          [
+            7,
+            "click",
+            "09:05:20",
+            1
+          ],
+          [
+            8,
+            "purchase",
+            "09:06:40",
+            1
+          ],
+          [
+            6,
+            "purchase",
+            "09:04:00",
+            1
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Number each copy of an event",
+            "highlightCols": [
+              "rn"
+            ]
+          },
+          {
+            "label": "Event 3 copy 2 has rn = 2",
+            "rows": [
+              4
+            ],
+            "state": "noMatch"
+          },
+          {
+            "label": "Keep rn = 1: 9 rows in, 8 out",
+            "order": [
+              0,
+              1,
+              2,
+              3,
+              5,
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5,
+                6
+              ],
+              "note": "ROW_NUMBER per event_id"
+            },
+            {
+              "lines": [
+                6
+              ],
+              "note": "first arrival is 1"
+            },
+            {
+              "lines": [
+                10
+              ],
+              "note": "WHERE rn = 1"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s32-gold",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 25,
+      "beat": "CodePanel; silver rows collapse into three gold rows; the click tile on the dashboard updates to 3.",
+      "on_screen_text": [
+        "GROUP BY event_date, event_type",
+        "click 3, page_view 3, purchase 2",
+        "Distinct users with COUNT(DISTINCT)"
+      ],
+      "narration": "Gold is what the dashboard reads. Group silver by event date and event type, and count events and distinct users. Three clicks, three page views, two purchases. Now the dashboard says three, because it reads from deduplicated silver, not raw bronze.",
+      "code_block": 6,
+      "component": "DataTable",
+      "props": {
+        "title": "gold: events per day and type",
+        "columns": [
+          "event_date",
+          "event_type",
+          "events",
+          "users"
+        ],
+        "rows": [
+          [
+            "2026-10-19",
+            "click",
+            3,
+            3
+          ],
+          [
+            "2026-10-19",
+            "page_view",
+            3,
+            3
+          ],
+          [
+            "2026-10-19",
+            "purchase",
+            2,
+            2
+          ]
+        ],
+        "highlightRows": [
+          0
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                4
+              ],
+              "note": "read silver"
+            },
+            {
+              "lines": [
+                5
+              ],
+              "note": "GROUP BY"
+            },
+            {
+              "lines": [
+                2,
+                3
+              ],
+              "note": "events and distinct users"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s33-keep-bronze",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 20,
+      "beat": "FlowGraph: a 'fix dedupe rule' patch is applied to the silver step; silver and gold rebuild from the untouched bronze layer.",
+      "on_screen_text": [
+        "Why keep bronze?",
+        "Rules change: rebuild silver from raw"
+      ],
+      "narration": "Why keep bronze at all? Because cleaning rules change. If you find a bug in your dedupe, you fix the query and rebuild silver from bronze. If you had cleaned on the way in, the raw events would be gone.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "b",
+            "label": "Bronze",
+            "x": 0.1,
+            "y": 0.8,
+            "sublabel": "untouched raw",
+            "tone": "pending"
+          },
+          {
+            "id": "f",
+            "label": "Fix dedupe rule",
+            "x": 0.5,
+            "y": 0.2,
+            "tone": "noMatch"
+          },
+          {
+            "id": "s",
+            "label": "Silver",
+            "x": 0.5,
+            "y": 0.8,
+            "sublabel": "rebuilt",
+            "tone": "active"
+          },
+          {
+            "id": "g",
+            "label": "Gold",
+            "x": 0.9,
+            "y": 0.8,
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "f",
+            "to": "s",
+            "label": "patch"
+          },
+          {
+            "from": "b",
+            "to": "s"
+          },
+          {
+            "from": "s",
+            "to": "g"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s34-medallion-takeaway",
+      "chapter": "5. Medallion architecture",
+      "duration_sec": 6,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: bronze keeps, silver fixes,",
+        "gold answers."
+      ],
+      "narration": "Takeaway: bronze keeps, silver fixes, gold answers.",
+      "component": "Callout",
+      "props": {
+        "text": "Bronze keeps, silver fixes, gold answers.",
+        "tone": "success",
+        "label": "Takeaway"
+      }
+    },
+    {
+      "id": "s35-prune-hook",
+      "chapter": "6. Partition pruning",
+      "duration_sec": 10,
+      "beat": "Hook card; a grid of date partitions where only one tile lights up.",
+      "on_screen_text": [
+        "Pruning needs a filter on the partition column.",
+        "Miss it, and no partition is skipped."
+      ],
+      "narration": "Partition pruning only kicks in when your query filters on the partition column.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Pruning needs a filter on the partition column.",
+        "subtitle": "Miss it, and no partition is skipped.",
+        "kicker": "6. Partition pruning",
+        "highlight": [
+          "filter",
+          "partition"
+        ]
+      }
+    },
+    {
+      "id": "s36-prune-what",
+      "chapter": "6. Partition pruning",
+      "duration_sec": 20,
+      "beat": "PartitionGrid: a month of date tiles; rows drop into the tile for their event_date.",
+      "on_screen_text": [
+        "Partition silver by event_date",
+        "Each day stored in its own partition",
+        "Lake: event_date=2026-10-19/ folders"
+      ],
+      "narration": "Our silver table grows every day, so we partition it by event_date: each day's rows are stored in their own partition. In BigQuery that's a partitioned table. In a data lake it's often Hive-style folders, one per value, like event_date equals 2026-10-19.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "10-17",
+          "10-18",
+          "10-19",
+          "10-20"
+        ],
+        "items": [
+          {
+            "label": "e1",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e2",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e3",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e4",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e5",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e6",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e7",
+            "from": 2,
+            "to": 2
+          },
+          {
+            "label": "e8",
+            "from": 2,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Silver rows",
+        "afterLabel": "Partitioned by event_date"
+      }
+    },
+    {
+      "id": "s37-prune-query",
+      "chapter": "6. Partition pruning",
+      "duration_sec": 41,
+      "beat": "CodePanel with the query; on the PartitionGrid every tile except 2026-10-19 greys out; a 'bytes scanned' bar shrinks.",
+      "on_screen_text": [
+        "WHERE event_date = DATE '2026-10-19'",
+        "Filter on partition column: skip the rest",
+        "BigQuery: fewer bytes processed",
+        "DuckDB: filter pushed into Hive partitions"
+      ],
+      "narration": "Now a query that filters on the partition column. BigQuery's docs call this pruning: with a qualifying filter on the partitioning column, it scans only the matching partitions and skips the rest, which reduces the bytes processed. DuckDB does the same with Hive-partitioned files: filters on the partition keys are pushed down, so non-matching partitions are skipped. Here we run the query on an in-memory table, so the result is real, but the skipping only happens on partitioned storage.",
+      "code_block": 7,
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "q",
+            "label": "Query",
+            "x": 0.5,
+            "y": 0.1,
+            "sublabel": "filter on event_date",
+            "tone": "active"
+          },
+          {
+            "id": "c",
+            "label": "2026-10-19",
+            "x": 0.5,
+            "y": 0.37,
+            "sublabel": "read",
+            "tone": "match"
+          },
+          {
+            "id": "r",
+            "label": "Result",
+            "x": 0.5,
+            "y": 0.63,
+            "sublabel": "purchases per user"
+          },
+          {
+            "id": "k",
+            "label": "Other days",
+            "x": 0.5,
+            "y": 0.9,
+            "sublabel": "skipped",
+            "tone": "pending"
+          }
+        ],
+        "edges": [
+          {
+            "from": "q",
+            "to": "c"
+          },
+          {
+            "from": "c",
+            "to": "r"
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5
+              ],
+              "note": "filter on partition column"
+            },
+            {
+              "lines": [
+                3,
+                4
+              ],
+              "note": "read silver"
+            },
+            {
+              "lines": [
+                6,
+                7
+              ],
+              "note": "then aggregate"
+            }
+          ],
+          "title": "DuckDB SQL"
+        }
+      }
+    },
+    {
+      "id": "s38-prune-trap",
+      "chapter": "6. Partition pruning",
+      "duration_sec": 23,
+      "beat": "Comparison: left 'WHERE user_id = 101' lights up every tile; right 'WHERE event_date = ...' lights up one.",
+      "on_screen_text": [
+        "Filter only on user_id? No partition skipped",
+        "The filter must hit the partition column",
+        "Partition by what you filter by"
+      ],
+      "narration": "The trap: filter only on user_id and there's no qualifying filter on event_date, so every day's partition still has to be read. Partitioning helps the queries that filter on the partition column. So pick that column from how the table is actually queried. For our dashboard, that's the date.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "WHERE user_id = 101",
+          "tone": "noMatch",
+          "points": [
+            "No filter on event_date",
+            "No partition skipped"
+          ]
+        },
+        "right": {
+          "title": "WHERE event_date = ...",
+          "tone": "match",
+          "points": [
+            "Filter on partition column",
+            "Other days skipped"
+          ]
+        },
+        "verdict": "Partition by what you filter by"
+      }
+    },
+    {
+      "id": "s39-prune-takeaway",
+      "chapter": "6. Partition pruning",
+      "duration_sec": 6,
+      "beat": "Callout takeaway card.",
+      "on_screen_text": [
+        "Takeaway: partition by what you filter by"
+      ],
+      "narration": "Takeaway: partition by what you filter by.",
+      "component": "Callout",
+      "props": {
+        "text": "Partition by what you filter by",
+        "tone": "success",
+        "label": "Takeaway"
+      }
+    },
+    {
+      "id": "s40-recap",
+      "chapter": "Recap",
+      "duration_sec": 39,
+      "beat": "ListCard: the six chapter cards stack while the click dot from the cold open retraces the full pipeline from Kafka to the dashboard tile.",
+      "on_screen_text": [
+        "Kafka: key by user_id, order per partition",
+        "Clock: count by event_time",
+        "Watermark: max event time - threshold",
+        "Idempotent: replayable source + keyed sink",
+        "Medallion: bronze, silver, gold",
+        "Pruning: filter on event_date"
+      ],
+      "narration": "Let's recap the whole pipeline. Clicks go into Kafka, keyed by user_id, so each user's events stay ordered within a partition. Whether you run batch or streaming, you count by event time. Late events are handled by a watermark: max event time seen minus a threshold, guaranteed inside, best effort outside. Every write is idempotent: a replayable source plus a sink keyed on event_id. Data flows bronze to silver to gold. And silver is partitioned by event_date, so queries filtering on date skip the other days.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Kafka: key by user_id, order per partition"
+          },
+          {
+            "label": "Clock: count by event_time"
+          },
+          {
+            "label": "Watermark: max event time - threshold"
+          },
+          {
+            "label": "Idempotent: replayable source + keyed sink"
+          },
+          {
+            "label": "Medallion: bronze, silver, gold"
+          },
+          {
+            "label": "Pruning: filter on event_date"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s41-cta",
+      "chapter": "Outro",
+      "duration_sec": 12,
+      "beat": "EndCard with the website and tagline; watermark queryunstuck.",
+      "on_screen_text": [
+        "More visual explanations: queryunstuck.in",
+        "Data & AI Engineering, visualized."
+      ],
+      "narration": "That's the clickstream pipeline, end to end, on nine rows. If this helped, you'll find more visual explanations like it at queryunstuck.in.",
+      "component": "EndCard",
+      "props": {
+        "headline": "More visual explanations: queryunstuck.in",
+        "cta": "queryunstuck.in"
+      }
+    }
+  ],
+  "code_blocks": [
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "SELECT event_id, user_id, event_type,\n       strftime(event_time, '%H:%M:%S')  AS event_at,\n       strftime(ingest_time, '%H:%M:%S') AS arrived_at\nFROM events\nORDER BY ingest_time;",
+      "expected_output": "event_id | user_id | event_type | event_at | arrived_at\n1 | 101 | page_view | 09:00:05 | 09:00:06\n2 | 102 | page_view | 09:01:10 | 09:01:11\n3 | 102 | click | 09:02:00 | 09:02:01\n4 | 101 | click | 09:02:30 | 09:02:31\n3 | 102 | click | 09:02:00 | 09:02:45\n5 | 103 | page_view | 09:03:15 | 09:03:16\n7 | 103 | click | 09:05:20 | 09:05:21\n8 | 102 | purchase | 09:06:40 | 09:06:41\n6 | 101 | purchase | 09:04:00 | 09:21:40",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "SELECT event_id, event_type,\n       strftime(event_time, '%H:%M:%S')  AS event_at,\n       strftime(ingest_time, '%H:%M:%S') AS arrived_at,\n       ingest_time - event_time          AS lag\nFROM events\nORDER BY ingest_time;",
+      "expected_output": "event_id | event_type | event_at | arrived_at | lag\n1 | page_view | 09:00:05 | 09:00:06 | 0:00:01\n2 | page_view | 09:01:10 | 09:01:11 | 0:00:01\n3 | click | 09:02:00 | 09:02:01 | 0:00:01\n4 | click | 09:02:30 | 09:02:31 | 0:00:01\n3 | click | 09:02:00 | 09:02:45 | 0:00:45\n5 | page_view | 09:03:15 | 09:03:16 | 0:00:01\n7 | click | 09:05:20 | 09:05:21 | 0:00:01\n8 | purchase | 09:06:40 | 09:06:41 | 0:00:01\n6 | purchase | 09:04:00 | 09:21:40 | 0:17:40",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "-- Illustration of the watermark rule, not Spark itself\nWITH seen AS (\n  SELECT *, MAX(event_time) OVER (ORDER BY ingest_time) AS max_seen\n  FROM events\n)\nSELECT event_id,\n       strftime(event_time, '%H:%M:%S') AS event_at,\n       strftime(max_seen, '%H:%M:%S')   AS max_seen_at,\n       max_seen - event_time            AS behind,\n       CASE WHEN max_seen - event_time < INTERVAL 10 MINUTE\n            THEN 'guaranteed' ELSE 'best effort' END AS t_10min,\n       CASE WHEN max_seen - event_time < INTERVAL 2 MINUTE\n            THEN 'guaranteed' ELSE 'best effort' END AS t_2min\nFROM seen\nORDER BY ingest_time;",
+      "expected_output": "event_id | event_at | max_seen_at | behind | t_10min | t_2min\n1 | 09:00:05 | 09:00:05 | 0:00:00 | guaranteed | guaranteed\n2 | 09:01:10 | 09:01:10 | 0:00:00 | guaranteed | guaranteed\n3 | 09:02:00 | 09:02:00 | 0:00:00 | guaranteed | guaranteed\n4 | 09:02:30 | 09:02:30 | 0:00:00 | guaranteed | guaranteed\n3 | 09:02:00 | 09:02:30 | 0:00:30 | guaranteed | guaranteed\n5 | 09:03:15 | 09:03:15 | 0:00:00 | guaranteed | guaranteed\n7 | 09:05:20 | 09:05:20 | 0:00:00 | guaranteed | guaranteed\n8 | 09:06:40 | 09:06:40 | 0:00:00 | guaranteed | guaranteed\n6 | 09:04:00 | 09:06:40 | 0:02:40 | guaranteed | best effort",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "CREATE TABLE events_clean (\n  event_id INTEGER PRIMARY KEY, user_id INTEGER,\n  event_type VARCHAR, event_time TIMESTAMP, ingest_time TIMESTAMP\n);\n-- load once, then retry the exact same load\nINSERT INTO events_clean\nSELECT * FROM events ORDER BY ingest_time\nON CONFLICT (event_id) DO NOTHING;\nINSERT INTO events_clean\nSELECT * FROM events ORDER BY ingest_time\nON CONFLICT (event_id) DO NOTHING;\nSELECT COUNT(*)                 AS rows_in_table,\n       COUNT(DISTINCT event_id) AS unique_events\nFROM events_clean;",
+      "expected_output": "rows_in_table | unique_events\n8 | 8",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "-- bronze = events exactly as they arrived\nSELECT event_type, COUNT(*) AS bronze_rows\nFROM events\nGROUP BY event_type\nORDER BY event_type;",
+      "expected_output": "event_type | bronze_rows\nclick | 4\npage_view | 3\npurchase | 2",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');",
+      "code": "SELECT event_id, user_id, event_type,\n       strftime(event_time, '%H:%M:%S') AS event_at\nFROM (\n  SELECT *,\n         ROW_NUMBER() OVER (\n           PARTITION BY event_id ORDER BY ingest_time\n         ) AS rn\n  FROM events\n)\nWHERE rn = 1\nORDER BY event_id;",
+      "expected_output": "event_id | user_id | event_type | event_at\n1 | 101 | page_view | 09:00:05\n2 | 102 | page_view | 09:01:10\n3 | 102 | click | 09:02:00\n4 | 101 | click | 09:02:30\n5 | 103 | page_view | 09:03:15\n6 | 101 | purchase | 09:04:00\n7 | 103 | click | 09:05:20\n8 | 102 | purchase | 09:06:40",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');\nCREATE TABLE silver_events AS\nSELECT event_id, user_id, event_type, event_time,\n       CAST(event_time AS DATE) AS event_date\nFROM (\n  SELECT *, ROW_NUMBER() OVER (PARTITION BY event_id ORDER BY ingest_time) AS rn\n  FROM events\n)\nWHERE rn = 1;",
+      "code": "SELECT event_date, event_type,\n       COUNT(*)                AS events,\n       COUNT(DISTINCT user_id) AS users\nFROM silver_events\nGROUP BY event_date, event_type\nORDER BY event_date, event_type;",
+      "expected_output": "event_date | event_type | events | users\n2026-10-19 | click | 3 | 3\n2026-10-19 | page_view | 3 | 3\n2026-10-19 | purchase | 2 | 2",
+      "verified": true
+    },
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE events (\n  event_id INTEGER, user_id INTEGER, event_type VARCHAR,\n  event_time TIMESTAMP, ingest_time TIMESTAMP\n);\nINSERT INTO events VALUES\n  (1, 101, 'page_view', '2026-10-19 09:00:05', '2026-10-19 09:00:06'),\n  (2, 102, 'page_view', '2026-10-19 09:01:10', '2026-10-19 09:01:11'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:01'),\n  (4, 101, 'click',     '2026-10-19 09:02:30', '2026-10-19 09:02:31'),\n  (5, 103, 'page_view', '2026-10-19 09:03:15', '2026-10-19 09:03:16'),\n  (6, 101, 'purchase',  '2026-10-19 09:04:00', '2026-10-19 09:21:40'),\n  (3, 102, 'click',     '2026-10-19 09:02:00', '2026-10-19 09:02:45'),\n  (7, 103, 'click',     '2026-10-19 09:05:20', '2026-10-19 09:05:21'),\n  (8, 102, 'purchase',  '2026-10-19 09:06:40', '2026-10-19 09:06:41');\nCREATE TABLE silver_events AS\nSELECT event_id, user_id, event_type, event_time,\n       CAST(event_time AS DATE) AS event_date\nFROM (\n  SELECT *, ROW_NUMBER() OVER (PARTITION BY event_id ORDER BY ingest_time) AS rn\n  FROM events\n)\nWHERE rn = 1;",
+      "code": "-- Conceptual: in BigQuery or Hive-partitioned files, partitioned\n-- by event_date, this filter lets the engine skip other days.\nSELECT user_id, COUNT(*) AS purchases\nFROM silver_events\nWHERE event_date = DATE '2026-10-19'   -- partition column\n  AND event_type = 'purchase'\nGROUP BY user_id\nORDER BY user_id;",
+      "expected_output": "user_id | purchases\n101 | 1\n102 | 1",
+      "needs_manual_check": true,
+      "verified": true
+    }
+  ],
+  "music": {
+    "bed": "drift",
+    "gain_db": -13,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Drift (60 BPM, drumless drone, rare bells) sits under 15 min of narration without fatigue; at 60 BPM every whole-second scene lands on a beat, so sync changes no scene length. Sparse 12 cues/min, but -13 dB keeps room for voice-over.",
+    "track": "pieces/qu-005.wav"
+  },
+  "render": {
+    "longform_url": "https://media.queryunstuck.in/qu-005/longform.mp4",
+    "duration_sec": 943,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-005/thumbnail.png"
+  }
+}
