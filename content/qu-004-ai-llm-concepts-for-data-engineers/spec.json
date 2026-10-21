@@ -4,7 +4,7 @@
   "title": "15 Must-Know AI/LLM Concepts for Data Engineers",
   "format": "reel-list",
   "pillar": "ai-ml",
-  "status": "storyboarded",
+  "status": "qa-passed",
   "audience_level": "intermediate",
   "hook": "15 AI/LLM terms data engineers must know.",
   "hook_options": [
@@ -68,6 +68,18 @@
       "agent": "composer",
       "action": "scored",
       "note": "Bed drift (60 BPM, drumless ambient), gain -11 dB, duck 4, sync on; track pieces/qu-004.wav 28.000 s, resolving chord at 24.00 s. 25 cues/27 s (~56/min) unsynced, 21 cues/28 s (45/min) synced: dense. Compared calm (31.8 s, s3 stretched, rejected), study (25.8 s), rain (28 s, same grid, noise layer masks pops), focus (26.9 s, drums). Drift: no stretch, pops on an even 0.5 s grid; only off-beat cue is title pop-1 (micro). Node 0 pop of each FlowGraph now lands on the scene whoosh at +0.00 (deduped), as with every bed. Mix peak -10.8 dBFS; bed ~-31 dB RMS vs pop peaks ~-13 dB."
+    },
+    {
+      "at": "2026-10-21T13:06:00+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Render time: 24.08 s. Music track 28.000 s exact. Reel 28.011 s (H.264 1080x1920 30 fps AAC, 3.0 MB). Thumbnail frame 45 (1.5 s) title+subtitle fully drawn. Captions: 12 cues, 23 lines, 1.50 s min. Carousel: 5 slides (cover+3 list+takeaway), all legible unclipped. ffprobe: H.264+AAC, 28.011 s ±0.1 s, 1080x1920 30 fps, file 3.0 MB<100 MB. Audio: peak -10.8 dBFS (per composer). All URLs public, sizes verified."
+    },
+    {
+      "at": "2026-10-21T13:10:32+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-passed",
+      "note": "QA: PASS, no blockers. Fact-checked wording exact (split lines 4-5, 9-10, 14-15 verified), no arrows in s2/s4, s3 order correct, captions in window, carousel 5 slides and public sizes match, peak -10.9 dBFS. Minor: header text ~30 px and sublabels ~24 px (<36), text still dominates frame, captions lag node reveals, mix quiet (mean -30 dB), frame 0 empty."
     }
   ],
   "sources": [
@@ -442,6 +454,13 @@
         "title": "RAG answers depend on what you retrieve.",
         "subtitle": "Save this for your next interview"
       }
+    ],
+    "urls": [
+      "https://media.queryunstuck.in/qu-004/carousel/slide-01.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-02.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-03.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-04.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-05.jpg"
     ]
   },
   "music": {
@@ -451,5 +470,14 @@
     "sync": true,
     "rationale": "Concept list with ~45 cues/min after sync: dense, so a soft drumless ambient bed. Drift (60 BPM) keeps 28 s with no stretch and places node pops on an even 0.5 s grid; rain's noise and study's arpeggios compete more with pops. Just audible at -11 dB.",
     "track": "pieces/qu-004.wav"
+  },
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-004/reel.mp4",
+    "duration_sec": 28.011,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 45,
+    "url": "https://media.queryunstuck.in/qu-004/thumbnail.png"
   }
 }
