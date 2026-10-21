@@ -4,7 +4,7 @@
   "title": "SQL Query Execution Order, Visualized",
   "format": "reel-animated",
   "pillar": "data-analysis",
-  "status": "idea",
+  "status": "in-review",
   "audience_level": "beginner",
   "hook_options": [
     "You write SELECT first. The database reads it almost last.",
@@ -12,8 +12,712 @@
     "The order SQL actually runs your query in"
   ],
   "target_duration_sec": 35,
-  "scheduled_for": "2026-10-20T19:00:00+05:30",
+  "scheduled_for": "2026-10-21T19:00:00+05:30",
   "history": [
-    {"at": "2026-10-03T12:00:00+05:30", "agent": "setup", "action": "created example piece"}
-  ]
+    {
+      "at": "2026-10-03T12:00:00+05:30",
+      "agent": "setup",
+      "action": "created example piece"
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "research.md and sources[] written; status researched"
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "script.md, scenes[] and code_blocks[] written; status scripted",
+      "note": "Hook adapted from option 1, scoped to 'after HAVING' (true in T-SQL and PostgreSQL docs regardless of step numbering). Framed as logical order with optimizer caveat; no universal alias-in-WHERE claim; LIMIT 1 for a visible cut; total 38.5 s."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "factcheck.md written; VERDICT: FAIL; status left scripted",
+      "note": "Code block verified (runner + independent DuckDB checks all match). Required fixes: s1 on-screen 'SQL processes it after HAVING.' -> 'SQL logically processes it after HAVING.' (unqualified line is a physical claim; T-SQL docs say order might vary). s2 'SELECT → DISTINCT → ORDER BY → LIMIT' -> 'SELECT → DISTINCT → ORDER BY → LIMIT/TOP' (LIMIT is non-standard; T-SQL uses TOP). Mirror in script.md."
+    },
+    {
+      "at": "2026-10-17T15:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "s1 line 2 now carries 'logically'; s2 line 2 ends LIMIT/TOP; s2 beat greys out DISTINCT. Hook unchanged (already says 'logically')."
+    },
+    {
+      "at": "2026-10-17T17:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "re-check after loop 1; factcheck.md rewritten; VERDICT: PASS; status fact-checked",
+      "note": "s1 'SQL logically processes it after HAVING.' and s2 '... ORDER BY → LIMIT/TOP' confirmed in spec.json and script.md; DISTINCT greyed in s2 beat. No new claims. Runner re-run: code_blocks[0] matches expected (Asha | 120), verified true."
+    },
+    {
+      "at": "2026-10-17T19:02:44+05:30",
+      "agent": "visual-director",
+      "action": "scenes[].component and props written; status storyboarded",
+      "note": "Data copied from code_blocks[0]. s4-s8 use RowHighlight; s5/s6 and s7/s8 share identical tables for continuity. Timeline cannot grey out DISTINCT; shown with detail 'not in this query'."
+    },
+    {
+      "at": "2026-10-17T19:05:22+05:30",
+      "agent": "visual-director",
+      "action": "s2 DISTINCT event set dim:true after engine fix; stills re-checked; status storyboarded"
+    },
+    {
+      "at": "2026-10-17T19:08:10+05:30",
+      "agent": "renderer",
+      "action": "render, timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 47.5s, file 4.9 MB. Duration 38.5s (within 20-60s limit). H.264 1080x1920 30fps + AAC. 11 caption cues, shortest 2.5s. Thumbnail frame 60 (2.0s into s1), shows hook text and HAVING highlight."
+    },
+    {
+      "at": "2026-10-17T19:11:21+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa.md written; QA: FAIL; status left rendered",
+      "note": "Blockers: s7 shows Ben again after HAVING dropped him; s7->s8 continuation blinks (3-row table flashes at s8 start). Owner: visual-director, then re-render."
+    },
+    {
+      "at": "2026-10-17T19:12:19+05:30",
+      "agent": "visual-director",
+      "action": "QA loop 1 fixes: s7/s8 tables now only Chen 90, Asha 120 (Ben stays dropped); s8 starts from s7 end state (step at -1 s, no blink); status storyboarded (needs re-render)"
+    },
+    {
+      "at": "2026-10-17T19:16:07+05:30",
+      "agent": "renderer",
+      "action": "re-render after QA loop 1; timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 32.2s, file 4.7 MB. Duration 38.507s (within 38.5 ±0.1 s tolerance). H.264 1080x1920 30fps + AAC. 11 caption cues, all validated (no overlaps, min 1.0s, max 2 lines, within scene windows). Thumbnail frame 60 confirms s1 text fully visible."
+    },
+    {
+      "at": "2026-10-17T19:18:28+05:30",
+      "agent": "qa-reviewer",
+      "action": "re-QA after loop 1; qa.md rewritten; QA: PASS; status qa-passed",
+      "note": "Both blockers fixed (Ben no longer reappears in s7; s7->s8 seamless). Only minor polish items remain."
+    },
+    {
+      "at": "2026-10-17T22:29:57+05:30",
+      "agent": "composer",
+      "action": "scored piece: music bed drift, gain -11 dB, duck 4 dB, beat sync on; status unchanged (qa-passed)",
+      "note": "Compared study (72 BPM, 37.5 s, shortens s3-s6 and s9), calm (66 BPM, 39.1 s, shortens hook s1 to 2.73 s), focus (78 BPM, 40.0 s, drums), drift/rain (60 BPM, 41.0 s): none stretched, no off-beat cues. 35 cues/38.5 s = ~55 cues/min (dense) -> no-drum bed, gain -11. Drift chosen: every scene >= original length, clean 0.5 s step grid, no rain noise over the SFX. Needs re-render and re-QA (music/beat sync changes timing)."
+    },
+    {
+      "at": "2026-10-19T11:32:04+05:30",
+      "agent": "renderer",
+      "action": "re-render with music (drift) + beat sync; timeline, thumbnail, captions.srt, ffprobe, upload to R2; status rendered",
+      "note": "Render time 61.5s, file 4.8 MB. Duration 41.0s (drift bed at 60 BPM, all scenes beat-aligned, none stretched, within 25-45s limit). H.264 1080x1920 30fps + AAC (mean -29.4 dB, max -10.2 dB). 9 caption cues, all validated (no overlaps, min 1.0s, max 2 lines, entirely within scene windows). Thumbnail frame 60 (2.0s into s1), both hook text lines fully visible."
+    },
+    {
+      "at": "2026-10-19T11:36:14+05:30",
+      "agent": "qa-reviewer",
+      "action": "re-QA after music bed + beat sync (41.0 s); qa.md rewritten; QA: PASS; status qa-passed",
+      "note": "Captions verified programmatically; no music dips; clean fade ending; nothing off-beat; s7->s8 seamless; only minor polish items remain."
+    },
+    {
+      "at": "2026-10-19T11:36:56+05:30",
+      "agent": "copywriter",
+      "action": "caption.md and youtube.md written; status copy-ready",
+      "note": "Claims limited to factcheck.md PASS: logical order only, LIMIT/TOP scoped, only alias claim is ORDER BY can use SELECT alias."
+    },
+    {
+      "at": "2026-10-19T11:37:41+05:30",
+      "agent": "orchestrator",
+      "action": "copy fix",
+      "note": "YouTube title option 2 said SELECT 'Runs' after HAVING; fact-check requires logical framing. Now 'SQL Logical Order: Why SELECT Comes After HAVING'."
+    },
+    {
+      "at": "2026-10-19T11:37:53+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-001"
+    },
+    {
+      "at": "2026-10-20T21:35:35+05:30",
+      "agent": "orchestrator",
+      "action": "rescheduled",
+      "note": "2026-10-20T19:00:00+05:30 -> 2026-10-21T11:00:00+05:30 (missed Tue slot; owner request)"
+    },
+    {
+      "at": "2026-10-21T12:24:18+05:30",
+      "agent": "renderer",
+      "action": "re-render (subtler watermark)",
+      "note": "Render time 34.5s, file 4.9 MB. Duration 41.0s (unchanged). H.264 1080x1920 30fps + AAC. 11 caption cues, all validated. Thumbnail frame 60 confirms title fully visible. All files uploaded to R2."
+    },
+    {
+      "at": "2026-10-21T12:39:22+05:30",
+      "agent": "orchestrator",
+      "action": "rescheduled",
+      "note": "2026-10-21T11:00:00+05:30 -> 2026-10-21T19:00:00+05:30 (missed 11:00 slot; owner request)"
+    }
+  ],
+  "sources": [
+    {
+      "claim": "T-SQL logical processing order is FROM, ON, JOIN, WHERE, GROUP BY, WITH CUBE/ROLLUP, HAVING, SELECT, DISTINCT, ORDER BY, TOP; aliases from SELECT can't be referenced by earlier clauses but can by ORDER BY; physical execution may vary",
+      "url": "https://learn.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql?view=sql-server-ver16",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "PostgreSQL SELECT evaluation sequence (FROM, WHERE, GROUP BY/HAVING, SELECT list, DISTINCT, set ops, ORDER BY, LIMIT/OFFSET)",
+      "url": "https://www.postgresql.org/docs/current/sql-select.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "PostgreSQL: output column names usable in ORDER BY and GROUP BY but not WHERE or HAVING; name clash resolved opposite ways in ORDER BY vs GROUP BY",
+      "url": "https://www.postgresql.org/docs/current/sql-select.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Window functions logically execute after WHERE, GROUP BY, HAVING and after aggregates; allowed only in SELECT list and ORDER BY",
+      "url": "https://www.postgresql.org/docs/current/tutorial-window.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Snowflake: WHERE predicates behave as if evaluated after FROM, optimizer may reorder if results unchanged",
+      "url": "https://docs.snowflake.com/en/sql-reference/constructs/where",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB supports reusable (lateral) column aliases, usable in WHERE, GROUP BY, HAVING but not JOIN ON",
+      "url": "https://duckdb.org/docs/current/sql/dialect/friendly_sql",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "DuckDB QUALIFY filters window function results, sits after WINDOW and before ORDER BY, can reference SELECT aliases",
+      "url": "https://duckdb.org/docs/current/sql/query_syntax/qualify",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Worked example and DuckDB alias-in-WHERE behaviour executed locally in DuckDB 1.5.6 (project .venv)",
+      "url": "https://duckdb.org/docs/current/sql/dialect/friendly_sql",
+      "type": "secondary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "hook": "You write SELECT first. SQL logically processes it after HAVING.",
+  "scenes": [
+    {
+      "id": "s1-hook",
+      "duration_sec": 3,
+      "on_screen_text": [
+        "You write SELECT first.",
+        "SQL logically processes it after HAVING."
+      ],
+      "beat": "Hook. Code panel shows the query; SELECT line glows, then visibly drops below the HAVING line.",
+      "narration": "You write SELECT first. Logically, SQL processes it after HAVING.",
+      "component": "CodePanel",
+      "props": {
+        "steps": [
+          {
+            "lines": [
+              1
+            ],
+            "note": "SELECT: written first",
+            "at": 0.3
+          },
+          {
+            "lines": [
+              6
+            ],
+            "note": "HAVING runs before SELECT",
+            "at": 1.3
+          },
+          {
+            "lines": [
+              1
+            ],
+            "note": "SELECT: processed after HAVING",
+            "at": 2.2
+          }
+        ],
+        "title": "query.sql"
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s2-order",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "FROM/JOIN → WHERE → GROUP BY → HAVING",
+        "SELECT → DISTINCT → ORDER BY → LIMIT/TOP",
+        "Logical order. The optimizer may reorder physically."
+      ],
+      "beat": "Timeline of the 8 logical steps builds left to right. DISTINCT is shown greyed out (this query has no DISTINCT), so the walkthrough numbers 1-7 stay consistent. Small caveat line fades in: this is the logical model, physical execution can differ.",
+      "narration": "This is the logical processing order. The optimizer can run things differently, but results must match this model.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "FROM/JOIN"
+          },
+          {
+            "label": "WHERE"
+          },
+          {
+            "label": "GROUP BY"
+          },
+          {
+            "label": "HAVING"
+          },
+          {
+            "label": "SELECT"
+          },
+          {
+            "label": "DISTINCT",
+            "detail": "not in this query",
+            "dim": true
+          },
+          {
+            "label": "ORDER BY"
+          },
+          {
+            "label": "LIMIT/TOP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s3-from-join",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "1. FROM + JOIN builds the rows",
+        "7 orders matched to 3 customers"
+      ],
+      "beat": "FROM/JOIN clause highlighted. Join matcher links each order to its customer; a 7-row working table appears.",
+      "narration": "Step one: FROM and JOIN build the working rows. Seven orders, each matched to a customer.",
+      "component": "JoinMatcher",
+      "props": {
+        "left": {
+          "name": "orders",
+          "columns": [
+            "order_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              50
+            ],
+            [
+              102,
+              1,
+              70
+            ],
+            [
+              103,
+              2,
+              20
+            ],
+            [
+              104,
+              2,
+              30
+            ],
+            [
+              105,
+              3,
+              90
+            ],
+            [
+              106,
+              3,
+              10
+            ],
+            [
+              107,
+              2,
+              15
+            ]
+          ],
+          "key": "customer_id"
+        },
+        "right": {
+          "name": "customers",
+          "columns": [
+            "customer_id",
+            "name",
+            "country"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              "IN"
+            ],
+            [
+              2,
+              "Ben",
+              "US"
+            ],
+            [
+              3,
+              "Chen",
+              "US"
+            ]
+          ],
+          "key": "customer_id"
+        },
+        "joinType": "inner",
+        "label": "JOIN ON o.customer_id = c.customer_id",
+        "codeHighlight": {
+          "activeLines": [
+            2,
+            3
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s4-where",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "2. WHERE drops rows",
+        "amount >= 20: the 10 and 15 go"
+      ],
+      "beat": "WHERE highlighted. Orders 106 (10) and 107 (15) are struck through and fade; 5 rows remain.",
+      "narration": "Step two: WHERE filters individual rows. Amounts ten and fifteen are gone.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "joined rows",
+        "columns": [
+          "order_id",
+          "name",
+          "amount"
+        ],
+        "rows": [
+          [
+            101,
+            "Asha",
+            50
+          ],
+          [
+            102,
+            "Asha",
+            70
+          ],
+          [
+            103,
+            "Ben",
+            20
+          ],
+          [
+            104,
+            "Ben",
+            30
+          ],
+          [
+            105,
+            "Chen",
+            90
+          ],
+          [
+            106,
+            "Chen",
+            10
+          ],
+          [
+            107,
+            "Ben",
+            15
+          ]
+        ],
+        "steps": [
+          {
+            "label": "WHERE amount >= 20",
+            "rows": [
+              5,
+              6
+            ],
+            "state": "noMatch",
+            "highlightCols": [
+              "amount"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            4
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s5-group-by",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "3. GROUP BY collapses rows",
+        "Asha 120 · Ben 50 · Chen 90"
+      ],
+      "beat": "GROUP BY highlighted. Surviving rows slide together by name and collapse into 3 group rows with sums.",
+      "narration": "Step three: GROUP BY collapses the rows into one per customer.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "groups",
+        "columns": [
+          "name",
+          "SUM(amount)"
+        ],
+        "rows": [
+          [
+            "Asha",
+            120
+          ],
+          [
+            "Ben",
+            50
+          ],
+          [
+            "Chen",
+            90
+          ]
+        ],
+        "steps": [
+          {
+            "label": "GROUP BY name",
+            "rows": [
+              0,
+              1,
+              2
+            ],
+            "state": "active"
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            5
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s6-having",
+      "duration_sec": 4.5,
+      "on_screen_text": [
+        "4. HAVING drops whole groups",
+        "SUM > 50: Ben (50) is out"
+      ],
+      "beat": "HAVING highlighted. Ben's group row is struck through; Asha and Chen remain.",
+      "narration": "Step four: HAVING filters groups, not rows. Ben's total is exactly fifty, so he is out.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "groups",
+        "columns": [
+          "name",
+          "SUM(amount)"
+        ],
+        "rows": [
+          [
+            "Asha",
+            120
+          ],
+          [
+            "Ben",
+            50
+          ],
+          [
+            "Chen",
+            90
+          ]
+        ],
+        "steps": [
+          {
+            "label": "HAVING SUM > 50",
+            "rows": [
+              1
+            ],
+            "state": "noMatch"
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            6
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s7-select-order",
+      "duration_sec": 5,
+      "on_screen_text": [
+        "5. SELECT computes and names: total",
+        "6. ORDER BY total DESC",
+        "ORDER BY can use the alias"
+      ],
+      "beat": "SELECT highlighted; column header becomes 'total'. Then ORDER BY highlighted; rows reorder to Asha 120, Chen 90.",
+      "narration": "Step five: SELECT computes the output and names it total. Only then can ORDER BY sort by that alias.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "result",
+        "columns": [
+          "name",
+          "total"
+        ],
+        "rows": [
+          [
+            "Chen",
+            90
+          ],
+          [
+            "Asha",
+            120
+          ]
+        ],
+        "steps": [
+          {
+            "label": "SELECT SUM(amount) AS total",
+            "rows": [
+              0,
+              1
+            ],
+            "state": "active",
+            "highlightCols": [
+              "total"
+            ],
+            "at": 0.6
+          },
+          {
+            "label": "ORDER BY total DESC",
+            "order": [
+              1,
+              0
+            ],
+            "at": 2.6
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                1
+              ],
+              "note": "SELECT",
+              "at": 0.4
+            },
+            {
+              "lines": [
+                7
+              ],
+              "note": "ORDER BY",
+              "at": 2.6
+            }
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s8-limit",
+      "duration_sec": 3.5,
+      "on_screen_text": [
+        "7. LIMIT 1 keeps the top row",
+        "Result: Asha | 120"
+      ],
+      "beat": "LIMIT highlighted. Chen's row is struck through; Asha 120 remains as the final result.",
+      "narration": "Last, LIMIT one keeps the top row. Asha, one twenty.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "result",
+        "columns": [
+          "name",
+          "total"
+        ],
+        "rows": [
+          [
+            "Chen",
+            90
+          ],
+          [
+            "Asha",
+            120
+          ]
+        ],
+        "steps": [
+          {
+            "label": "ORDER BY total DESC",
+            "rows": [
+              0,
+              1
+            ],
+            "state": "active",
+            "highlightCols": [
+              "total"
+            ],
+            "order": [
+              1,
+              0
+            ],
+            "at": -1
+          },
+          {
+            "label": "LIMIT 1",
+            "rows": [
+              0
+            ],
+            "state": "noMatch",
+            "at": 0.9
+          },
+          {
+            "label": "LIMIT 1",
+            "order": [
+              1
+            ],
+            "at": 1.7
+          }
+        ],
+        "codeHighlight": {
+          "activeLines": [
+            8
+          ]
+        }
+      },
+      "code_block": 0
+    },
+    {
+      "id": "s9-end",
+      "duration_sec": 4,
+      "on_screen_text": [
+        "Rows, then groups, then SELECT, then sort.",
+        "Save this for your next interview"
+      ],
+      "beat": "End card with one-line takeaway and save prompt; watermark queryunstuck.",
+      "narration": "Rows, then groups, then SELECT, then sort. Save this for your next interview.",
+      "component": "EndCard",
+      "props": {
+        "headline": "Rows, then groups, then SELECT, then sort.",
+        "cta": "Save this for your next interview"
+      }
+    }
+  ],
+  "code_blocks": [
+    {
+      "lang": "sql",
+      "dialect": "duckdb",
+      "setup": "CREATE TABLE customers (customer_id INTEGER, name VARCHAR, country VARCHAR);\nINSERT INTO customers VALUES (1,'Asha','IN'),(2,'Ben','US'),(3,'Chen','US');\nCREATE TABLE orders (order_id INTEGER, customer_id INTEGER, amount INTEGER);\nINSERT INTO orders VALUES (101,1,50),(102,1,70),(103,2,20),(104,2,30),(105,3,90),(106,3,10),(107,2,15);",
+      "code": "SELECT c.name, SUM(o.amount) AS total\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nWHERE o.amount >= 20\nGROUP BY c.name\nHAVING SUM(o.amount) > 50\nORDER BY total DESC\nLIMIT 1;",
+      "expected_output": "name | total\nAsha | 120",
+      "verified": true
+    }
+  ],
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-001/reel.mp4",
+    "duration_sec": 41,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-001/thumbnail.png"
+  },
+  "music": {
+    "bed": "drift",
+    "gain_db": -11,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Dense SFX (~55 cues/min) needs a sparse bed without drums. Drift (60 BPM ambient drone, rare bells) stays out of the way of notes/dings, and its 0.5 s grid keeps every scene at or above its QA-passed length (41.0 s, none stretched, no off-beat cues).",
+    "track": "pieces/qu-001.wav"
+  }
 }
