@@ -49,6 +49,10 @@ export interface Spec {
   history: unknown[];
   scenes?: Scene[];
   code_blocks?: CodeBlock[];
+  carousel?: {
+    slides: Array<{ kind: "cover" | "list" | "takeaway"; title: string; subtitle?: string; lines?: string[]; start?: number }>;
+    urls?: string[];
+  };
   music?: { bed: string; gain_db?: number; duck_db?: number; sync?: boolean; rationale?: string; track?: string };
   [key: string]: unknown;
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { Composition } from "remotion";
 import { layout } from "./brand";
 import { calculateSpecMetadata, FromSpec, FromSpecLandscape } from "./compositions/FromSpec";
+import { Carousel, calculateCarouselMetadata } from "./compositions/Carousel";
 import demo from "./demos/demo-sql-order.json";
 import type { Spec } from "./types";
 import "./fonts";
@@ -29,6 +30,16 @@ export const RemotionRoot: React.FC = () => (
       durationInFrames={1}
       defaultProps={demoSpec}
       calculateMetadata={calculateSpecMetadata("landscape")}
+    />
+    <Composition
+      id="Carousel"
+      component={Carousel}
+      width={layout.carousel.width}
+      height={layout.carousel.height}
+      fps={1}
+      durationInFrames={1}
+      defaultProps={demoSpec}
+      calculateMetadata={calculateCarouselMetadata}
     />
   </>
 );

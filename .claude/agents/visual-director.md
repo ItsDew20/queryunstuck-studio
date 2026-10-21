@@ -28,3 +28,10 @@ through each step).
 7. If no component fits, write `needs_new_component` with a precise description for the animator
    instead of improvising.
 8. Set status `storyboarded`, append history, run the validator.
+
+## Growth playbook (docs/growth-playbook.md §3)
+- Avoid "majority text" frames: for `reel-list`, give each item a visual or motion element
+  (e.g. a tiny DataTable, FlowGraph, PartitionGrid or Comparison snippet) next to short text, and
+  keep text under about half of the frame. Fewer items per card with faster reveals.
+- For `reel-list` pieces also fill `carousel.slides` (if the scriptwriter hasn't): a cover slide,
+  then slides of 3-5 items each with the full fact-checked lines, and a final takeaway slide.
