@@ -4,7 +4,7 @@
   "title": "15 Must-Know AI/LLM Concepts for Data Engineers",
   "format": "reel-list",
   "pillar": "ai-ml",
-  "status": "qa-passed",
+  "status": "in-review",
   "audience_level": "intermediate",
   "hook": "15 AI/LLM terms data engineers must know.",
   "hook_options": [
@@ -80,6 +80,24 @@
       "agent": "qa-reviewer",
       "action": "qa-passed",
       "note": "QA: PASS, no blockers. Fact-checked wording exact (split lines 4-5, 9-10, 14-15 verified), no arrows in s2/s4, s3 order correct, captions in window, carousel 5 slides and public sizes match, peak -10.9 dBFS. Minor: header text ~30 px and sublabels ~24 px (<36), text still dominates frame, captions lag node reveals, mix quiet (mean -30 dB), frame 0 empty."
+    },
+    {
+      "at": "2026-10-21T13:11:20+05:30",
+      "agent": "copywriter",
+      "action": "copy-ready",
+      "note": "caption.md (reel + carousel caption, audio_name) and youtube.md (Short). Definitions copied exactly from fact-checked text; hook_options[0] and [2] not used."
+    },
+    {
+      "at": "2026-10-21T13:12:05+05:30",
+      "agent": "orchestrator",
+      "action": "copy fix",
+      "note": "'grouped by where they show up in the pipeline' implied every term is a pipeline stage; now 'grouped in three cards'."
+    },
+    {
+      "at": "2026-10-21T13:12:05+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-004"
     }
   ],
   "sources": [
