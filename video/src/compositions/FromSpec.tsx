@@ -234,18 +234,52 @@ const Box: React.FC<{ r: Rect; o: Orientation; durationInFrames: number; childre
   );
 };
 
+/** Title-zone typography: sizes, and the height the block needs at those sizes. */
+const titleMetrics = (text: string[], r: Rect, o: Orientation, availableH: number) => {
+  const [title = "", ...rest] = text;
+  const lines = rest.slice(0, 3);
+  const portrait = o === "portrait";
+  const lineFs0 = (portrait ? [38, 34, 30] : [32, 30, 28])[Math.max(0, lines.length - 1)];
+  // Montserrat Black averages ~0.66em per glyph; shrink long titles to one line where possible.
+  const maxFs = (portrait ? 80 : 66) - (lines.length >= 2 ? 12 : 0);
+  const titleFs0 = Math.max(portrait ? 54 : 46, Math.min(maxFs, r.w / Math.max(1, title.length * 0.66)));
+  const rows = (t: string, fs: number, glyph: number) => Math.max(1, Math.ceil((t.length * glyph * fs) / r.w));
+  const heightAt = (k: number) =>
+    rows(title, titleFs0 * k, 0.66) * titleFs0 * k * 1.08 +
+    lines.reduce((acc, l, i) => acc + (i === 0 ? 16 : 6) + rows(l, lineFs0 * k, 0.55) * lineFs0 * k * 1.25, 0);
+  // Shrink only if the block still doesn't fit the (possibly enlarged) zone; never below ~85%.
+  let fit = 1;
+  while (fit > 0.86 && heightAt(fit) > availableH - 8) fit -= 0.02;
+  return { title, lines, titleFs: titleFs0 * fit, lineFs: lineFs0 * fit, needed: heightAt(1) + 8 };
+};
+
+/**
+ * Zoned layouts: if the title block needs more height than the title zone, grow the zone and push
+ * the component (and code panel) down by the same amount, up to a cap, instead of overlapping.
+ */
+const MAX_TITLE_GROW = { portrait: 140, landscape: 200 } as const;
+const growForTitle = (R: ReturnType<typeof rects>, text: string[], o: Orientation) => {
+  const need = titleMetrics(text, R.title, o, Infinity).needed;
+  const grow = Math.max(0, Math.min(MAX_TITLE_GROW[o], need - R.title.h));
+  if (!grow) return R;
+  const shift = (r: Rect): Rect => ({ ...r, y: r.y + grow, h: r.h - grow });
+  return {
+    ...R,
+    title: { ...R.title, h: R.title.h + grow },
+    anim: shift(R.anim),
+    code: R.code ? shift(R.code) : R.code,
+    animNoCode: shift(R.animNoCode),
+    codeMain: shift(R.codeMain),
+  };
+};
+
 const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, o, text }) => {
   const frame = useCurrentFrame();
   // Every on_screen_text line is fact-checked as on-screen copy, so all of them are drawn:
   // [0] is the title, [1..3] are supporting lines (definition, caveat) in decreasing emphasis.
-  const [title, ...rest] = text;
-  const lines = rest.slice(0, 3);
+  const { title, lines, titleFs, lineFs } = titleMetrics(text, r, o, r.h);
   if (!title) return null;
   const portrait = o === "portrait";
-  const lineFs = (portrait ? [38, 34, 30] : [32, 30, 28])[Math.max(0, lines.length - 1)];
-  // Montserrat Black averages ~0.66em per glyph; shrink long titles to one line where possible.
-  const maxFs = (portrait ? 80 : 66) - (lines.length >= 2 ? 12 : 0);
-  const titleFs = Math.max(portrait ? 54 : 46, Math.min(maxFs, r.w / (title.length * 0.66)));
   return (
     <div
       style={{
@@ -418,7 +452,7 @@ const SceneView: React.FC<{
   grid?: Grid;
 }> = ({ scene, codeBlocks, o, durationInFrames, links, prev, grid }) => {
   const frame = useCurrentFrame();
-  const R = rects(o);
+  const R = scene.component && !FULL_FRAME.has(scene.component) ? growForTitle(rects(o), scene.on_screen_text, o) : rects(o);
   const fadeIn = interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
   const fadeOut = interpolate(frame, [durationInFrames - 6, durationInFrames], [1, 0], { extrapolateLeft: "clamp" });
   // Parts that carry on into the neighbouring scene stay put instead of blinking.
