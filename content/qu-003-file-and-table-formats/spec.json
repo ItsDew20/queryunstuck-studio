@@ -107,6 +107,18 @@
       "agent": "orchestrator",
       "action": "opened review PR",
       "note": "branch content/qu-003"
+    },
+    {
+      "at": "2026-10-21T12:21:18+05:30",
+      "agent": "orchestrator",
+      "action": "carousel slides added",
+      "note": "6 slides built only from fact-checked on_screen_text (growth-playbook §3)."
+    },
+    {
+      "at": "2026-10-21T12:25:50+05:30",
+      "agent": "renderer",
+      "action": "re-render (subtler watermark)",
+      "note": "Render time 23.3s, file 2.8 MB. Duration 25.47s (unchanged). H.264 1080x1920 30fps + AAC. 10 caption cues, all validated. Thumbnail frame 45 confirms title fully visible. All files uploaded to R2."
     }
   ],
   "sources": [
@@ -374,5 +386,66 @@
     "sync": true,
     "rationale": "Dense list (47 cues/min), so a drum-free pad bed sits under the rising notes. At 66 BPM item reveals land 0.9-1.4 s apart, the most even spacing tested, so each card reads without rush. -12 dB keeps it just audible.",
     "track": "pieces/qu-003.wav"
+  },
+  "carousel": {
+    "slides": [
+      {
+        "kind": "cover",
+        "title": "Parquet is a file format.\nIceberg is not.",
+        "subtitle": "10 must-know file & table formats, CSV to Iceberg"
+      },
+      {
+        "kind": "list",
+        "title": "Row-based files",
+        "lines": [
+          "CSV: plain-text rows, comma-separated",
+          "JSON: text format for structured data",
+          "JSON Lines: one JSON value per line",
+          "Avro: binary rows, schema embedded"
+        ],
+        "start": 1
+      },
+      {
+        "kind": "list",
+        "title": "Columnar + in-memory",
+        "lines": [
+          "Parquet: column-oriented file, built-in compression",
+          "ORC: columnar file, created for Hive",
+          "Arrow: columnar in memory, built for compute"
+        ],
+        "start": 5
+      },
+      {
+        "kind": "list",
+        "title": "Table formats: metadata over data files",
+        "lines": [
+          "Delta Lake: ACID transaction log",
+          "Iceberg: snapshots, schema evolution, time travel",
+          "Hudi: upserts, deletes, incremental processing"
+        ],
+        "start": 8
+      },
+      {
+        "kind": "list",
+        "title": "File format vs table format",
+        "lines": [
+          "File format: how bytes sit in a file",
+          "Table format: which files form the table"
+        ]
+      },
+      {
+        "kind": "takeaway",
+        "title": "Files store data. Tables track files.",
+        "subtitle": "Save this for your next interview"
+      }
+    ],
+    "urls": [
+      "https://media.queryunstuck.in/qu-003/carousel/slide-01.jpg",
+      "https://media.queryunstuck.in/qu-003/carousel/slide-02.jpg",
+      "https://media.queryunstuck.in/qu-003/carousel/slide-03.jpg",
+      "https://media.queryunstuck.in/qu-003/carousel/slide-04.jpg",
+      "https://media.queryunstuck.in/qu-003/carousel/slide-05.jpg",
+      "https://media.queryunstuck.in/qu-003/carousel/slide-06.jpg"
+    ]
   }
 }
