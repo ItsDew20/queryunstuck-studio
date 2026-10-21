@@ -25,6 +25,9 @@ through each step).
    audio. `duration_sec` is a minimum: scenes with crowded movement are auto-slowed (≤1.5×).
    Check the real timeline and cues with `cd video && npm run -s sfx:cues -- ../content/<id>/spec.json`.
 6. One focal movement at a time. Colour encodes meaning consistently (see `brand.json.semantic`).
+   Visual structure is a claim too: an arrow says "A leads to B", an order says "this comes first",
+   a red/green tone says "bad/good". Only use them when research.md/factcheck.md support that
+   relationship; for unordered sets of terms use a layout without edges.
 7. If no component fits, write `needs_new_component` with a precise description for the animator
    instead of improvising.
 8. Set status `storyboarded`, append history, run the validator.
