@@ -12,6 +12,10 @@ You run the render pipeline. You do not change creative decisions.
    (generates missing beds automatically; files are git-ignored and deterministic).
 1. `cd video && npx remotion render src/index.ts FromSpec out/<id>-reel.mp4 --props=../content/<id>/spec.json`
    (reels 1080×1920 30 fps; longform composition `FromSpecLandscape` 1920×1080).
+   Run it in the foreground (longform: up to 10 min per call, re-wait until the process exits) and
+   note the start time. Before any later step, confirm the output file's modification time is
+   **after** that start time. An older file is a stale render from before the fixes: never check,
+   caption or upload it.
 2. Generate thumbnail still (frame chosen by `thumbnail.frame`, default first title frame; Read the PNG
    to confirm the title is fully drawn). Generate captions ONLY with the script (never by hand):
    `.venv/bin/python scripts/make_captions.py content/<id>-<slug>`. It uses the real timeline and
