@@ -4,7 +4,7 @@
   "title": "Designing a Clickstream Analytics Pipeline, End to End",
   "format": "longform",
   "pillar": "data-system-design",
-  "status": "fact-checked",
+  "status": "storyboarded",
   "audience_level": "intermediate",
   "hook": "Every click becomes a dashboard number. Here are the 6 design steps in between.",
   "hook_options": [
@@ -62,6 +62,18 @@
       "agent": "fact-checker",
       "action": "fact-checked (PASS, loop 3)",
       "note": "VERDICT: PASS after 2 fix loops. s35 loop-2 fix confirmed in spec.json and script.md; diff vs original scripted spec shows only the loop-1/loop-2 fixes, duration tweaks (943 s) and block 3 ORDER BY. Re-ran snippets: 8/8 OK and verified; block 7 needs_manual_check retained (in-memory table cannot show pruning); no disk writes; on-screen numbers match outputs. Watermark ruling: script correct (2m40s behind 09:06:40: 10-min guaranteed, 2-min best effort); research.md corrected. Non-blocking: don't present bytes-scanned bar as measured; don't reintroduce removed wording in copy."
+    },
+    {
+      "at": "2026-10-21T13:00:54+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "All 42 scenes given component + props; shared 9-row events table, numbers match verified blocks. s26 Spark dedupe shown as Callout (no unverified code). s37 FlowGraph shows skipped partitions, no bytes-scanned bar."
+    },
+    {
+      "at": "2026-10-21T13:14:25+05:30",
+      "agent": "visual-director",
+      "action": "storyboard revision",
+      "note": "s36: removed unverified filler rows (only e1-e8 move into 10-19). s40: ListCard overlapped watermark and overflowed with a title, so switched to Timeline of the 6 recap lines (no overlap). Takeaway callout text capitalised."
     }
   ],
   "sources": [
@@ -132,7 +144,30 @@
         "Kafka, streaming, watermarks",
         "Idempotency, medallion, pruning"
       ],
-      "narration": "Every click on a website becomes a number on a dashboard. Between the click and the number are six design decisions worth knowing cold: Kafka partitions, batch versus streaming, late data and watermarks, idempotent writes, bronze, silver and gold, and partition pruning. We'll build the whole pipeline on one nine-row table, and every query you see was actually run."
+      "narration": "Every click on a website becomes a number on a dashboard. Between the click and the number are six design decisions worth knowing cold: Kafka partitions, batch versus streaming, late data and watermarks, idempotent writes, bronze, silver and gold, and partition pruning. We'll build the whole pipeline on one nine-row table, and every query you see was actually run.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Kafka partitions"
+          },
+          {
+            "label": "Batch or streaming"
+          },
+          {
+            "label": "Late data and watermarks"
+          },
+          {
+            "label": "Idempotent writes"
+          },
+          {
+            "label": "Bronze, silver, gold"
+          },
+          {
+            "label": "Partition pruning"
+          }
+        ]
+      }
     },
     {
       "id": "s01-what-is-clickstream",
@@ -145,7 +180,55 @@
         "event_time: when it happened",
         "ingest_time: when we received it"
       ],
-      "narration": "A clickstream is the log of what users do: page views, clicks, purchases. Each action becomes one event. We treat events as append-only: a click that happened, happened. So every action is a new row. Two timestamps matter. event_time is when the action happened. ingest_time is when our pipeline received it. Keep those two apart, because half of this video depends on the gap between them."
+      "narration": "A clickstream is the log of what users do: page views, clicks, purchases. Each action becomes one event. We treat events as append-only: a click that happened, happened. So every action is a new row. Two timestamps matter. event_time is when the action happened. ingest_time is when our pipeline received it. Keep those two apart, because half of this video depends on the gap between them.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (3 of 9 rows)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_time",
+          "ingest_time"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "event_time: when it happened",
+            "highlightCols": [
+              "event_time"
+            ]
+          },
+          {
+            "label": "ingest_time: when we received it",
+            "highlightCols": [
+              "ingest_time"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "s02-events-table",
@@ -158,7 +241,118 @@
         "Event 6 arrives 17 min 40 s late"
       ],
       "narration": "Here's the table we'll use for the whole video, in the order rows arrived. Three users: 101, 102 and 103. Most events land about a second after they happen. Two rows are trouble. Event 3, a click by user 102, shows up twice, the second copy 44 seconds after the first, like a retry. And event 6, a purchase by user 101, happened at 09:04 but only arrived at 09:21:40. Nine rows, but only eight real events. Every chapter fixes one problem in this table.",
-      "code_block": 0
+      "code_block": 0,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (arrival order)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at",
+          "arrived_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10",
+            "09:01:11"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:01"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:45"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15",
+            "09:03:16"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20",
+            "09:05:21"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00",
+            "09:21:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 3 arrives twice (44 s apart)",
+            "rows": [
+              2,
+              4
+            ]
+          },
+          {
+            "label": "Event 6: 17 min 40 s late",
+            "reset": true,
+            "rows": [
+              8
+            ],
+            "highlightCols": [
+              "arrived_at"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5
+              ],
+              "note": "ORDER BY ingest_time"
+            },
+            {
+              "lines": [
+                3
+              ],
+              "note": "arrived_at"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s03-kafka-hook",
@@ -169,7 +363,16 @@
         "Kafka doesn't order your topic.",
         "It orders each partition."
       ],
-      "narration": "Kafka does not keep your whole topic in order. It keeps each partition in order. That one sentence answers a lot of Kafka interview questions."
+      "narration": "Kafka does not keep your whole topic in order. It keeps each partition in order. That one sentence answers a lot of Kafka interview questions.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Kafka doesn't order your topic.",
+        "subtitle": "It orders each partition.",
+        "kicker": "1. Kafka",
+        "highlight": [
+          "partition"
+        ]
+      }
     },
     {
       "id": "s04-kafka-partitions",
@@ -182,7 +385,51 @@
         "One partition: read in the order written",
         "Across partitions: no order promised"
       ],
-      "narration": "Our click events land in a Kafka topic, say one called clicks. A topic is split into partitions, and those partitions are spread across the brokers in the cluster. Inside one partition, a consumer reads events in exactly the order they were written. Across partitions there's no such promise. An event in partition zero and an event in partition two have no defined order relative to each other."
+      "narration": "Our click events land in a Kafka topic, say one called clicks. A topic is split into partitions, and those partitions are spread across the brokers in the cluster. Inside one partition, a consumer reads events in exactly the order they were written. Across partitions there's no such promise. An event in partition zero and an event in partition two have no defined order relative to each other.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "Partition 0",
+          "Partition 1",
+          "Partition 2"
+        ],
+        "items": [
+          {
+            "label": "A",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "B",
+            "from": 0,
+            "to": 1
+          },
+          {
+            "label": "C",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "D",
+            "from": 0,
+            "to": 0
+          },
+          {
+            "label": "E",
+            "from": 0,
+            "to": 1
+          },
+          {
+            "label": "F",
+            "from": 0,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Topic: clicks",
+        "afterLabel": "Ordered inside each partition only",
+        "moveAt": 4,
+        "moveSpan": 0.5
+      }
     },
     {
       "id": "s05-kafka-keys",
@@ -194,7 +441,61 @@
         "Key = user_id",
         "User 101: view, click, purchase in order"
       ],
-      "narration": "So how do you get the order you actually need? With the key. Events with the same key go to the same partition. If we key by user_id, every event from user 101 lands in the same partition, and a consumer reads page view, then click, then purchase, in the order they were written. Different users can sit on different partitions, and that's fine, because 'what did this user do next' is a per-user question."
+      "narration": "So how do you get the order you actually need? With the key. Events with the same key go to the same partition. If we key by user_id, every event from user 101 lands in the same partition, and a consumer reads page view, then click, then purchase, in the order they were written. Different users can sit on different partitions, and that's fine, because 'what did this user do next' is a per-user question.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "P0: user 101",
+          "P1: user 102",
+          "P2: user 103"
+        ],
+        "items": [
+          {
+            "label": "e1 view",
+            "from": 1,
+            "to": 0
+          },
+          {
+            "label": "e2 view",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "e3 click",
+            "from": 1,
+            "to": 1
+          },
+          {
+            "label": "e4 click",
+            "from": 1,
+            "to": 0
+          },
+          {
+            "label": "e5 view",
+            "from": 1,
+            "to": 2
+          },
+          {
+            "label": "e6 buy",
+            "from": 1,
+            "to": 0
+          },
+          {
+            "label": "e7 click",
+            "from": 1,
+            "to": 2
+          },
+          {
+            "label": "e8 buy",
+            "from": 1,
+            "to": 1
+          }
+        ],
+        "beforeLabel": "Events in arrival order",
+        "afterLabel": "Key = user_id: same user, same partition",
+        "moveAt": 4,
+        "moveSpan": 0.6
+      }
     },
     {
       "id": "s06-consumer-groups",
@@ -206,7 +507,74 @@
         "Each partition: one consumer in the group",
         "Position: one offset per partition"
       ],
-      "narration": "Now reading. Consumers subscribe as a consumer group. Within the group, each partition is consumed by exactly one consumer. That's how Kafka splits the work, and it's why per-partition order survives: one partition, one reader in the group. The group's position is small: one offset per partition, which marks how far it has read. Remember that offset. It's what makes replay possible in chapter four."
+      "narration": "Now reading. Consumers subscribe as a consumer group. Within the group, each partition is consumed by exactly one consumer. That's how Kafka splits the work, and it's why per-partition order survives: one partition, one reader in the group. The group's position is small: one offset per partition, which marks how far it has read. Remember that offset. It's what makes replay possible in chapter four.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "p0",
+            "label": "Partition 0",
+            "x": 0.17,
+            "y": 0.15,
+            "sublabel": "offset"
+          },
+          {
+            "id": "p1",
+            "label": "Partition 1",
+            "x": 0.17,
+            "y": 0.5,
+            "sublabel": "offset"
+          },
+          {
+            "id": "p2",
+            "label": "Partition 2",
+            "x": 0.17,
+            "y": 0.85,
+            "sublabel": "offset"
+          },
+          {
+            "id": "a",
+            "label": "Consumer A",
+            "x": 0.83,
+            "y": 0.15,
+            "sublabel": "one group",
+            "tone": "match"
+          },
+          {
+            "id": "b",
+            "label": "Consumer B",
+            "x": 0.83,
+            "y": 0.5,
+            "sublabel": "one group",
+            "tone": "match"
+          },
+          {
+            "id": "c",
+            "label": "Consumer C",
+            "x": 0.83,
+            "y": 0.85,
+            "sublabel": "one group",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p0",
+            "to": "a",
+            "colorIndex": 0
+          },
+          {
+            "from": "p1",
+            "to": "b",
+            "colorIndex": 1
+          },
+          {
+            "from": "p2",
+            "to": "c",
+            "colorIndex": 2
+          }
+        ]
+      }
     },
     {
       "id": "s07-kafka-interview",
@@ -218,7 +586,27 @@
         "A: key by user_id",
         "Order is per partition, not per topic"
       ],
-      "narration": "Interview version. 'How do you guarantee a user's events are processed in order?' Key the events by user_id. Same key, same partition. Ordering is per partition, not per topic, and one consumer in the group reads each partition."
+      "narration": "Interview version. 'How do you guarantee a user's events are processed in order?' Key the events by user_id. Same key, same partition. Ordering is per partition, not per topic, and one consumer in the group reads each partition.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Whole topic",
+          "tone": "noMatch",
+          "points": [
+            "No order promised",
+            "Across partitions"
+          ]
+        },
+        "right": {
+          "title": "Per partition",
+          "tone": "match",
+          "points": [
+            "Key by user_id",
+            "Same key, same partition"
+          ]
+        },
+        "verdict": "Order is per partition, not per topic"
+      }
     },
     {
       "id": "s08-kafka-takeaway",
@@ -229,7 +617,14 @@
         "Takeaway: order lives in the partition",
         "Pick the key that matches your question"
       ],
-      "narration": "Takeaway: order lives in the partition, so pick the key that matches the question you need answered in order."
+      "narration": "Takeaway: order lives in the partition, so pick the key that matches the question you need answered in order.",
+      "component": "Callout",
+      "props": {
+        "text": "Order lives in the partition",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Pick the key that matches your question"
+      }
     },
     {
       "id": "s09-batch-hook",
@@ -240,7 +635,16 @@
         "Batch or streaming?",
         "First decide which clock you trust."
       ],
-      "narration": "Batch or streaming? Before you pick, decide which clock your numbers follow."
+      "narration": "Batch or streaming? Before you pick, decide which clock your numbers follow.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Batch or streaming?",
+        "subtitle": "First decide which clock you trust.",
+        "kicker": "2. Batch vs streaming",
+        "highlight": [
+          "clock"
+        ]
+      }
     },
     {
       "id": "s10-batch-vs-stream",
@@ -252,7 +656,27 @@
         "Streaming: keep processing as events arrive",
         "Same events, different trigger"
       ],
-      "narration": "Batch means: take the events that have already landed, say all of yesterday, process them, and finish. Streaming means the job keeps running and processes events as they arrive. Same events, same business logic. The difference is when the work runs, and how much of the data has shown up when it runs."
+      "narration": "Batch means: take the events that have already landed, say all of yesterday, process them, and finish. Streaming means the job keeps running and processes events as they arrive. Same events, same business logic. The difference is when the work runs, and how much of the data has shown up when it runs.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Batch",
+          "tone": "active",
+          "points": [
+            "Process what has landed",
+            "Then stop"
+          ]
+        },
+        "right": {
+          "title": "Streaming",
+          "tone": "active",
+          "points": [
+            "Keep processing as events arrive",
+            "Job keeps running"
+          ]
+        },
+        "verdict": "Same events, different trigger"
+      }
     },
     {
       "id": "s11-event-time-lag",
@@ -265,7 +689,114 @@
         "Event 6: 17 min 40 s between them"
       ],
       "narration": "This is where the clocks matter. Spark's docs define event time as the time embedded in the data itself, not the time it arrived. Look at the lag column. Most events arrive a second after they happen. Event 6, a purchase, took seventeen minutes and forty seconds. A batch job that runs after it has landed simply sees it. A streaming job counting purchases per minute has to decide what to do when a 09:04 purchase shows up at 09:21.",
-      "code_block": 1
+      "code_block": 1,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (event time vs ingest time)",
+        "columns": [
+          "event_id",
+          "event_type",
+          "event_at",
+          "arrived_at",
+          "lag"
+        ],
+        "rows": [
+          [
+            1,
+            "page_view",
+            "09:00:05",
+            "09:00:06",
+            "0:00:01"
+          ],
+          [
+            2,
+            "page_view",
+            "09:01:10",
+            "09:01:11",
+            "0:00:01"
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            "09:02:01",
+            "0:00:01"
+          ],
+          [
+            4,
+            "click",
+            "09:02:30",
+            "09:02:31",
+            "0:00:01"
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            "09:02:45",
+            "0:00:45"
+          ],
+          [
+            5,
+            "page_view",
+            "09:03:15",
+            "09:03:16",
+            "0:00:01"
+          ],
+          [
+            7,
+            "click",
+            "09:05:20",
+            "09:05:21",
+            "0:00:01"
+          ],
+          [
+            8,
+            "purchase",
+            "09:06:40",
+            "09:06:41",
+            "0:00:01"
+          ],
+          [
+            6,
+            "purchase",
+            "09:04:00",
+            "09:21:40",
+            "0:17:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "lag = ingest_time - event_time",
+            "highlightCols": [
+              "lag"
+            ]
+          },
+          {
+            "label": "Event 6: 17 min 40 s",
+            "rows": [
+              8
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                4
+              ],
+              "note": "lag"
+            },
+            {
+              "lines": [
+                2,
+                3
+              ],
+              "note": "two clocks"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s12-replayable",
@@ -277,7 +808,60 @@
         "Offsets + checkpoints: a replayable source",
         "Restart: pick up from the checkpoint"
       ],
-      "narration": "A streaming job also has to survive restarts. Spark Structured Streaming tracks how far it has read with source offsets and checkpoints, so after a failure the source can be replayed from where the job was. Hold on to that. It's half of exactly-once in chapter four."
+      "narration": "A streaming job also has to survive restarts. Spark Structured Streaming tracks how far it has read with source offsets and checkpoints, so after a failure the source can be replayed from where the job was. Hold on to that. It's half of exactly-once in chapter four.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "s",
+            "label": "Kafka source",
+            "x": 0.17,
+            "y": 0.18,
+            "sublabel": "offsets"
+          },
+          {
+            "id": "j",
+            "label": "Spark streaming job",
+            "x": 0.83,
+            "y": 0.18,
+            "sublabel": "fails",
+            "tone": "noMatch"
+          },
+          {
+            "id": "c",
+            "label": "Checkpoint",
+            "x": 0.83,
+            "y": 0.82,
+            "sublabel": "how far it read",
+            "tone": "active"
+          },
+          {
+            "id": "r",
+            "label": "Job restarts",
+            "x": 0.17,
+            "y": 0.82,
+            "sublabel": "resumes from checkpoint",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "j",
+            "label": "read"
+          },
+          {
+            "from": "j",
+            "to": "c",
+            "label": "save offsets"
+          },
+          {
+            "from": "c",
+            "to": "r",
+            "label": "resume from"
+          }
+        ]
+      }
     },
     {
       "id": "s13-batch-interview",
@@ -289,7 +873,14 @@
         "Let the requirement pick the mode",
         "Either way: count by event_time"
       ],
-      "narration": "In an interview, don't declare a winner. Ask how fresh the numbers need to be, and let that requirement pick the mode. We won't quote cost or latency figures here, because those depend on your system. What doesn't depend on your system: if you bucket by arrival time instead of event time, a late purchase lands in the wrong minute."
+      "narration": "In an interview, don't declare a winner. Ask how fresh the numbers need to be, and let that requirement pick the mode. We won't quote cost or latency figures here, because those depend on your system. What doesn't depend on your system: if you bucket by arrival time instead of event time, a late purchase lands in the wrong minute.",
+      "component": "Callout",
+      "props": {
+        "text": "Ask first: how fresh must the numbers be?",
+        "tone": "tip",
+        "label": "Interview tip",
+        "detail": "Let the requirement pick the mode. Either way, bucket by event_time."
+      }
     },
     {
       "id": "s14-batch-takeaway",
@@ -300,7 +891,14 @@
         "Takeaway: ask how fresh it needs to be",
         "Event time picks the bucket"
       ],
-      "narration": "Takeaway: ask how fresh the numbers need to be, and let that pick the mode. Event time picks the bucket."
+      "narration": "Takeaway: ask how fresh the numbers need to be, and let that pick the mode. Event time picks the bucket.",
+      "component": "Callout",
+      "props": {
+        "text": "Ask how fresh it needs to be",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Event time picks the bucket"
+      }
     },
     {
       "id": "s15-wm-hook",
@@ -311,7 +909,16 @@
         "Late data isn't automatically dropped.",
         "The watermark decides."
       ],
-      "narration": "Late data is not automatically dropped. A watermark decides, and it doesn't use the wall clock."
+      "narration": "Late data is not automatically dropped. A watermark decides, and it doesn't use the wall clock.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Late data isn't automatically dropped.",
+        "subtitle": "The watermark decides.",
+        "kicker": "3. Late data",
+        "highlight": [
+          "watermark"
+        ]
+      }
     },
     {
       "id": "s16-wm-why",
@@ -323,7 +930,25 @@
         "A straggler could always show up",
         "Threshold: how late can data be?"
       ],
-      "narration": "Say you count purchases per ten-minute window. When is the 09:00 window finished? A straggler could always show up. A job that never ends can't wait forever, so Spark asks you for a threshold: how late can data be and still be counted?"
+      "narration": "Say you count purchases per ten-minute window. When is the 09:00 window finished? A straggler could always show up. A job that never ends can't wait forever, so Spark asks you for a threshold: how late can data be and still be counted?",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Window 09:00 to 09:10 opens"
+          },
+          {
+            "label": "Rows keep arriving"
+          },
+          {
+            "label": "A straggler could still show up"
+          },
+          {
+            "label": "Threshold: how late can data be?",
+            "detail": "and still be counted"
+          }
+        ]
+      }
     },
     {
       "id": "s17-wm-rule",
@@ -335,7 +960,27 @@
         "Less late than threshold: guaranteed",
         "Later than that: best effort, may drop"
       ],
-      "narration": "Here's the rule from the Spark docs. The watermark is the maximum event time the engine has seen, minus your threshold. Data that is less late than the threshold is guaranteed to be processed. Data later than that may be dropped, or may still be counted. Spark only promises best effort there. So never say 'late data is dropped'. Say 'data beyond the watermark isn't guaranteed'."
+      "narration": "Here's the rule from the Spark docs. The watermark is the maximum event time the engine has seen, minus your threshold. Data that is less late than the threshold is guaranteed to be processed. Data later than that may be dropped, or may still be counted. Spark only promises best effort there. So never say 'late data is dropped'. Say 'data beyond the watermark isn't guaranteed'.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Max event time seen",
+            "detail": "moves forward with newer events"
+          },
+          {
+            "label": "Watermark = max event time - threshold"
+          },
+          {
+            "label": "Less late than threshold",
+            "detail": "guaranteed to be processed"
+          },
+          {
+            "label": "Later than that",
+            "detail": "best effort: may drop, may count"
+          }
+        ]
+      }
     },
     {
       "id": "s18-wm-walkthrough",
@@ -350,7 +995,147 @@
         "2 min threshold: best effort"
       ],
       "narration": "Let's run the rule on our table as plain SQL. This illustrates the arithmetic; it is not Spark's engine. Go through events in arrival order and track the max event time seen so far. When event 6 finally arrives at 09:21:40, the latest event time seen is 09:06:40, from event 8. Event 6 happened at 09:04. So it's only two minutes forty seconds behind in event time. With a ten-minute threshold, it's inside: guaranteed. With a two-minute threshold, it's outside: best effort.",
-      "code_block": 2
+      "code_block": 2,
+      "component": "RowHighlight",
+      "props": {
+        "title": "events + watermark arithmetic (SQL illustration)",
+        "columns": [
+          "event_id",
+          "event_at",
+          "max_seen_at",
+          "behind",
+          "t_10min",
+          "t_2min"
+        ],
+        "rows": [
+          [
+            1,
+            "09:00:05",
+            "09:00:05",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            2,
+            "09:01:10",
+            "09:01:10",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            3,
+            "09:02:00",
+            "09:02:00",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            4,
+            "09:02:30",
+            "09:02:30",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            3,
+            "09:02:00",
+            "09:02:30",
+            "0:00:30",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            5,
+            "09:03:15",
+            "09:03:15",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            7,
+            "09:05:20",
+            "09:05:20",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            8,
+            "09:06:40",
+            "09:06:40",
+            "0:00:00",
+            "guaranteed",
+            "guaranteed"
+          ],
+          [
+            6,
+            "09:04:00",
+            "09:06:40",
+            "0:02:40",
+            "guaranteed",
+            "best effort"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 6: only 2 min 40 s behind max event time",
+            "rows": [
+              8
+            ],
+            "highlightCols": [
+              "behind"
+            ]
+          },
+          {
+            "label": "10 min threshold: guaranteed",
+            "highlightCols": [
+              "t_10min"
+            ],
+            "state": "match"
+          },
+          {
+            "label": "2 min threshold: best effort",
+            "highlightCols": [
+              "t_2min"
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                3
+              ],
+              "note": "max event time seen"
+            },
+            {
+              "lines": [
+                9
+              ],
+              "note": "behind"
+            },
+            {
+              "lines": [
+                10,
+                11
+              ],
+              "note": "10 min: guaranteed"
+            },
+            {
+              "lines": [
+                12,
+                13
+              ],
+              "note": "2 min: best effort"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s19-wm-trap",
@@ -362,7 +1147,27 @@
         "Not wall-clock delay",
         "Watermark moves only with newer events"
       ],
-      "narration": "That's the trap. Event 6 was delayed seventeen minutes on the wall clock, but the watermark is built from event times. Nothing newer than 09:06:40 had arrived, so the watermark was still 09:06:40 minus the threshold. What counts is how far behind the latest event time a row is, not how long it spent in transit."
+      "narration": "That's the trap. Event 6 was delayed seventeen minutes on the wall clock, but the watermark is built from event times. Nothing newer than 09:06:40 had arrived, so the watermark was still 09:06:40 minus the threshold. What counts is how far behind the latest event time a row is, not how long it spent in transit.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "Wall clock",
+          "tone": "noMatch",
+          "points": [
+            "Event 6: 17 min 40 s",
+            "Not used"
+          ]
+        },
+        "right": {
+          "title": "Event time",
+          "tone": "match",
+          "points": [
+            "Event 6: 2 min 40 s",
+            "Behind max seen"
+          ]
+        },
+        "verdict": "Watermark moves only with newer events"
+      }
     },
     {
       "id": "s20-wm-takeaway",
@@ -373,7 +1178,14 @@
         "Takeaway: watermark = max event time - threshold",
         "Inside: guaranteed. Outside: best effort."
       ],
-      "narration": "Takeaway: watermark equals max event time minus threshold. Inside it, guaranteed. Outside it, best effort."
+      "narration": "Takeaway: watermark equals max event time minus threshold. Inside it, guaranteed. Outside it, best effort.",
+      "component": "Callout",
+      "props": {
+        "text": "Watermark = max event time - threshold",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Inside: guaranteed. Outside: best effort."
+      }
     },
     {
       "id": "s21-idem-hook",
@@ -384,7 +1196,17 @@
         "Assume your pipeline runs twice.",
         "Make twice look like once."
       ],
-      "narration": "Assume your pipeline runs twice. Retries make it likely. Make twice look exactly like once."
+      "narration": "Assume your pipeline runs twice. Retries make it likely. Make twice look exactly like once.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Assume your pipeline runs twice.",
+        "subtitle": "Make twice look like once.",
+        "kicker": "4. Idempotent pipelines",
+        "highlight": [
+          "twice",
+          "once"
+        ]
+      }
     },
     {
       "id": "s22-idem-definition",
@@ -396,7 +1218,99 @@
         "Retries and replays are normal",
         "Event 3 already arrived twice"
       ],
-      "narration": "Idempotent means running a step twice gives the same result as running it once. You need it because retries are normal: a network blip, a producer resend, a job replayed from its last checkpoint. Our table already shows it. Event 3, the click by user 102, arrived twice, 44 seconds apart."
+      "narration": "Idempotent means running a step twice gives the same result as running it once. You need it because retries are normal: a network blip, a producer resend, a job replayed from its last checkpoint. Our table already shows it. Event 3, the click by user 102, arrived twice, 44 seconds apart.",
+      "component": "RowHighlight",
+      "props": {
+        "title": "events (arrival order)",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at",
+          "arrived_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05",
+            "09:00:06"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10",
+            "09:01:11"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:01"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30",
+            "09:02:31"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00",
+            "09:02:45"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15",
+            "09:03:16"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20",
+            "09:05:21"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40",
+            "09:06:41"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00",
+            "09:21:40"
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Event 3 arrived twice",
+            "rows": [
+              2,
+              4
+            ]
+          },
+          {
+            "label": "44 s apart: a retry",
+            "rows": [
+              4
+            ],
+            "state": "noMatch"
+          }
+        ]
+      }
     },
     {
       "id": "s23-idem-producer",
@@ -408,7 +1322,47 @@
         "Producer ID + sequence number",
         "Broker spots the resend and dedupes it"
       ],
-      "narration": "Kafka handles one source of duplicates for you. With the idempotent producer, each producer has an ID and every message it sends carries a sequence number. If it resends after a timeout, the broker recognises the same producer ID and sequence number and dedupes it. But that only covers producer retries into Kafka. Duplicates can still come from elsewhere, so the sink has to defend itself too."
+      "narration": "Kafka handles one source of duplicates for you. With the idempotent producer, each producer has an ID and every message it sends carries a sequence number. If it resends after a timeout, the broker recognises the same producer ID and sequence number and dedupes it. But that only covers producer retries into Kafka. Duplicates can still come from elsewhere, so the sink has to defend itself too.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Producer sends",
+            "x": 0.17,
+            "y": 0.17,
+            "sublabel": "ID + seq 7"
+          },
+          {
+            "id": "b",
+            "label": "Timeout, resends",
+            "x": 0.17,
+            "y": 0.83,
+            "sublabel": "ID + seq 7 again",
+            "tone": "pending"
+          },
+          {
+            "id": "k",
+            "label": "Broker",
+            "x": 0.83,
+            "y": 0.5,
+            "sublabel": "dedupes the resend",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "a",
+            "to": "k",
+            "label": "seq 7"
+          },
+          {
+            "from": "b",
+            "to": "k",
+            "label": "seq 7"
+          }
+        ]
+      }
     },
     {
       "id": "s24-idem-on-conflict",
@@ -422,7 +1376,104 @@
         "Result: 8 rows, one per event"
       ],
       "narration": "In DuckDB, the cleanest guard is an enforced key. Give the table a primary key on event_id and insert with ON CONFLICT DO NOTHING. In DuckDB, ON CONFLICT needs a primary key or unique constraint to check against. We load all nine raw rows, then run the exact same load again, like a retried job. The duplicate copy of event 3 is skipped the first time, and the whole retry is skipped the second time. Eight rows, eight unique events. Run it a third time and nothing changes. That's idempotent.",
-      "code_block": 3
+      "code_block": 3,
+      "component": "DataTable",
+      "props": {
+        "title": "events_clean (after load + retry): 8 rows",
+        "columns": [
+          "event_id",
+          "user_id",
+          "event_type",
+          "event_at"
+        ],
+        "rows": [
+          [
+            1,
+            101,
+            "page_view",
+            "09:00:05"
+          ],
+          [
+            2,
+            102,
+            "page_view",
+            "09:01:10"
+          ],
+          [
+            3,
+            102,
+            "click",
+            "09:02:00"
+          ],
+          [
+            4,
+            101,
+            "click",
+            "09:02:30"
+          ],
+          [
+            5,
+            103,
+            "page_view",
+            "09:03:15"
+          ],
+          [
+            7,
+            103,
+            "click",
+            "09:05:20"
+          ],
+          [
+            8,
+            102,
+            "purchase",
+            "09:06:40"
+          ],
+          [
+            6,
+            101,
+            "purchase",
+            "09:04:00"
+          ]
+        ],
+        "highlightCols": [
+          "event_id"
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                2
+              ],
+              "note": "PRIMARY KEY (event_id)"
+            },
+            {
+              "lines": [
+                6,
+                7,
+                8
+              ],
+              "note": "load: duplicate skipped"
+            },
+            {
+              "lines": [
+                9,
+                10,
+                11
+              ],
+              "note": "retry: all skipped"
+            },
+            {
+              "lines": [
+                12,
+                13,
+                14
+              ],
+              "note": "8 rows, 8 unique"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s25-exactly-once",
@@ -435,7 +1486,52 @@
         "2. Idempotent sink",
         "Replay safely, write safely"
       ],
-      "narration": "Spark's docs describe how Structured Streaming can ensure end-to-end exactly-once: replayable sources, tracked with offsets and checkpoints, plus idempotent sinks. The source lets you redo work after a failure. The sink makes redoing it harmless. In Spark, it's those two properties together."
+      "narration": "Spark's docs describe how Structured Streaming can ensure end-to-end exactly-once: replayable sources, tracked with offsets and checkpoints, plus idempotent sinks. The source lets you redo work after a failure. The sink makes redoing it harmless. In Spark, it's those two properties together.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "s",
+            "label": "Replayable source",
+            "x": 0.17,
+            "y": 0.18,
+            "sublabel": "offsets, checkpoints",
+            "tone": "match"
+          },
+          {
+            "id": "k",
+            "label": "Idempotent sink",
+            "x": 0.83,
+            "y": 0.18,
+            "sublabel": "row count unchanged",
+            "tone": "match"
+          },
+          {
+            "id": "j",
+            "label": "Spark job",
+            "x": 0.5,
+            "y": 0.82
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "j",
+            "label": "read"
+          },
+          {
+            "from": "j",
+            "to": "k",
+            "label": "write"
+          },
+          {
+            "from": "k",
+            "to": "s",
+            "label": "replay",
+            "dots": 1
+          }
+        ]
+      }
     },
     {
       "id": "s26-stream-dedupe",
@@ -446,7 +1542,14 @@
         "Inside the stream: dropDuplicates",
         "With watermark: key on event_id + event_time"
       ],
-      "narration": "You can also dedupe inside the stream. With a watermark, Spark dedupes on event_id plus event time, or with dropDuplicatesWithinWatermark on event_id."
+      "narration": "You can also dedupe inside the stream. With a watermark, Spark dedupes on event_id plus event time, or with dropDuplicatesWithinWatermark on event_id.",
+      "component": "Callout",
+      "props": {
+        "text": "With a watermark: dropDuplicates on event_id + event_time",
+        "tone": "info",
+        "label": "Spark",
+        "detail": "Or dropDuplicatesWithinWatermark on event_id"
+      }
     },
     {
       "id": "s27-idem-takeaway",
@@ -457,7 +1560,14 @@
         "Takeaway: assume every step runs twice",
         "Key on event_id. Make the sink idempotent."
       ],
-      "narration": "Takeaway: assume every step runs twice. Key on event_id, and make the sink idempotent."
+      "narration": "Takeaway: assume every step runs twice. Key on event_id, and make the sink idempotent.",
+      "component": "Callout",
+      "props": {
+        "text": "Assume every step runs twice",
+        "tone": "success",
+        "label": "Takeaway",
+        "detail": "Key on event_id. Make the sink idempotent."
+      }
     },
     {
       "id": "s28-medallion-hook",
@@ -468,7 +1578,17 @@
         "Your dashboard says 4 clicks.",
         "There were 3."
       ],
-      "narration": "Your dashboard says four clicks. There were three. Here's the layering that fixes it."
+      "narration": "Your dashboard says four clicks. There were three. Here's the layering that fixes it.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Your dashboard says 4 clicks.",
+        "subtitle": "There were 3.",
+        "kicker": "5. Medallion architecture",
+        "highlight": [
+          "4",
+          "3"
+        ]
+      }
     },
     {
       "id": "s29-medallion-layers",
@@ -480,7 +1600,46 @@
         "Silver: cleaned, validated, deduplicated",
         "Gold: aggregated for dashboards and BI"
       ],
-      "narration": "The medallion architecture, as Databricks describes it, has three layers. Bronze holds raw, unvalidated data, as it arrived. Silver is cleaned, validated and deduplicated. Gold is aggregated, business-level data for analytics and reporting. Our nine-row events table, duplicate and all, is bronze."
+      "narration": "The medallion architecture, as Databricks describes it, has three layers. Bronze holds raw, unvalidated data, as it arrived. Silver is cleaned, validated and deduplicated. Gold is aggregated, business-level data for analytics and reporting. Our nine-row events table, duplicate and all, is bronze.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "b",
+            "label": "Bronze",
+            "x": 0.1,
+            "y": 0.5,
+            "sublabel": "raw, as it arrived",
+            "tone": "pending"
+          },
+          {
+            "id": "s",
+            "label": "Silver",
+            "x": 0.5,
+            "y": 0.5,
+            "sublabel": "cleaned, deduplicated",
+            "tone": "active"
+          },
+          {
+            "id": "g",
+            "label": "Gold",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "aggregated for BI",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "b",
+            "to": "s"
+          },
+          {
+            "from": "s",
+            "to": "g"
+          }
+        ]
+      }
     },
     {
       "id": "s30-bronze-count",
@@ -492,7 +1651,48 @@
         "click: 4 (event 3 counted twice)"
       ],
       "narration": "Count straight from bronze and you get four clicks. The retry of event 3 is counted twice. That's the four from the hook.",
-      "code_block": 4
+      "code_block": 4,
+      "component": "DataTable",
+      "props": {
+        "title": "bronze: rows per event_type",
+        "columns": [
+          "event_type",
+          "bronze_rows"
+        ],
+        "rows": [
+          [
+            "click",
+            4
+          ],
+          [
+            "page_view",
+            3
+          ],
+          [
+            "purchase",
+            2
+          ]
+        ],
+        "highlightRows": [
+          0
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                3
+              ],
+              "note": "bronze: raw events"
+            },
+            {
+              "lines": [
+                4
+              ],
+              "note": "click = 4"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s31-silver",
@@ -505,7 +1705,124 @@
         "9 rows in, 8 rows out"
       ],
       "narration": "Silver removes the duplicate. ROW_NUMBER, partitioned by event_id and ordered by ingest_time, numbers every copy of an event. Keep row number one, the first arrival, and drop the rest. Nine rows in, eight out. Unlike ON CONFLICT, this is just a query, so it needs no constraint, and you can rerun it from bronze whenever your cleaning rules change.",
-      "code_block": 5
+      "code_block": 5,
+      "component": "RowHighlight",
+      "props": {
+        "title": "bronze + rn (ROW_NUMBER per event_id)",
+        "columns": [
+          "event_id",
+          "event_type",
+          "event_at",
+          "rn"
+        ],
+        "rows": [
+          [
+            1,
+            "page_view",
+            "09:00:05",
+            1
+          ],
+          [
+            2,
+            "page_view",
+            "09:01:10",
+            1
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            1
+          ],
+          [
+            4,
+            "click",
+            "09:02:30",
+            1
+          ],
+          [
+            3,
+            "click",
+            "09:02:00",
+            2
+          ],
+          [
+            5,
+            "page_view",
+            "09:03:15",
+            1
+          ],
+          [
+            7,
+            "click",
+            "09:05:20",
+            1
+          ],
+          [
+            8,
+            "purchase",
+            "09:06:40",
+            1
+          ],
+          [
+            6,
+            "purchase",
+            "09:04:00",
+            1
+          ]
+        ],
+        "steps": [
+          {
+            "label": "Number each copy of an event",
+            "highlightCols": [
+              "rn"
+            ]
+          },
+          {
+            "label": "Event 3 copy 2 has rn = 2",
+            "rows": [
+              4
+            ],
+            "state": "noMatch"
+          },
+          {
+            "label": "Keep rn = 1: 9 rows in, 8 out",
+            "order": [
+              0,
+              1,
+              2,
+              3,
+              5,
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5,
+                6
+              ],
+              "note": "ROW_NUMBER per event_id"
+            },
+            {
+              "lines": [
+                6
+              ],
+              "note": "first arrival is 1"
+            },
+            {
+              "lines": [
+                10
+              ],
+              "note": "WHERE rn = 1"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s32-gold",
@@ -518,7 +1835,63 @@
         "Distinct users with COUNT(DISTINCT)"
       ],
       "narration": "Gold is what the dashboard reads. Group silver by event date and event type, and count events and distinct users. Three clicks, three page views, two purchases. Now the dashboard says three, because it reads from deduplicated silver, not raw bronze.",
-      "code_block": 6
+      "code_block": 6,
+      "component": "DataTable",
+      "props": {
+        "title": "gold: events per day and type",
+        "columns": [
+          "event_date",
+          "event_type",
+          "events",
+          "users"
+        ],
+        "rows": [
+          [
+            "2026-10-19",
+            "click",
+            3,
+            3
+          ],
+          [
+            "2026-10-19",
+            "page_view",
+            3,
+            3
+          ],
+          [
+            "2026-10-19",
+            "purchase",
+            2,
+            2
+          ]
+        ],
+        "highlightRows": [
+          0
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                4
+              ],
+              "note": "read silver"
+            },
+            {
+              "lines": [
+                5
+              ],
+              "note": "GROUP BY"
+            },
+            {
+              "lines": [
+                2,
+                3
+              ],
+              "note": "events and distinct users"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s33-keep-bronze",
@@ -529,7 +1902,58 @@
         "Why keep bronze?",
         "Rules change: rebuild silver from raw"
       ],
-      "narration": "Why keep bronze at all? Because cleaning rules change. If you find a bug in your dedupe, you fix the query and rebuild silver from bronze. If you had cleaned on the way in, the raw events would be gone."
+      "narration": "Why keep bronze at all? Because cleaning rules change. If you find a bug in your dedupe, you fix the query and rebuild silver from bronze. If you had cleaned on the way in, the raw events would be gone.",
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "b",
+            "label": "Bronze",
+            "x": 0.1,
+            "y": 0.8,
+            "sublabel": "untouched raw",
+            "tone": "pending"
+          },
+          {
+            "id": "f",
+            "label": "Fix dedupe rule",
+            "x": 0.5,
+            "y": 0.2,
+            "tone": "noMatch"
+          },
+          {
+            "id": "s",
+            "label": "Silver",
+            "x": 0.5,
+            "y": 0.8,
+            "sublabel": "rebuilt",
+            "tone": "active"
+          },
+          {
+            "id": "g",
+            "label": "Gold",
+            "x": 0.9,
+            "y": 0.8,
+            "sublabel": "rebuilt",
+            "tone": "match"
+          }
+        ],
+        "edges": [
+          {
+            "from": "f",
+            "to": "s",
+            "label": "patch"
+          },
+          {
+            "from": "b",
+            "to": "s"
+          },
+          {
+            "from": "s",
+            "to": "g"
+          }
+        ]
+      }
     },
     {
       "id": "s34-medallion-takeaway",
@@ -540,7 +1964,13 @@
         "Takeaway: bronze keeps, silver fixes,",
         "gold answers."
       ],
-      "narration": "Takeaway: bronze keeps, silver fixes, gold answers."
+      "narration": "Takeaway: bronze keeps, silver fixes, gold answers.",
+      "component": "Callout",
+      "props": {
+        "text": "Bronze keeps, silver fixes, gold answers.",
+        "tone": "success",
+        "label": "Takeaway"
+      }
     },
     {
       "id": "s35-prune-hook",
@@ -551,7 +1981,17 @@
         "Pruning needs a filter on the partition column.",
         "Miss it, and no partition is skipped."
       ],
-      "narration": "Partition pruning only kicks in when your query filters on the partition column."
+      "narration": "Partition pruning only kicks in when your query filters on the partition column.",
+      "component": "TitleCard",
+      "props": {
+        "title": "Pruning needs a filter on the partition column.",
+        "subtitle": "Miss it, and no partition is skipped.",
+        "kicker": "6. Partition pruning",
+        "highlight": [
+          "filter",
+          "partition"
+        ]
+      }
     },
     {
       "id": "s36-prune-what",
@@ -563,7 +2003,62 @@
         "Each day stored in its own partition",
         "Lake: event_date=2026-10-19/ folders"
       ],
-      "narration": "Our silver table grows every day, so we partition it by event_date: each day's rows are stored in their own partition. In BigQuery that's a partitioned table. In a data lake it's often Hive-style folders, one per value, like event_date equals 2026-10-19."
+      "narration": "Our silver table grows every day, so we partition it by event_date: each day's rows are stored in their own partition. In BigQuery that's a partitioned table. In a data lake it's often Hive-style folders, one per value, like event_date equals 2026-10-19.",
+      "component": "PartitionGrid",
+      "props": {
+        "partitions": [
+          "10-17",
+          "10-18",
+          "10-19",
+          "10-20"
+        ],
+        "items": [
+          {
+            "label": "e1",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e2",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e3",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e4",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e5",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e6",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e7",
+            "from": 0,
+            "to": 2
+          },
+          {
+            "label": "e8",
+            "from": 0,
+            "to": 2
+          }
+        ],
+        "beforeLabel": "Silver rows",
+        "afterLabel": "Partitioned by event_date",
+        "moveAt": 4,
+        "moveSpan": 0.6
+      }
     },
     {
       "id": "s37-prune-query",
@@ -577,7 +2072,77 @@
         "DuckDB: filter pushed into Hive partitions"
       ],
       "narration": "Now a query that filters on the partition column. BigQuery's docs call this pruning: with a qualifying filter on the partitioning column, it scans only the matching partitions and skips the rest, which reduces the bytes processed. DuckDB does the same with Hive-partitioned files: filters on the partition keys are pushed down, so non-matching partitions are skipped. Here we run the query on an in-memory table, so the result is real, but the skipping only happens on partitioned storage.",
-      "code_block": 7
+      "code_block": 7,
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "q",
+            "label": "Query",
+            "x": 0.5,
+            "y": 0.1,
+            "sublabel": "filter on event_date",
+            "tone": "active"
+          },
+          {
+            "id": "c",
+            "label": "2026-10-19",
+            "x": 0.5,
+            "y": 0.37,
+            "sublabel": "read",
+            "tone": "match"
+          },
+          {
+            "id": "r",
+            "label": "Result",
+            "x": 0.5,
+            "y": 0.63,
+            "sublabel": "purchases per user"
+          },
+          {
+            "id": "k",
+            "label": "Other days",
+            "x": 0.5,
+            "y": 0.9,
+            "sublabel": "skipped",
+            "tone": "pending"
+          }
+        ],
+        "edges": [
+          {
+            "from": "q",
+            "to": "c"
+          },
+          {
+            "from": "c",
+            "to": "r"
+          }
+        ],
+        "codeHighlight": {
+          "steps": [
+            {
+              "lines": [
+                5
+              ],
+              "note": "filter on partition column"
+            },
+            {
+              "lines": [
+                3,
+                4
+              ],
+              "note": "read silver"
+            },
+            {
+              "lines": [
+                6,
+                7
+              ],
+              "note": "then aggregate"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "s38-prune-trap",
@@ -589,7 +2154,27 @@
         "The filter must hit the partition column",
         "Partition by what you filter by"
       ],
-      "narration": "The trap: filter only on user_id and there's no qualifying filter on event_date, so every day's partition still has to be read. Partitioning helps the queries that filter on the partition column. So pick that column from how the table is actually queried. For our dashboard, that's the date."
+      "narration": "The trap: filter only on user_id and there's no qualifying filter on event_date, so every day's partition still has to be read. Partitioning helps the queries that filter on the partition column. So pick that column from how the table is actually queried. For our dashboard, that's the date.",
+      "component": "Comparison",
+      "props": {
+        "left": {
+          "title": "WHERE user_id = 101",
+          "tone": "noMatch",
+          "points": [
+            "No filter on event_date",
+            "No partition skipped"
+          ]
+        },
+        "right": {
+          "title": "WHERE event_date = ...",
+          "tone": "match",
+          "points": [
+            "Filter on partition column",
+            "Other days skipped"
+          ]
+        },
+        "verdict": "Partition by what you filter by"
+      }
     },
     {
       "id": "s39-prune-takeaway",
@@ -599,7 +2184,13 @@
       "on_screen_text": [
         "Takeaway: partition by what you filter by"
       ],
-      "narration": "Takeaway: partition by what you filter by."
+      "narration": "Takeaway: partition by what you filter by.",
+      "component": "Callout",
+      "props": {
+        "text": "Partition by what you filter by",
+        "tone": "success",
+        "label": "Takeaway"
+      }
     },
     {
       "id": "s40-recap",
@@ -614,7 +2205,30 @@
         "Medallion: bronze, silver, gold",
         "Pruning: filter on event_date"
       ],
-      "narration": "Let's recap the whole pipeline. Clicks go into Kafka, keyed by user_id, so each user's events stay ordered within a partition. Whether you run batch or streaming, you count by event time. Late events are handled by a watermark: max event time seen minus a threshold, guaranteed inside, best effort outside. Every write is idempotent: a replayable source plus a sink keyed on event_id. Data flows bronze to silver to gold. And silver is partitioned by event_date, so queries filtering on date skip the other days."
+      "narration": "Let's recap the whole pipeline. Clicks go into Kafka, keyed by user_id, so each user's events stay ordered within a partition. Whether you run batch or streaming, you count by event time. Late events are handled by a watermark: max event time seen minus a threshold, guaranteed inside, best effort outside. Every write is idempotent: a replayable source plus a sink keyed on event_id. Data flows bronze to silver to gold. And silver is partitioned by event_date, so queries filtering on date skip the other days.",
+      "component": "Timeline",
+      "props": {
+        "events": [
+          {
+            "label": "Kafka: key by user_id, order per partition"
+          },
+          {
+            "label": "Clock: count by event_time"
+          },
+          {
+            "label": "Watermark: max event time - threshold"
+          },
+          {
+            "label": "Idempotent: replayable source + keyed sink"
+          },
+          {
+            "label": "Medallion: bronze, silver, gold"
+          },
+          {
+            "label": "Pruning: filter on event_date"
+          }
+        ]
+      }
     },
     {
       "id": "s41-cta",
@@ -625,7 +2239,12 @@
         "More visual explanations: queryunstuck.in",
         "Data & AI Engineering, visualized."
       ],
-      "narration": "That's the clickstream pipeline, end to end, on nine rows. If this helped, you'll find more visual explanations like it at queryunstuck.in."
+      "narration": "That's the clickstream pipeline, end to end, on nine rows. If this helped, you'll find more visual explanations like it at queryunstuck.in.",
+      "component": "EndCard",
+      "props": {
+        "headline": "More visual explanations: queryunstuck.in",
+        "cta": "queryunstuck.in"
+      }
     }
   ],
   "code_blocks": [
