@@ -1,0 +1,501 @@
+{
+  "id": "qu-004",
+  "slug": "ai-llm-concepts-for-data-engineers",
+  "title": "15 Must-Know AI/LLM Concepts for Data Engineers",
+  "format": "reel-list",
+  "pillar": "ai-ml",
+  "status": "in-review",
+  "audience_level": "intermediate",
+  "hook": "15 AI/LLM terms data engineers must know.",
+  "hook_options": [
+    "Tokens, embeddings, RAG: 15 AI terms data engineers now get asked about.",
+    "You build the pipelines that feed LLMs. Know these 15 terms.",
+    "15 AI/LLM concepts on one screen. Screenshot it."
+  ],
+  "target_duration_sec": 30,
+  "scheduled_for": "2026-10-25T19:00:00+05:30",
+  "history": [
+    {
+      "at": "2026-10-17T10:00:00+05:30",
+      "agent": "content-strategist",
+      "action": "created idea",
+      "note": "No analytics reports exist yet (analytics/ is empty); planned from backlog/topics.yaml only. Topic '15 Must-Know AI/LLM Concepts for Data Engineers' (ai-ml, list). Chosen to mix pillars this week (DA + 2x DE + AI/ML reels) and because it lists well as a single cheat-sheet. Sun reel slot."
+    },
+    {
+      "at": "2026-10-17T12:00:00+05:30",
+      "agent": "researcher",
+      "action": "researched",
+      "note": "research.md + 17 sources. 15 terms chosen along the RAG pipeline path. Reranking, vector database, agents dropped (no primary source opened). 'prompt' definition generic/UNVERIFIED. No model-specific numbers used."
+    },
+    {
+      "at": "2026-10-17T14:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "scripted",
+      "note": "script.md + 5 scenes, 27 s. 15 terms in 3 ListCard groups of 5 (header line + 5 items each). Tool calling moved into 'talking to the model' group for coherence. Temperature-0 misconception folded into item 4. Prompt and vector index kept generic. No code_blocks (pgvector not runnable in DuckDB)."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "fact-checker",
+      "action": "fact-check failed",
+      "note": "VERDICT: FAIL. factcheck.md. All source URLs opened. code_blocks empty, run_snippet ran with nothing to execute. Required: (5) tool calling 'your code runs it' wrong for server/built-in tools; (12) fine-tuning 'more data' misleading; (13) hallucination too narrow ('fluent' unsourced, misses context-inconsistency); (s5) 'RAG is only as good as your data' overgeneralised; (s1/hook) 'One screen' false with 3 separate cards. Added 2 sources (prompt, cosine similarity). Status left 'scripted'."
+    },
+    {
+      "at": "2026-10-17T16:00:00+05:30",
+      "agent": "scriptwriter",
+      "action": "fixed fact-check failures (loop 1)",
+      "note": "Required: items 5, 12, 13, end takeaway + narration, s1 subtitle and hook ('One screen' removed). Optional applied: items 2, 4, 8, 9. Durations unchanged (27 s)."
+    },
+    {
+      "at": "2026-10-17T14:56:40+05:30",
+      "agent": "fact-checker",
+      "action": "fact-checked",
+      "note": "VERDICT: PASS (pass 2, after loop 1). All 5 required fixes verified. New optional wordings (items 2, 4, 8, 9) checked as new claims and supported; 'fast' in item 9 supported by pgvector README and HNSW paper. code_blocks empty; run_snippet ran with nothing to execute. Copy note: avoid hook_options[0] (unsourced) and [2] ('one screen'). Timestamp from `date`; the earlier 16:00 fact-checker and scriptwriter entries carry placeholder times that are later than this real one."
+    },
+    {
+      "at": "2026-10-21T12:59:02+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "Growth-playbook storyboard: s1 TitleCard; s2-s4 FlowGraph (term nodes + arrows; defs 1-3/6-8/11-13 in title zone, defs of last two items in node sublabels, numbers dropped from node labels because 330px nodes wrap); s5 EndCard. Carousel: cover, 3 list slides (start 1/6/11), takeaway. on_screen_text untouched."
+    },
+    {
+      "at": "2026-10-21T13:01:41+05:30",
+      "agent": "visual-director",
+      "action": "revised storyboard (accuracy of arrows)",
+      "note": "s2/s4: edges removed, 2-2-1 grid. s3: pipeline Chunking > Embedding > Vector index > ANN search; Cosine similarity placed apart, no edge. Node x set to 0/1 so two 330px nodes per row do not overlap; Cosine similarity sits under ANN search, no edge. Right column x=0.9 keeps nodes inside the 140px right safe inset."
+    },
+    {
+      "at": "2026-10-21T13:04:20+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Bed drift (60 BPM, drumless ambient), gain -11 dB, duck 4, sync on; track pieces/qu-004.wav 28.000 s, resolving chord at 24.00 s. 25 cues/27 s (~56/min) unsynced, 21 cues/28 s (45/min) synced: dense. Compared calm (31.8 s, s3 stretched, rejected), study (25.8 s), rain (28 s, same grid, noise layer masks pops), focus (26.9 s, drums). Drift: no stretch, pops on an even 0.5 s grid; only off-beat cue is title pop-1 (micro). Node 0 pop of each FlowGraph now lands on the scene whoosh at +0.00 (deduped), as with every bed. Mix peak -10.8 dBFS; bed ~-31 dB RMS vs pop peaks ~-13 dB."
+    },
+    {
+      "at": "2026-10-21T13:06:00+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Render time: 24.08 s. Music track 28.000 s exact. Reel 28.011 s (H.264 1080x1920 30 fps AAC, 3.0 MB). Thumbnail frame 45 (1.5 s) title+subtitle fully drawn. Captions: 12 cues, 23 lines, 1.50 s min. Carousel: 5 slides (cover+3 list+takeaway), all legible unclipped. ffprobe: H.264+AAC, 28.011 s ±0.1 s, 1080x1920 30 fps, file 3.0 MB<100 MB. Audio: peak -10.8 dBFS (per composer). All URLs public, sizes verified."
+    },
+    {
+      "at": "2026-10-21T13:10:32+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-passed",
+      "note": "QA: PASS, no blockers. Fact-checked wording exact (split lines 4-5, 9-10, 14-15 verified), no arrows in s2/s4, s3 order correct, captions in window, carousel 5 slides and public sizes match, peak -10.9 dBFS. Minor: header text ~30 px and sublabels ~24 px (<36), text still dominates frame, captions lag node reveals, mix quiet (mean -30 dB), frame 0 empty."
+    },
+    {
+      "at": "2026-10-21T13:11:20+05:30",
+      "agent": "copywriter",
+      "action": "copy-ready",
+      "note": "caption.md (reel + carousel caption, audio_name) and youtube.md (Short). Definitions copied exactly from fact-checked text; hook_options[0] and [2] not used."
+    },
+    {
+      "at": "2026-10-21T13:12:05+05:30",
+      "agent": "orchestrator",
+      "action": "copy fix",
+      "note": "'grouped by where they show up in the pipeline' implied every term is a pipeline stage; now 'grouped in three cards'."
+    },
+    {
+      "at": "2026-10-21T13:12:05+05:30",
+      "agent": "orchestrator",
+      "action": "opened review PR",
+      "note": "branch content/qu-004"
+    }
+  ],
+  "sources": [
+    {
+      "claim": "RAG combines a seq2seq model with a dense vector index of Wikipedia via a neural retriever (Lewis et al., 2020)",
+      "url": "https://arxiv.org/abs/2005.11401",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "RAG definition: retrieve from knowledge base, pass into context window; quality depends on retrieved data",
+      "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "pgvector: Postgres extension; <=> is cosine distance; HNSW and IVFFlat indexes; exact search by default, approximate index trades recall for speed",
+      "url": "https://github.com/pgvector/pgvector",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "HNSW is an approximate nearest neighbour algorithm using multi-layer proximity graphs (Malkov & Yashunin)",
+      "url": "https://arxiv.org/abs/1603.09320",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Context window = all text model can reference incl. its response; working memory, not training data",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Context window = prompt plus generated output combined; token counts and limits vary by model",
+      "url": "https://developers.openai.com/api/docs/concepts",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Tokens may be words, subwords, characters or bytes; counts depend on model and language",
+      "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Temperature controls randomness; temperature 0 is not fully deterministic",
+      "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Fine-tuning = further training a pretrained model on additional data",
+      "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Fine-tuning complements prompting; evals systematically measure performance",
+      "url": "https://developers.openai.com/api/docs/guides/model-optimization",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Embedding is a vector of floats; cosine similarity recommended for comparing embeddings",
+      "url": "https://developers.openai.com/api/docs/guides/embeddings",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Hallucination: models generate false or inconsistent text; mitigations reduce but do not eliminate it",
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Survey of hallucination in NLG (Ji et al.)",
+      "url": "https://arxiv.org/abs/2202.03629",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Tool use: model returns a structured call, application executes it and returns tool_result",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Evals: define measurable success criteria and automated test cases",
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Guardrails: input screening, validation, treating retrieved/tool content as untrusted (prompt injection)",
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Chunking documents, embedding chunks, semantic search; chunks can lack context",
+      "url": "https://www.anthropic.com/news/contextual-retrieval",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Model inputs are called prompts; prompting = providing instructions or examples",
+      "url": "https://developers.openai.com/api/docs/concepts",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    },
+    {
+      "claim": "Cosine similarity = L2-normalised dot product = cosine of the angle between vectors",
+      "url": "https://scikit-learn.org/stable/modules/metrics.html",
+      "type": "primary",
+      "accessed": "2026-10-17"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1-title",
+      "duration_sec": 2.5,
+      "beat": "Hook: payoff in first 1.5 s; 15 terms on one screen",
+      "on_screen_text": [
+        "15 AI/LLM terms",
+        "for data engineers",
+        "Three cards. Screenshot them."
+      ],
+      "component": "TitleCard",
+      "props": {
+        "title": "15 AI/LLM terms",
+        "subtitle": "for data engineers",
+        "kicker": "Three cards. Screenshot them.",
+        "highlight": [
+          "AI/LLM"
+        ]
+      }
+    },
+    {
+      "id": "s2-model",
+      "duration_sec": 7,
+      "beat": "Group 1: talking to the model (items 1-5, reveal one by one, then hold)",
+      "on_screen_text": [
+        "Talking to the model",
+        "1. Token: a chunk of text the model reads",
+        "2. Context window: max tokens per request, output included",
+        "3. Prompt: the instructions and data you send",
+        "4. Temperature: controls randomness; 0 can still vary",
+        "5. Tool calling: model emits a call; app or API runs it"
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "Token",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Context window",
+            "x": 0.9,
+            "y": 0.1
+          },
+          {
+            "id": "n2",
+            "label": "Prompt",
+            "x": 0,
+            "y": 0.5
+          },
+          {
+            "id": "n3",
+            "label": "Temperature",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "controls randomness; 0 can still vary"
+          },
+          {
+            "id": "n4",
+            "label": "Tool calling",
+            "x": 0.45,
+            "y": 0.9,
+            "sublabel": "model emits a call; app or API runs it"
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "id": "s3-data",
+      "duration_sec": 7,
+      "beat": "Group 2: finding the right data (items 6-10)",
+      "on_screen_text": [
+        "Finding the right data",
+        "6. Chunking: split docs into retrievable pieces",
+        "7. Embedding: a vector of numbers for meaning",
+        "8. Cosine similarity: how closely two vectors align",
+        "9. Vector index: structure for fast similarity search",
+        "10. ANN search: approximate; trades recall for speed"
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "Chunking",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Embedding",
+            "x": 0.9,
+            "y": 0.3
+          },
+          {
+            "id": "n2",
+            "label": "Vector index",
+            "x": 0,
+            "y": 0.5,
+            "sublabel": "structure for fast similarity search"
+          },
+          {
+            "id": "n3",
+            "label": "ANN search",
+            "x": 0.9,
+            "y": 0.7,
+            "sublabel": "approximate; trades recall for speed"
+          },
+          {
+            "id": "n4",
+            "label": "Cosine similarity",
+            "x": 0.9,
+            "y": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "from": "n0",
+            "to": "n1",
+            "dots": 1
+          },
+          {
+            "from": "n1",
+            "to": "n2",
+            "dots": 1
+          },
+          {
+            "from": "n2",
+            "to": "n3",
+            "dots": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "s4-reliable",
+      "duration_sec": 7,
+      "beat": "Group 3: making answers reliable (items 11-15)",
+      "on_screen_text": [
+        "Making answers reliable",
+        "11. RAG: retrieve relevant data, then generate",
+        "12. Fine-tuning: further train a model on your own data",
+        "13. Hallucination: output that is false or unsupported",
+        "14. Evals: repeatable tests of output quality",
+        "15. Guardrails: checks on inputs and outputs"
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "RAG",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Fine-tuning",
+            "x": 0.9,
+            "y": 0.1
+          },
+          {
+            "id": "n2",
+            "label": "Hallucination",
+            "x": 0,
+            "y": 0.5,
+            "tone": "noMatch"
+          },
+          {
+            "id": "n3",
+            "label": "Evals",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "repeatable tests of output quality",
+            "tone": "active"
+          },
+          {
+            "id": "n4",
+            "label": "Guardrails",
+            "x": 0.45,
+            "y": 0.9,
+            "sublabel": "checks on inputs and outputs",
+            "tone": "match"
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "id": "s5-end",
+      "duration_sec": 3.5,
+      "beat": "One-line takeaway + save CTA",
+      "on_screen_text": [
+        "RAG answers depend on what you retrieve.",
+        "Save this for your next interview"
+      ],
+      "component": "EndCard",
+      "props": {
+        "headline": "RAG answers depend on what you retrieve.",
+        "cta": "Save this for your next interview"
+      }
+    }
+  ],
+  "code_blocks": [],
+  "carousel": {
+    "slides": [
+      {
+        "kind": "cover",
+        "title": "15 AI/LLM terms",
+        "subtitle": "for data engineers"
+      },
+      {
+        "kind": "list",
+        "title": "Talking to the model",
+        "lines": [
+          "Token: a chunk of text the model reads",
+          "Context window: max tokens per request, output included",
+          "Prompt: the instructions and data you send",
+          "Temperature: controls randomness; 0 can still vary",
+          "Tool calling: model emits a call; app or API runs it"
+        ],
+        "start": 1
+      },
+      {
+        "kind": "list",
+        "title": "Finding the right data",
+        "lines": [
+          "Chunking: split docs into retrievable pieces",
+          "Embedding: a vector of numbers for meaning",
+          "Cosine similarity: how closely two vectors align",
+          "Vector index: structure for fast similarity search",
+          "ANN search: approximate; trades recall for speed"
+        ],
+        "start": 6
+      },
+      {
+        "kind": "list",
+        "title": "Making answers reliable",
+        "lines": [
+          "RAG: retrieve relevant data, then generate",
+          "Fine-tuning: further train a model on your own data",
+          "Hallucination: output that is false or unsupported",
+          "Evals: repeatable tests of output quality",
+          "Guardrails: checks on inputs and outputs"
+        ],
+        "start": 11
+      },
+      {
+        "kind": "takeaway",
+        "title": "RAG answers depend on what you retrieve.",
+        "subtitle": "Save this for your next interview"
+      }
+    ],
+    "urls": [
+      "https://media.queryunstuck.in/qu-004/carousel/slide-01.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-02.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-03.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-04.jpg",
+      "https://media.queryunstuck.in/qu-004/carousel/slide-05.jpg"
+    ]
+  },
+  "music": {
+    "bed": "drift",
+    "gain_db": -11,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Concept list with ~45 cues/min after sync: dense, so a soft drumless ambient bed. Drift (60 BPM) keeps 28 s with no stretch and places node pops on an even 0.5 s grid; rain's noise and study's arpeggios compete more with pops. Just audible at -11 dB.",
+    "track": "pieces/qu-004.wav"
+  },
+  "render": {
+    "reel_url": "https://media.queryunstuck.in/qu-004/reel.mp4",
+    "duration_sec": 28.011,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 45,
+    "url": "https://media.queryunstuck.in/qu-004/thumbnail.png"
+  }
+}
