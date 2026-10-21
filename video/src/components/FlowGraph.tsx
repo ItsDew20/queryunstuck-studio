@@ -134,20 +134,32 @@ export const FlowGraph: React.FC<FlowGraphProps> = ({ nodes, edges, reveal = tru
                     );
                   })
                 : null}
-              {e.label ? (
-                <text
-                  x={(a.x + b.x) / 2}
-                  y={(a.y + b.y) / 2 - 16 * s}
-                  textAnchor="middle"
-                  fill={colors.textMuted}
-                  fontFamily={fonts.code}
-                  fontSize={28 * s}
-                  opacity={draw}
-                >
-                  {e.label}
-                </text>
-              ) : null}
             </g>
+          );
+        })}
+        {/* Edge labels last, with a dark outline, so travelling dots never cover them. */}
+        {edges.map((e, i) => {
+          const A = byId.get(e.from);
+          const B = byId.get(e.to);
+          if (!e.label || !A || !B) return null;
+          const a = exitPoint(pos(A.n), pos(B.n));
+          const b = exitPoint(pos(B.n), pos(A.n));
+          return (
+            <text
+              key={`label-${i}`}
+              x={(a.x + b.x) / 2}
+              y={(a.y + b.y) / 2 - 16 * s}
+              textAnchor="middle"
+              fill={colors.textMuted}
+              stroke={colors.background}
+              strokeWidth={8 * s}
+              paintOrder="stroke"
+              fontFamily={fonts.code}
+              fontSize={28 * s}
+              opacity={progress(frame, edgeDelay(i), 14)}
+            >
+              {e.label}
+            </text>
           );
         })}
       </svg>
@@ -177,9 +189,28 @@ export const FlowGraph: React.FC<FlowGraphProps> = ({ nodes, edges, reveal = tru
               transform: `scale(${0.8 + 0.2 * p})`,
             }}
           >
-            <div style={{ fontFamily: fonts.heading, fontWeight: 800, fontSize: 42 * s, color: colors.text }}>{n.label}</div>
+            <div
+              style={{
+                fontFamily: fonts.heading,
+                fontWeight: 800,
+                // Shrink long labels to fit the node (Montserrat ExtraBold ~0.62em per glyph).
+                fontSize: Math.min(42 * s, (nw - 28 * s) / Math.max(1, n.label.length * 0.62)),
+                color: colors.text,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {n.label}
+            </div>
             {n.sublabel ? (
-              <div style={{ fontFamily: fonts.code, fontSize: 26 * s, color: colors.textMuted, marginTop: 4 * s }}>
+              <div
+                style={{
+                  fontFamily: fonts.code,
+                  fontSize: Math.min(26 * s, (nw - 24 * s) / Math.max(1, n.sublabel.length * 0.6)),
+                  color: colors.textMuted,
+                  marginTop: 4 * s,
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {n.sublabel}
               </div>
             ) : null}

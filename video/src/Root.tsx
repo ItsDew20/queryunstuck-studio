@@ -3,6 +3,7 @@ import { Composition } from "remotion";
 import { layout } from "./brand";
 import { calculateSpecMetadata, FromSpec, FromSpecLandscape } from "./compositions/FromSpec";
 import { Carousel, calculateCarouselMetadata } from "./compositions/Carousel";
+import { calculateThumbnailMetadata, ReelCover, Thumbnail } from "./compositions/Thumbnail";
 import demo from "./demos/demo-sql-order.json";
 import type { Spec } from "./types";
 import "./fonts";
@@ -40,6 +41,26 @@ export const RemotionRoot: React.FC = () => (
       durationInFrames={1}
       defaultProps={demoSpec}
       calculateMetadata={calculateCarouselMetadata}
+    />
+    <Composition
+      id="Thumbnail"
+      component={Thumbnail}
+      width={1280}
+      height={720}
+      fps={1}
+      durationInFrames={1}
+      defaultProps={demoSpec}
+      calculateMetadata={calculateThumbnailMetadata("landscape")}
+    />
+    <Composition
+      id="ReelCover"
+      component={ReelCover}
+      width={1080}
+      height={1920}
+      fps={1}
+      durationInFrames={1}
+      defaultProps={demoSpec}
+      calculateMetadata={calculateThumbnailMetadata("portrait")}
     />
   </>
 );

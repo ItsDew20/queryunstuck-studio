@@ -23,6 +23,9 @@ ORDER = ["idea", "researched", "scripted", "fact-checked", "storyboarded", "rend
 DURATION = {"reel-animated": (20, 60), "reel-list": (10, 45), "short": (10, 60), "longform": (300, 1500)}
 
 
+VIEWER_GATE_FROM = "2026-10-22"  # creative.md + viewer.md required for pieces started on/after this date
+
+
 def at_least(status: str, stage: str) -> bool:
     if status == "blocked":
         return False
@@ -111,6 +114,17 @@ def check_piece(folder: Path) -> list[str]:
         qa = folder / "qa.md"
         if qa.exists() and last_line(qa) != "QA: PASS":
             errs.append(f"{qa}: last line must be 'QA: PASS' for status '{status}'")
+
+    # Audience-panel gate (studio v2). Pieces started before it existed are exempt.
+    started = min((h.get("at", "") for h in spec.get("history", [])), default="")
+    if started >= VIEWER_GATE_FROM:
+        need("creative.md", "scripted")
+        need("viewer.md", "rendered")
+        vw = folder / "viewer.md"
+        if vw.exists() and not last_line(vw).startswith("VIEWER: "):
+            errs.append(f"{vw}: last line must be 'VIEWER: PASS' or 'VIEWER: FAIL'")
+        if at_least(status, "copy-ready") and vw.exists() and last_line(vw) != "VIEWER: PASS":
+            errs.append(f"{vw}: last line must be 'VIEWER: PASS' for status '{status}'")
 
     if at_least(status, "copy-ready"):
         cap = folder / "caption.md"

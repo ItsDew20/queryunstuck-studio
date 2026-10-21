@@ -36,19 +36,33 @@ Any agent may set `blocked` with a reason in `history[]`.
 
 | Stage | Agent | Writes |
 |---|---|---|
+| scout | trend-scout | `backlog/trends-YYYY-WW.md`, sourced candidates in `backlog/topics.yaml` |
 | plan | content-strategist | `backlog/calendar.yaml`, new `content/<id>/spec.json` (status idea) |
 | research | researcher | `research.md`, `sources[]` |
+| concept | creative-director | `creative.md` (surprise, angle, hooks, beat map, signature visual); status stays `researched` |
 | script | scriptwriter | `script.md`, `scenes[]` (text), `code_blocks[]` |
 | verify | fact-checker | `factcheck.md` (must end with `VERDICT: PASS` or `VERDICT: FAIL`) |
 | storyboard | visual-director | `scenes[].component` + `props` |
+| audit | creative-director | `creative.md` § Storyboard audit (pacing via `scripts/engagement_stats.py`) |
+| preview | audience-panel | `viewer.md` § Preview from stills (must end `VIEWER: PASS` before render) |
 | score | composer | `music` (original bed, level, beat sync); status stays `storyboarded` |
 | animate | animator | composition in `video/src/compositions/` (only if new layout needed) |
 | render | renderer | `render.reel_url` / `render.longform_url`, `thumbnail` |
 | qa | qa-reviewer | `qa.md` (must end with `QA: PASS` or `QA: FAIL`) |
+| watch | audience-panel | `viewer.md` § Final watch + `viewer.final` (must end `VIEWER: PASS` before copy) |
+| package | packaging-designer | `thumbnail.options`, chosen thumbnail/cover, `packaging.md` |
 | copy | copywriter | `caption.md`, `youtube.md` |
 | review | orchestrator | opens PR `content/<id>` → Dew reviews |
 | publish | publisher | `publish.*.post_id`, `publish.*.published_at` |
+| engage | community-manager | `community/*.md` reply drafts + question digest (never posts) |
 | learn | analyst | `analytics/weekly-YYYY-WW.md` |
+
+## Studio quality bar
+Accurate is the floor; interesting is the job. `docs/creative-playbook.md` sets the pacing limits
+and anti-stale rules, and `docs/STUDIO.md` shows who does what. From 2026-10-22 every piece needs
+`creative.md` before scripting and a `VIEWER: PASS` from the audience-panel before it is rendered
+(preview) and before copy (final watch). The panel's scores are predictions; the analyst checks
+them against real retention.
 
 ## Revision loop
 Dew's PR review comments are the instructions. The orchestrator routes each comment to the

@@ -25,6 +25,9 @@ through each step).
    audio. `duration_sec` is a minimum: scenes with crowded movement are auto-slowed (≤1.5×).
    Check the real timeline and cues with `cd video && npm run -s sfx:cues -- ../content/<id>/spec.json`.
 6. One focal movement at a time. Colour encodes meaning consistently (see `brand.json.semantic`).
+   Visual structure is a claim too: an arrow says "A leads to B", an order says "this comes first",
+   a red/green tone says "bad/good". Only use them when research.md/factcheck.md support that
+   relationship; for unordered sets of terms use a layout without edges.
 7. If no component fits, write `needs_new_component` with a precise description for the animator
    instead of improvising.
 8. Set status `storyboarded`, append history, run the validator.
@@ -35,3 +38,13 @@ through each step).
   keep text under about half of the frame. Fewer items per card with faster reveals.
 - For `reel-list` pieces also fill `carousel.slides` (if the scriptwriter hasn't): a cover slide,
   then slides of 3-5 items each with the full fact-checked lines, and a final takeaway slide.
+
+## Pacing and freshness (docs/creative-playbook.md)
+- Before handing off, run `.venv/bin/python scripts/engagement_stats.py content/<id>-<slug>` and
+  meet the playbook limits: first motion, longest gap between events, events per minute, same
+  component in a row. Give reading time motion (a highlight, counter or travelling dot), and split
+  long scenes into steps rather than holding one frame.
+- Build the `creative.md` signature visual and hook frame exactly; if a component can't, request it
+  via `needs_new_component`.
+- Next come the creative-director's storyboard audit and the audience-panel preview. Fix what they
+  route to you before render.

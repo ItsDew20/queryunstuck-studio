@@ -337,6 +337,7 @@
     "thumbnail": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Thumbnail / cover. frame+url: the chosen image. options: packaging-designer's candidates (rendered by video/scripts/thumbnail.mjs).",
       "properties": {
         "frame": {
           "type": "integer",
@@ -344,6 +345,45 @@
         },
         "url": {
           "type": "string"
+        },
+        "cover_url": {
+          "type": "string",
+          "description": "Reel cover (1080x1920), if one was made"
+        },
+        "chosen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "options": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 40
+              },
+              "accent": {
+                "type": "string"
+              },
+              "badge": {
+                "type": "string",
+                "maxLength": 16
+              },
+              "frame_sec": {
+                "type": "number",
+                "minimum": 0
+              },
+              "why": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -404,6 +444,155 @@
           },
           "note": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "viewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Audience-panel predictions (simulated viewers, not real data). The analyst compares them with real retention.",
+      "properties": {
+        "preview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verdict",
+            "overall",
+            "hook"
+          ],
+          "properties": {
+            "at": {
+              "type": "string"
+            },
+            "verdict": {
+              "enum": [
+                "PASS",
+                "FAIL"
+              ]
+            },
+            "overall": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "hook": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "pacing": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "novelty": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "clarity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "payoff": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "shareability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "would_finish": {
+              "type": "string",
+              "pattern": "^[0-9]+/[0-9]+$",
+              "description": "personas who would watch to the end, e.g. 2/3"
+            },
+            "longest_static_sec": {
+              "type": "number",
+              "minimum": 0
+            },
+            "drop_offs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "predicted drop-off moments, 'mm:ss reason'"
+            }
+          }
+        },
+        "final": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verdict",
+            "overall",
+            "hook"
+          ],
+          "properties": {
+            "at": {
+              "type": "string"
+            },
+            "verdict": {
+              "enum": [
+                "PASS",
+                "FAIL"
+              ]
+            },
+            "overall": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "hook": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "pacing": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "novelty": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "clarity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "payoff": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "shareability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "would_finish": {
+              "type": "string",
+              "pattern": "^[0-9]+/[0-9]+$",
+              "description": "personas who would watch to the end, e.g. 2/3"
+            },
+            "longest_static_sec": {
+              "type": "number",
+              "minimum": 0
+            },
+            "drop_offs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "predicted drop-off moments, 'mm:ss reason'"
+            }
           }
         }
       }

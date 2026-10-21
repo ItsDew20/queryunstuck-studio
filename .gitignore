@@ -15,3 +15,7 @@ content/*/qa/
 # Music beds are generated deterministically (npm run music:generate); only the manifest is tracked
 video/public/music/*.wav
 video/public/music/pieces/
+
+# Packaging and viewer working files are regenerable from the render
+video/public/thumbs/
+content/*/viewer/

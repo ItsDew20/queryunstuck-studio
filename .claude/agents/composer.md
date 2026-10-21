@@ -46,3 +46,8 @@ music section of `video/src/components/README.md`.
    under the effects.
 7. Append history (`at` from `date "+%Y-%m-%dT%H:%M:%S+05:30"`, agent "composer", note: bed, tempo,
    cues/min, why). Status is unchanged (stays `storyboarded`). Run the validator.
+
+## Energy matches the edit
+- Read `creative.md` (angle, beat map). The bed supports attention: a calm bed under a fast
+  "guess the output" reel or a tense debug story can make it feel flat. Pick by energy as well as
+  density, and keep it under the voice when there is one.
