@@ -1,3 +1,5 @@
+audio_name: QueryUnstuck – SQL order
+
 You write SELECT first. SQL logically processes it after HAVING.
 
 The logical order of a SQL query, in 8 steps:
