@@ -190,6 +190,9 @@ const Background: React.FC = () => (
 );
 
 const Watermark: React.FC<{ o: Orientation }> = ({ o }) => {
+  // Kept small and light (brand.watermarkStyle): Instagram's ranking docs say watermarked reels
+  // can be shown less, so the handle stays present but unobtrusive.
+  const w = brand.watermarkStyle;
   const right = o === "portrait" ? layout.reel.safeRight : layout.landscape.safeRight;
   const top = o === "portrait" ? 64 : 48;
   return (
@@ -200,16 +203,16 @@ const Watermark: React.FC<{ o: Orientation }> = ({ o }) => {
         right,
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 9,
         fontFamily: fonts.heading,
-        fontWeight: 800,
-        fontSize: o === "portrait" ? 32 : 28,
+        fontWeight: w.fontWeight,
+        fontSize: o === "portrait" ? w.fontSizeReel : w.fontSizeLandscape,
         letterSpacing: 0.5,
-        color: alpha(colors.text, 0.85),
+        color: alpha(colors.text, w.opacity),
         zIndex: 10,
       }}
     >
-      <div style={{ width: 14, height: 14, borderRadius: 4, background: colors.accent }} />
+      <div style={{ width: w.dotSize, height: w.dotSize, borderRadius: 3, background: alpha(colors.accent, w.opacity + 0.2) }} />
       {brand.watermark}
     </div>
   );

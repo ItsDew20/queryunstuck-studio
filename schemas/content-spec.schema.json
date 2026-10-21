@@ -270,6 +270,67 @@
         }
       }
     },
+    "carousel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slides"
+      ],
+      "description": "Companion Instagram carousel (4:5 JPEG slides) for text-dense lessons, e.g. reel-list pieces.",
+      "properties": {
+        "slides": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "title"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "cover",
+                  "list",
+                  "takeaway"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "subtitle": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "lines": {
+                "type": "array",
+                "maxItems": 6,
+                "items": {
+                  "type": "string",
+                  "maxLength": 90
+                }
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of the first list line (continues numbering across slides)"
+              }
+            }
+          }
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "description": "Public JPEG URLs in slide order (renderer)"
+        }
+      }
+    },
     "needs_new_component": {
       "type": "string"
     },
