@@ -273,8 +273,9 @@ const growForTitle = (R: ReturnType<typeof rects>, text: string[], o: Orientatio
   };
 };
 
-const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, o, text }) => {
-  const frame = useCurrentFrame();
+const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[]; instant?: boolean }> = ({ r, o, text, instant }) => {
+  // The opening scene's header is fully drawn on frame 0: that frame is the feed cover and the hook.
+  const frame = useCurrentFrame() + (instant ? 30 : 0);
   // Every on_screen_text line is fact-checked as on-screen copy, so all of them are drawn:
   // [0] is the title, [1..3] are supporting lines (definition, caveat) in decreasing emphasis.
   const { title, lines, titleFs, lineFs } = titleMetrics(text, r, o, r.h);
@@ -450,10 +451,12 @@ const SceneView: React.FC<{
   /** Previous scene, used to carry the code highlight across a continuation. */
   prev?: Scene;
   grid?: Grid;
-}> = ({ scene, codeBlocks, o, durationInFrames, links, prev, grid }) => {
+  /** First scene of the video: no fade-in, header drawn on frame 0. */
+  first?: boolean;
+}> = ({ scene, codeBlocks, o, durationInFrames, links, prev, grid, first }) => {
   const frame = useCurrentFrame();
   const R = scene.component && !FULL_FRAME.has(scene.component) ? growForTitle(rects(o), scene.on_screen_text, o) : rects(o);
-  const fadeIn = interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
+  const fadeIn = first ? 1 : interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
   const fadeOut = interpolate(frame, [durationInFrames - 6, durationInFrames], [1, 0], { extrapolateLeft: "clamp" });
   // Parts that carry on into the neighbouring scene stay put instead of blinking.
   const fade = (keepIn: boolean, keepOut: boolean) => Math.min(keepIn ? 1 : fadeIn, keepOut ? 1 : fadeOut);
@@ -483,7 +486,7 @@ const SceneView: React.FC<{
     const merged = { ...(block ? { code: block.code, lang: block.lang } : {}), ...props };
     body = (
       <>
-        <SceneTitle r={R.title} o={o} text={scene.on_screen_text} />
+        <SceneTitle r={R.title} o={o} text={scene.on_screen_text} instant={first} />
         <Box r={R.codeMain} o={o} durationInFrames={durationInFrames}>
           <CodePanel {...(merged as unknown as React.ComponentProps<typeof CodePanel>)} />
         </Box>
@@ -494,7 +497,7 @@ const SceneView: React.FC<{
     body = (
       <>
         <div style={{ opacity }}>
-          <SceneTitle r={R.title} o={o} text={scene.on_screen_text} />
+          <SceneTitle r={R.title} o={o} text={scene.on_screen_text} instant={first} />
         </div>
         <div style={{ opacity: animOpacity }}>
           <Box r={block && R.code ? R.anim : R.animNoCode} o={o} durationInFrames={durationInFrames}>
@@ -548,6 +551,7 @@ const SpecPlayer: React.FC<{ spec: Spec; o: Orientation }> = ({ spec, o }) => {
             links={links}
             prev={plan[i - 1]?.scene}
             grid={grid}
+            first={i === 0}
           />
         </Sequence>
       ))}

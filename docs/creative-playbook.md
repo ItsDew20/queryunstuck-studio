@@ -23,6 +23,8 @@ A deliberate exception (e.g. a 3 s "pause and guess" freeze) must be written in 
 
 ## 2. Hooks (first 1.5 s)
 - Open on **motion and the question**, never a plain title card. The first frame is also the cover.
+  The engine draws the opening scene's header on frame 0 (no fade-in); a `TitleCard` opener still
+  builds word by word from an empty frame, so never open on `TitleCard`.
 - Patterns that are honest and concrete:
   - **Contradiction:** "Kafka doesn't order your topic."
   - **Mistake:** "This GROUP BY drops a row."
