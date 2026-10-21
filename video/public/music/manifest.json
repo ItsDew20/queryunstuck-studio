@@ -1,0 +1,66 @@
+{
+  "calm": {
+    "bpm": 66,
+    "beats_per_bar": 4,
+    "character": "warm pads, sparse piano, shimmer; no drums",
+    "seconds": 29.091,
+    "rms_db": -20.0,
+    "phone_share": 0.86
+  },
+  "drift": {
+    "bpm": 60,
+    "beats_per_bar": 4,
+    "character": "ambient drone, slow chord colours, rare bells; no drums",
+    "seconds": 32.0,
+    "rms_db": -20.0,
+    "phone_share": 0.89
+  },
+  "flow": {
+    "bpm": 88,
+    "beats_per_bar": 4,
+    "character": "minimal repeating mallet pattern, soft pulse",
+    "seconds": 21.818,
+    "rms_db": -20.0,
+    "phone_share": 1.0
+  },
+  "focus": {
+    "bpm": 78,
+    "beats_per_bar": 4,
+    "character": "lo-fi electric piano, soft swung drums, light vinyl",
+    "seconds": 24.615,
+    "rms_db": -20.0,
+    "phone_share": 0.9
+  },
+  "night": {
+    "bpm": 64,
+    "beats_per_bar": 4,
+    "character": "slow lo-fi electric piano, brushes, round bass",
+    "seconds": 30.0,
+    "rms_db": -20.0,
+    "phone_share": 1.0
+  },
+  "rain": {
+    "bpm": 60,
+    "beats_per_bar": 4,
+    "character": "soft rain over warm pads and sparse piano; no drums",
+    "seconds": 32.0,
+    "rms_db": -20.0,
+    "phone_share": 0.89
+  },
+  "study": {
+    "bpm": 72,
+    "beats_per_bar": 4,
+    "character": "felt-piano arpeggios over a faint pad; no drums",
+    "seconds": 26.667,
+    "rms_db": -20.0,
+    "phone_share": 0.74
+  },
+  "upbeat": {
+    "bpm": 100,
+    "beats_per_bar": 4,
+    "character": "bright plucked arpeggios, light four-on-the-floor",
+    "seconds": 19.2,
+    "rms_db": -20.0,
+    "phone_share": 0.57
+  }
+}

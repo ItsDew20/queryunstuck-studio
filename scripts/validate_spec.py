@@ -115,14 +115,21 @@ def check_piece(folder: Path) -> list[str]:
     if at_least(status, "copy-ready"):
         cap = folder / "caption.md"
         if cap.exists():
-            text = cap.read_text(encoding="utf-8")
-            if len(text) > 2200:
-                errs.append(f"{cap}: {len(text)} chars (Instagram limit 2200)")
-            tags = re.findall(r"(?<!\w)#\w+", text)
-            if "#queryunstuck" not in [t.lower() for t in tags]:
-                errs.append(f"{cap}: missing #queryunstuck")
-            if len(tags) > 6:
-                errs.append(f"{cap}: {len(tags)} hashtags (max 6)")
+            raw = cap.read_text(encoding="utf-8")
+            # caption.md may hold two posts: the reel caption, then an optional
+            # "## Carousel caption" section. An "audio_name:" line is metadata, not caption text.
+            reel, _, carousel = raw.partition("## Carousel caption")
+            reel = re.sub(r"^\s*audio_name:.*\n", "", reel, count=1)
+            posts = [("reel caption", reel)] + ([("carousel caption", carousel)] if carousel.strip() else [])
+            for label, text in posts:
+                text = text.strip()
+                if len(text) > 2200:
+                    errs.append(f"{cap}: {label} is {len(text)} chars (Instagram limit 2200)")
+                tags = re.findall(r"(?<!\w)#\w+", text)
+                if "#queryunstuck" not in [t.lower() for t in tags]:
+                    errs.append(f"{cap}: {label} missing #queryunstuck")
+                if len(tags) > 6:
+                    errs.append(f"{cap}: {label} has {len(tags)} hashtags (max 6)")
 
     if status == "published":
         pub = spec.get("publish") or {}

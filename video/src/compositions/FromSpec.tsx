@@ -7,6 +7,8 @@ import { fonts } from "../fonts";
 import { enter, progress } from "../lib/anim";
 import { SceneProvider } from "../lib/scene";
 import { Cue, dedupe, minGapFrames, SfxTrack, tightestGap } from "../lib/sfx";
+import type { Grid } from "../lib/anim";
+import { beatFrames, musicFor, MusicTrack } from "../lib/music";
 import type { CodeBlock, Scene, Spec } from "../types";
 
 type Orientation = "portrait" | "landscape";
@@ -34,6 +36,10 @@ interface PlannedScene {
   durationInFrames: number;
   cues: Cue[];
   links: Links;
+  /** Music beat grid for this scene (undefined when there's no synced music). */
+  grid?: Grid;
+  /** True when crowded movement forced a slow-down (not just rounding to whole beats). */
+  stretched: boolean;
 }
 
 /** How a scene connects to its neighbours; continuations skip the fade and the whoosh. */
@@ -79,18 +85,31 @@ export const planScenes = (spec: Spec, fps: number): PlannedScene[] => {
   const pitches = linePitches(spec.scenes ?? []);
   const target = minGapFrames("swoosh", fps);
   const scenes = spec.scenes ?? [];
+  const music = musicFor(spec);
+  // With synced music, scenes start on whole beats and steps snap to eighth notes.
+  const beat = music?.sync ? beatFrames(music.bpm, fps) : 0;
   let from = 0;
+  let beatsSoFar = 0;
   return scenes.map((scene, i) => {
     const links = sceneLinks(scenes, i);
     const base = sceneFrames(scene, fps);
-    let d = base;
-    let cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d);
+    const lengthFor = (frames: number) => {
+      if (!beat) return { d: frames, beats: 0 };
+      const beats = Math.max(1, Math.round(frames / beat));
+      return { d: Math.round((beatsSoFar + beats) * beat) - Math.round(beatsSoFar * beat), beats };
+    };
+    const grid: Grid | undefined = beat ? { offset: from, step: beat / 2 } : undefined;
+    let { d, beats } = lengthFor(base);
+    let cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d, grid);
+    let stretched = false;
     for (let k = 1.05; k <= brand.audio.maxStretch + 1e-9 && tightestGap(cues, "swoosh") < target; k += 0.05) {
-      d = Math.round(base * k);
-      cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d);
+      ({ d, beats } = lengthFor(Math.round(base * k)));
+      cues = sceneCues(scene, i, links, codeBlocks, pitches, fps, d, grid);
+      stretched = true;
     }
-    const planned = { scene, from, durationInFrames: d, cues, links };
+    const planned = { scene, from, durationInFrames: d, cues, links, grid, stretched };
     from += d;
+    beatsSoFar += beats;
     return planned;
   });
 };
@@ -171,6 +190,9 @@ const Background: React.FC = () => (
 );
 
 const Watermark: React.FC<{ o: Orientation }> = ({ o }) => {
+  // Kept small and light (brand.watermarkStyle): Instagram's ranking docs say watermarked reels
+  // can be shown less, so the handle stays present but unobtrusive.
+  const w = brand.watermarkStyle;
   const right = o === "portrait" ? layout.reel.safeRight : layout.landscape.safeRight;
   const top = o === "portrait" ? 64 : 48;
   return (
@@ -181,39 +203,48 @@ const Watermark: React.FC<{ o: Orientation }> = ({ o }) => {
         right,
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 9,
         fontFamily: fonts.heading,
-        fontWeight: 800,
-        fontSize: o === "portrait" ? 32 : 28,
+        fontWeight: w.fontWeight,
+        fontSize: o === "portrait" ? w.fontSizeReel : w.fontSizeLandscape,
         letterSpacing: 0.5,
-        color: alpha(colors.text, 0.85),
+        color: alpha(colors.text, w.opacity),
         zIndex: 10,
       }}
     >
-      <div style={{ width: 14, height: 14, borderRadius: 4, background: colors.accent }} />
+      <div style={{ width: w.dotSize, height: w.dotSize, borderRadius: 3, background: alpha(colors.accent, w.opacity + 0.2) }} />
       {brand.watermark}
     </div>
   );
 };
+
+const GridCtx = React.createContext<Grid | undefined>(undefined);
 
 const Box: React.FC<{ r: Rect; o: Orientation; durationInFrames: number; children: React.ReactNode }> = ({
   r,
   o,
   durationInFrames,
   children,
-}) => (
-  <div style={{ position: "absolute", left: r.x, top: r.y, width: r.w, height: r.h }}>
-    <SceneProvider value={{ width: r.w, height: r.h, orientation: o, durationInFrames }}>{children}</SceneProvider>
-  </div>
-);
+}) => {
+  const grid = React.useContext(GridCtx);
+  return (
+    <div style={{ position: "absolute", left: r.x, top: r.y, width: r.w, height: r.h }}>
+      <SceneProvider value={{ width: r.w, height: r.h, orientation: o, durationInFrames, grid }}>{children}</SceneProvider>
+    </div>
+  );
+};
 
 const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, o, text }) => {
   const frame = useCurrentFrame();
-  const [title, definition] = text;
+  // Every on_screen_text line is fact-checked as on-screen copy, so all of them are drawn:
+  // [0] is the title, [1..3] are supporting lines (definition, caveat) in decreasing emphasis.
+  const [title, ...rest] = text;
+  const lines = rest.slice(0, 3);
   if (!title) return null;
   const portrait = o === "portrait";
+  const lineFs = (portrait ? [38, 34, 30] : [32, 30, 28])[Math.max(0, lines.length - 1)];
   // Montserrat Black averages ~0.66em per glyph; shrink long titles to one line where possible.
-  const maxFs = portrait ? 80 : 66;
+  const maxFs = (portrait ? 80 : 66) - (lines.length >= 2 ? 12 : 0);
   const titleFs = Math.max(portrait ? 54 : 46, Math.min(maxFs, r.w / (title.length * 0.66)));
   return (
     <div
@@ -243,21 +274,22 @@ const SceneTitle: React.FC<{ r: Rect; o: Orientation; text: string[] }> = ({ r, 
       >
         {title}
       </div>
-      {definition ? (
+      {lines.map((line, i) => (
         <div
+          key={i}
           style={{
-            marginTop: 18,
+            marginTop: i === 0 ? 16 : 6,
             fontFamily: fonts.body,
-            fontWeight: 600,
-            fontSize: portrait ? 38 : 32,
-            lineHeight: 1.3,
+            fontWeight: i === 0 ? 600 : 500,
+            fontSize: lineFs,
+            lineHeight: 1.25,
             color: colors.textMuted,
-            ...enter(progress(frame, 5, 12), 16),
+            ...enter(progress(frame, 5 + i * 4, 12), 16),
           }}
         >
-          {definition}
+          {line}
         </div>
-      ) : null}
+      ))}
     </div>
   );
 };
@@ -344,10 +376,11 @@ const sceneCues = (
   pitches: LinePitches,
   fps: number,
   d: number,
+  grid?: Grid,
 ): Cue[] => {
   const { codeHighlight, sfx, props } = splitProps(scene);
   if (sfx === false) return [];
-  const ctx = { fps, durationInFrames: d };
+  const ctx = { fps, durationInFrames: d, grid };
   const block = scene.code_block !== undefined ? codeBlocks[scene.code_block] : undefined;
   const cues: Cue[] = wantsWhoosh(scene, index, links) ? [{ frame: 0, sound: "whoosh" }] : [];
   const name = scene.component;
@@ -364,7 +397,8 @@ const sceneCues = (
   } else {
     cues.push({ frame: 0, sound: "pop" });
   }
-  return cues.filter((c) => c.frame < d);
+  // Steps timed before the scene starts (at < 0) set an initial state silently.
+  return cues.filter((c) => c.frame >= 0 && c.frame < d);
 };
 
 /** Code lines highlighted at the end of a scene (last step, or its static activeLines). */
@@ -381,7 +415,8 @@ const SceneView: React.FC<{
   links: Links;
   /** Previous scene, used to carry the code highlight across a continuation. */
   prev?: Scene;
-}> = ({ scene, codeBlocks, o, durationInFrames, links, prev }) => {
+  grid?: Grid;
+}> = ({ scene, codeBlocks, o, durationInFrames, links, prev, grid }) => {
   const frame = useCurrentFrame();
   const R = rects(o);
   const fadeIn = interpolate(frame, [0, 6], [0, 1], { extrapolateRight: "clamp" });
@@ -453,21 +488,38 @@ const SceneView: React.FC<{
   return <AbsoluteFill style={{ opacity }}>{body}</AbsoluteFill>;
 };
 
+const SceneWithGrid: React.FC<React.ComponentProps<typeof SceneView>> = (props) => (
+  <GridCtx.Provider value={props.grid}>
+    <SceneView {...props} />
+  </GridCtx.Provider>
+);
+
 const SpecPlayer: React.FC<{ spec: Spec; o: Orientation }> = ({ spec, o }) => {
   const fps = o === "portrait" ? layout.reel.fps : layout.landscape.fps;
   const plan = planScenes(spec, fps);
   const end = plan.reduce((a, p) => a + p.durationInFrames, 0);
   const allCues = plan.flatMap((p) => p.cues.map((c) => ({ ...c, frame: c.frame + p.from })));
+  const finalCues = dedupe(allCues, fps, end);
+  const music = musicFor(spec);
   return (
     <AbsoluteFill>
       <Background />
-      {plan.map(({ scene, from, durationInFrames: d, links }, i) => (
+      {plan.map(({ scene, from, durationInFrames: d, links, grid }, i) => (
         <Sequence key={scene.id} from={from} durationInFrames={d} name={`${scene.id} · ${scene.component ?? "text"}`}>
-          <SceneView scene={scene} codeBlocks={spec.code_blocks ?? []} o={o} durationInFrames={d} links={links} prev={plan[i - 1]?.scene} />
+          <SceneWithGrid
+            scene={scene}
+            codeBlocks={spec.code_blocks ?? []}
+            o={o}
+            durationInFrames={d}
+            links={links}
+            prev={plan[i - 1]?.scene}
+            grid={grid}
+          />
         </Sequence>
       ))}
       <Watermark o={o} />
-      <SfxTrack cues={dedupe(allCues, fps, end)} fps={fps} />
+      <SfxTrack cues={finalCues} fps={fps} />
+      {music ? <MusicTrack music={music} cues={finalCues} total={end} fps={fps} /> : null}
     </AbsoluteFill>
   );
 };

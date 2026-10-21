@@ -24,3 +24,12 @@ interview-focused and on-the-job focused).
 - Apply analyst learnings explicitly; cite the report line you acted on in `history[]`.
 - Longform should bundle 4–6 reel-sized concepts so it can be cut into reels later.
 - Titles: concrete, searchable, no clickbait the content can't deliver.
+
+## Growth playbook
+Read `docs/growth-playbook.md` before planning and apply it explicitly (cite the section in the
+idea's history note):
+- Prefer topics that can be shown with motion (Instagram shows "majority text" reels less, §3).
+- Every `reel-list` piece also gets a companion **carousel** post (4:5 slides) on the same or next
+  day; add it to the calendar as `carousel_of: <id>`.
+- Trial reels (§5): only once the analyst reports **200+ followers**. Then mark 1-2 slots per week
+  `trial: true` to test new formats or hooks with non-followers first.

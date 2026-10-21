@@ -36,13 +36,46 @@ export const stepStarts = (
   durationInFrames: number,
   leadIn = 0.5,
   hold = 1.2,
+  grid?: Grid,
 ): number[] => {
   const start = Math.round(leadIn * fps);
   const end = Math.max(start + 1, durationInFrames - Math.round(hold * fps));
   const n = steps.length;
-  return steps.map((s, i) =>
+  const raw = steps.map((s, i) =>
     s.at !== undefined ? Math.round(s.at * fps) : Math.round(start + ((end - start) * i) / Math.max(1, n)),
   );
+  return snapToGrid(raw, grid, durationInFrames);
+};
+
+/** Music beat grid for the current scene: grid lines every `step` frames, counted from composition frame 0. */
+export interface Grid {
+  /** Composition frame where this scene starts. */
+  offset: number;
+  /** Frames between grid lines (an eighth note of the bed's tempo). */
+  step: number;
+}
+
+/** A coarser grid whose lines are a whole number of `grid` steps apart and at least `minFrames` apart. */
+export const coarseGrid = (grid: Grid | undefined, minFrames: number): Grid | undefined =>
+  grid ? { offset: grid.offset, step: grid.step * Math.max(1, Math.ceil((minFrames - 1e-6) / grid.step)) } : undefined;
+
+/**
+ * Snap scene-relative frames to the music grid so steps (and their sounds) land on the beat.
+ * Negative frames (silent initial-state steps) are left alone; order is preserved.
+ */
+export const snapToGrid = (frames: number[], grid: Grid | undefined, durationInFrames: number): number[] => {
+  if (!grid || grid.step <= 0) return frames;
+  let prev = -Infinity;
+  return frames.map((f) => {
+    if (f < 0) return f;
+    let snapped = Math.round(Math.round((grid.offset + f) / grid.step) * grid.step - grid.offset);
+    if (snapped < 0) snapped = Math.round(Math.ceil(grid.offset / grid.step) * grid.step - grid.offset);
+    // Collision: move to the next grid line after the previous step (computed exactly, no drift).
+    if (snapped <= prev) snapped = Math.round(Math.ceil((grid.offset + prev + 1) / grid.step) * grid.step - grid.offset);
+    snapped = Math.min(snapped, durationInFrames - 1);
+    prev = snapped;
+    return snapped;
+  });
 };
 
 /** Index of the active step at `frame` (-1 before the first step starts). */

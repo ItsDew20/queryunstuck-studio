@@ -2,6 +2,13 @@
   "name": "QueryUnstuck",
   "handle": "@queryunstuck",
   "watermark": "queryunstuck",
+  "watermarkStyle": {
+    "opacity": 0.55,
+    "fontSizeReel": 26,
+    "fontSizeLandscape": 24,
+    "fontWeight": 700,
+    "dotSize": 9
+  },
   "tagline": "Data & AI Engineering, visualized.",
   "fonts": {
     "heading": "Montserrat",
@@ -69,6 +76,11 @@
       "safeBottom": 100,
       "safeRight": 96,
       "codeSplit": 0.42
+    },
+    "carousel": {
+      "width": 1080,
+      "height": 1350,
+      "margin": 88
     }
   },
   "links": {
@@ -94,7 +106,7 @@
   },
   "audio": {
     "sfxEnabled": true,
-    "sfxVolume": 0.6,
+    "sfxVolume": 0.8,
     "dedupeMs": 150,
     "mix": {
       "whoosh": 0.3,
@@ -118,6 +130,11 @@
     "minGapMs": {
       "swoosh": 450
     },
-    "maxStretch": 1.5
+    "maxStretch": 1.5,
+    "musicEnabled": true,
+    "musicGainDb": -10,
+    "duckDb": 4,
+    "musicFadeInSec": 0.8,
+    "musicFadeOutSec": 1.5
   }
 }
