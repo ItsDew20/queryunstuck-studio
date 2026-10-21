@@ -74,6 +74,12 @@
       "agent": "visual-director",
       "action": "storyboard revision",
       "note": "s36: removed unverified filler rows (only e1-e8 move into 10-19). s40: ListCard overlapped watermark and overflowed with a title, so switched to Timeline of the 6 recap lines (no overlap). Takeaway callout text capitalised."
+    },
+    {
+      "at": "2026-10-21T13:15:49+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Scored: drift bed, 60 BPM, gain -13 dB, duck 4 dB, sync on. 193 cues / 15.72 min = 12.3 cues/min (sparse) but narration-led longform, so a quiet drumless ambient bed was chosen over pulse beds. Compared study/calm/drift/rain/night/focus/flow: calm stretched 3 scenes (+37.9 s); drift and rain keep all 42 scene lengths unchanged (total 943 s), with only pop/tick/sparkle off-beat; drift picked over rain so no rain noise sits under voice-over. Track pieces/qu-005.wav rendered at 943.000 s, resolving at 940 s. Status unchanged."
     }
   ],
   "sources": [
@@ -2313,5 +2319,13 @@
       "needs_manual_check": true,
       "verified": true
     }
-  ]
+  ],
+  "music": {
+    "bed": "drift",
+    "gain_db": -13,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Drift (60 BPM, drumless drone, rare bells) sits under 15 min of narration without fatigue; at 60 BPM every whole-second scene lands on a beat, so sync changes no scene length. Sparse 12 cues/min, but -13 dB keeps room for voice-over.",
+    "track": "pieces/qu-005.wav"
+  }
 }
