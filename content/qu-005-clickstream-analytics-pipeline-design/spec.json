@@ -128,6 +128,12 @@
       "agent": "orchestrator",
       "action": "in-review",
       "note": "youtube.md: removed the TBD newsletter/Discord placeholder lines (no links yet). Opening PR content/qu-005."
+    },
+    {
+      "at": "2026-10-22T01:09:21+05:30",
+      "agent": "audience-panel",
+      "action": "viewer-final",
+      "note": "Final watch of the 943 s longform (contact sheets fps=1/3, hook and chapter frames). VIEWER: FAIL: mean overall 3.3, hook 4.0, 0/3 would finish; longest still 26.4 s vs 5 s limit, 10.9 events/min vs 20; no voice. Top fixes: voice track, open on the 4-vs-3 clicks stakes, kill held stills, pause-and-guess interview beats, cut to about 10 min. Status unchanged."
     }
   ],
   "sources": [
@@ -2379,5 +2385,27 @@
   "thumbnail": {
     "frame": 60,
     "url": "https://media.queryunstuck.in/qu-005/thumbnail.png"
+  },
+  "viewer": {
+    "final": {
+      "at": "2026-10-22T01:09:21+05:30",
+      "verdict": "FAIL",
+      "overall": 3.3,
+      "hook": 4.0,
+      "pacing": 2.3,
+      "novelty": 4.0,
+      "clarity": 5.7,
+      "payoff": 5.0,
+      "shareability": 2.3,
+      "would_finish": "0/3",
+      "longest_static_sec": 26.4,
+      "drop_offs": [
+        "00:25 working DE: s01 defines clickstream after a 25 s agenda cold open; no hook, nothing new",
+        "01:16 fresher: s02 9-row table held still about 20 s twice; 1:16 in and still no pipeline",
+        "02:01 all: s04/s05 Kafka partition grids static 20 s and 22 s; no voice to explain",
+        "05:34 switcher: s13 single interview-tip Callout static 26.4 s",
+        "11:01 best hook (4 clicks, there were 3) arrives after every persona has left"
+      ]
+    }
   }
 }
