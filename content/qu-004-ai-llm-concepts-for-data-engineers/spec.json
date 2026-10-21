@@ -4,7 +4,7 @@
   "title": "15 Must-Know AI/LLM Concepts for Data Engineers",
   "format": "reel-list",
   "pillar": "ai-ml",
-  "status": "fact-checked",
+  "status": "storyboarded",
   "audience_level": "intermediate",
   "hook": "15 AI/LLM terms data engineers must know.",
   "hook_options": [
@@ -50,6 +50,24 @@
       "agent": "fact-checker",
       "action": "fact-checked",
       "note": "VERDICT: PASS (pass 2, after loop 1). All 5 required fixes verified. New optional wordings (items 2, 4, 8, 9) checked as new claims and supported; 'fast' in item 9 supported by pgvector README and HNSW paper. code_blocks empty; run_snippet ran with nothing to execute. Copy note: avoid hook_options[0] (unsourced) and [2] ('one screen'). Timestamp from `date`; the earlier 16:00 fact-checker and scriptwriter entries carry placeholder times that are later than this real one."
+    },
+    {
+      "at": "2026-10-21T12:59:02+05:30",
+      "agent": "visual-director",
+      "action": "storyboarded",
+      "note": "Growth-playbook storyboard: s1 TitleCard; s2-s4 FlowGraph (term nodes + arrows; defs 1-3/6-8/11-13 in title zone, defs of last two items in node sublabels, numbers dropped from node labels because 330px nodes wrap); s5 EndCard. Carousel: cover, 3 list slides (start 1/6/11), takeaway. on_screen_text untouched."
+    },
+    {
+      "at": "2026-10-21T13:01:41+05:30",
+      "agent": "visual-director",
+      "action": "revised storyboard (accuracy of arrows)",
+      "note": "s2/s4: edges removed, 2-2-1 grid. s3: pipeline Chunking > Embedding > Vector index > ANN search; Cosine similarity placed apart, no edge. Node x set to 0/1 so two 330px nodes per row do not overlap; Cosine similarity sits under ANN search, no edge. Right column x=0.9 keeps nodes inside the 140px right safe inset."
+    },
+    {
+      "at": "2026-10-21T13:04:20+05:30",
+      "agent": "composer",
+      "action": "scored",
+      "note": "Bed drift (60 BPM, drumless ambient), gain -11 dB, duck 4, sync on; track pieces/qu-004.wav 28.000 s, resolving chord at 24.00 s. 25 cues/27 s (~56/min) unsynced, 21 cues/28 s (45/min) synced: dense. Compared calm (31.8 s, s3 stretched, rejected), study (25.8 s), rain (28 s, same grid, noise layer masks pops), focus (26.9 s, drums). Drift: no stretch, pops on an even 0.5 s grid; only off-beat cue is title pop-1 (micro). Node 0 pop of each FlowGraph now lands on the scene whoosh at +0.00 (deduped), as with every bed. Mix peak -10.8 dBFS; bed ~-31 dB RMS vs pop peaks ~-13 dB."
     }
   ],
   "sources": [
@@ -177,7 +195,16 @@
         "15 AI/LLM terms",
         "for data engineers",
         "Three cards. Screenshot them."
-      ]
+      ],
+      "component": "TitleCard",
+      "props": {
+        "title": "15 AI/LLM terms",
+        "subtitle": "for data engineers",
+        "kicker": "Three cards. Screenshot them.",
+        "highlight": [
+          "AI/LLM"
+        ]
+      }
     },
     {
       "id": "s2-model",
@@ -190,7 +217,45 @@
         "3. Prompt: the instructions and data you send",
         "4. Temperature: controls randomness; 0 can still vary",
         "5. Tool calling: model emits a call; app or API runs it"
-      ]
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "Token",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Context window",
+            "x": 0.9,
+            "y": 0.1
+          },
+          {
+            "id": "n2",
+            "label": "Prompt",
+            "x": 0,
+            "y": 0.5
+          },
+          {
+            "id": "n3",
+            "label": "Temperature",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "controls randomness; 0 can still vary"
+          },
+          {
+            "id": "n4",
+            "label": "Tool calling",
+            "x": 0.45,
+            "y": 0.9,
+            "sublabel": "model emits a call; app or API runs it"
+          }
+        ],
+        "edges": []
+      }
     },
     {
       "id": "s3-data",
@@ -203,7 +268,61 @@
         "8. Cosine similarity: how closely two vectors align",
         "9. Vector index: structure for fast similarity search",
         "10. ANN search: approximate; trades recall for speed"
-      ]
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "Chunking",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Embedding",
+            "x": 0.9,
+            "y": 0.3
+          },
+          {
+            "id": "n2",
+            "label": "Vector index",
+            "x": 0,
+            "y": 0.5,
+            "sublabel": "structure for fast similarity search"
+          },
+          {
+            "id": "n3",
+            "label": "ANN search",
+            "x": 0.9,
+            "y": 0.7,
+            "sublabel": "approximate; trades recall for speed"
+          },
+          {
+            "id": "n4",
+            "label": "Cosine similarity",
+            "x": 0.9,
+            "y": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "from": "n0",
+            "to": "n1",
+            "dots": 1
+          },
+          {
+            "from": "n1",
+            "to": "n2",
+            "dots": 1
+          },
+          {
+            "from": "n2",
+            "to": "n3",
+            "dots": 1
+          }
+        ]
+      }
     },
     {
       "id": "s4-reliable",
@@ -216,7 +335,48 @@
         "13. Hallucination: output that is false or unsupported",
         "14. Evals: repeatable tests of output quality",
         "15. Guardrails: checks on inputs and outputs"
-      ]
+      ],
+      "component": "FlowGraph",
+      "props": {
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "RAG",
+            "x": 0,
+            "y": 0.1
+          },
+          {
+            "id": "n1",
+            "label": "Fine-tuning",
+            "x": 0.9,
+            "y": 0.1
+          },
+          {
+            "id": "n2",
+            "label": "Hallucination",
+            "x": 0,
+            "y": 0.5,
+            "tone": "noMatch"
+          },
+          {
+            "id": "n3",
+            "label": "Evals",
+            "x": 0.9,
+            "y": 0.5,
+            "sublabel": "repeatable tests of output quality",
+            "tone": "active"
+          },
+          {
+            "id": "n4",
+            "label": "Guardrails",
+            "x": 0.45,
+            "y": 0.9,
+            "sublabel": "checks on inputs and outputs",
+            "tone": "match"
+          }
+        ],
+        "edges": []
+      }
     },
     {
       "id": "s5-end",
@@ -225,8 +385,71 @@
       "on_screen_text": [
         "RAG answers depend on what you retrieve.",
         "Save this for your next interview"
-      ]
+      ],
+      "component": "EndCard",
+      "props": {
+        "headline": "RAG answers depend on what you retrieve.",
+        "cta": "Save this for your next interview"
+      }
     }
   ],
-  "code_blocks": []
+  "code_blocks": [],
+  "carousel": {
+    "slides": [
+      {
+        "kind": "cover",
+        "title": "15 AI/LLM terms",
+        "subtitle": "for data engineers"
+      },
+      {
+        "kind": "list",
+        "title": "Talking to the model",
+        "lines": [
+          "Token: a chunk of text the model reads",
+          "Context window: max tokens per request, output included",
+          "Prompt: the instructions and data you send",
+          "Temperature: controls randomness; 0 can still vary",
+          "Tool calling: model emits a call; app or API runs it"
+        ],
+        "start": 1
+      },
+      {
+        "kind": "list",
+        "title": "Finding the right data",
+        "lines": [
+          "Chunking: split docs into retrievable pieces",
+          "Embedding: a vector of numbers for meaning",
+          "Cosine similarity: how closely two vectors align",
+          "Vector index: structure for fast similarity search",
+          "ANN search: approximate; trades recall for speed"
+        ],
+        "start": 6
+      },
+      {
+        "kind": "list",
+        "title": "Making answers reliable",
+        "lines": [
+          "RAG: retrieve relevant data, then generate",
+          "Fine-tuning: further train a model on your own data",
+          "Hallucination: output that is false or unsupported",
+          "Evals: repeatable tests of output quality",
+          "Guardrails: checks on inputs and outputs"
+        ],
+        "start": 11
+      },
+      {
+        "kind": "takeaway",
+        "title": "RAG answers depend on what you retrieve.",
+        "subtitle": "Save this for your next interview"
+      }
+    ]
+  },
+  "music": {
+    "bed": "drift",
+    "gain_db": -11,
+    "duck_db": 4,
+    "sync": true,
+    "rationale": "Concept list with ~45 cues/min after sync: dense, so a soft drumless ambient bed. Drift (60 BPM) keeps 28 s with no stretch and places node pops on an even 0.5 s grid; rain's noise and study's arpeggios compete more with pops. Just audible at -11 dB.",
+    "track": "pieces/qu-004.wav"
+  }
 }
