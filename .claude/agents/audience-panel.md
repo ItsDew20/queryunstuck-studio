@@ -62,6 +62,7 @@ honestly and specifically, whether they would keep watching, and where they woul
 Otherwise FAIL. A FAIL is useful; a soft PASS wastes a posting slot.
 
 ## Rules
+- Refer to personas by role (Fresher, Working DE, Switcher) and use they/them for them.
 - Be blunt and concrete. "Slow" is useless; "s05 holds one still grid for 22 s with nothing new" is useful.
   No compliments unless they explain what to keep.
 - Never ask to change a fact, add a statistic, or promise something the video doesn't deliver.
