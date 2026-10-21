@@ -80,6 +80,24 @@
       "agent": "composer",
       "action": "scored",
       "note": "Scored: drift bed, 60 BPM, gain -13 dB, duck 4 dB, sync on. 193 cues / 15.72 min = 12.3 cues/min (sparse) but narration-led longform, so a quiet drumless ambient bed was chosen over pulse beds. Compared study/calm/drift/rain/night/focus/flow: calm stretched 3 scenes (+37.9 s); drift and rain keep all 42 scene lengths unchanged (total 943 s), with only pop/tick/sparkle off-beat; drift picked over rain so no rain noise sits under voice-over. Track pieces/qu-005.wav rendered at 943.000 s, resolving at 940 s. Status unchanged."
+    },
+    {
+      "at": "2026-10-21T13:38:24+05:30",
+      "agent": "renderer",
+      "action": "rendered",
+      "note": "Landscape longform (1920x1080 30fps, 943s, 28290 frames). Render time: 13 min 36 sec. File: 81.4 MB. Music: drift bed (943.000s, -13 dB, sync). H.264 + AAC. Audio: peak -10.5 dB, mean -32.6 dB. Captions: 70 cues, 120 lines verified. Thumbnail frame 60 (2s cold-open hook, title fully drawn). All files uploaded to R2."
+    },
+    {
+      "at": "2026-10-21T13:45:55+05:30",
+      "agent": "qa-reviewer",
+      "action": "qa-failed",
+      "note": "QA FAIL (3 blockers). s05 and s36: PartitionGrid start state stacks all events inside a labelled partition (user 102 / 10-17) for ~4 s, showing wrong placement. s25: sink -> source 'replay' arrow unsupported by sources. Everything else passed: 120/120 on-screen lines exact, captions 70 cues in order and public = local, numbers match factcheck, other FlowGraph arrows supported, audio peak -10.5 dBFS with steady bed, public video size = local. Minor issues in qa.md. Status stays rendered."
+    },
+    {
+      "at": "2026-10-21T13:46:57+05:30",
+      "agent": "visual-director",
+      "action": "storyboard revision (QA loop 1)",
+      "note": "s04/s05/s36 items appear directly in their partition (from=to); s25 replay edge removed; s33 gold 'rebuilt' label removed; code panel titles set to 'DuckDB SQL'."
     }
   ],
   "sources": [
@@ -356,7 +374,8 @@
               ],
               "note": "arrived_at"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -407,12 +426,12 @@
           },
           {
             "label": "B",
-            "from": 0,
+            "from": 1,
             "to": 1
           },
           {
             "label": "C",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
@@ -422,19 +441,17 @@
           },
           {
             "label": "E",
-            "from": 0,
+            "from": 1,
             "to": 1
           },
           {
             "label": "F",
-            "from": 0,
+            "from": 2,
             "to": 2
           }
         ],
         "beforeLabel": "Topic: clicks",
-        "afterLabel": "Ordered inside each partition only",
-        "moveAt": 4,
-        "moveSpan": 0.5
+        "afterLabel": "Ordered inside each partition only"
       }
     },
     {
@@ -458,7 +475,7 @@
         "items": [
           {
             "label": "e1 view",
-            "from": 1,
+            "from": 0,
             "to": 0
           },
           {
@@ -473,22 +490,22 @@
           },
           {
             "label": "e4 click",
-            "from": 1,
+            "from": 0,
             "to": 0
           },
           {
             "label": "e5 view",
-            "from": 1,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e6 buy",
-            "from": 1,
+            "from": 0,
             "to": 0
           },
           {
             "label": "e7 click",
-            "from": 1,
+            "from": 2,
             "to": 2
           },
           {
@@ -498,9 +515,7 @@
           }
         ],
         "beforeLabel": "Events in arrival order",
-        "afterLabel": "Key = user_id: same user, same partition",
-        "moveAt": 4,
-        "moveSpan": 0.6
+        "afterLabel": "Key = user_id: same user, same partition"
       }
     },
     {
@@ -800,7 +815,8 @@
               ],
               "note": "two clocks"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1139,7 +1155,8 @@
               ],
               "note": "2 min: best effort"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1477,7 +1494,8 @@
               ],
               "note": "8 rows, 8 unique"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1499,16 +1517,16 @@
           {
             "id": "s",
             "label": "Replayable source",
-            "x": 0.17,
-            "y": 0.18,
+            "x": 0.1,
+            "y": 0.5,
             "sublabel": "offsets, checkpoints",
             "tone": "match"
           },
           {
             "id": "k",
             "label": "Idempotent sink",
-            "x": 0.83,
-            "y": 0.18,
+            "x": 0.9,
+            "y": 0.5,
             "sublabel": "row count unchanged",
             "tone": "match"
           },
@@ -1516,7 +1534,7 @@
             "id": "j",
             "label": "Spark job",
             "x": 0.5,
-            "y": 0.82
+            "y": 0.5
           }
         ],
         "edges": [
@@ -1529,12 +1547,6 @@
             "from": "j",
             "to": "k",
             "label": "write"
-          },
-          {
-            "from": "k",
-            "to": "s",
-            "label": "replay",
-            "dots": 1
           }
         ]
       }
@@ -1696,7 +1708,8 @@
               ],
               "note": "click = 4"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1826,7 +1839,8 @@
               ],
               "note": "WHERE rn = 1"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1895,7 +1909,8 @@
               ],
               "note": "events and distinct users"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -1940,7 +1955,6 @@
             "label": "Gold",
             "x": 0.9,
             "y": 0.8,
-            "sublabel": "rebuilt",
             "tone": "match"
           }
         ],
@@ -2021,49 +2035,47 @@
         "items": [
           {
             "label": "e1",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e2",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e3",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e4",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e5",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e6",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e7",
-            "from": 0,
+            "from": 2,
             "to": 2
           },
           {
             "label": "e8",
-            "from": 0,
+            "from": 2,
             "to": 2
           }
         ],
         "beforeLabel": "Silver rows",
-        "afterLabel": "Partitioned by event_date",
-        "moveAt": 4,
-        "moveSpan": 0.6
+        "afterLabel": "Partitioned by event_date"
       }
     },
     {
@@ -2146,7 +2158,8 @@
               ],
               "note": "then aggregate"
             }
-          ]
+          ],
+          "title": "DuckDB SQL"
         }
       }
     },
@@ -2327,5 +2340,14 @@
     "sync": true,
     "rationale": "Drift (60 BPM, drumless drone, rare bells) sits under 15 min of narration without fatigue; at 60 BPM every whole-second scene lands on a beat, so sync changes no scene length. Sparse 12 cues/min, but -13 dB keeps room for voice-over.",
     "track": "pieces/qu-005.wav"
+  },
+  "render": {
+    "longform_url": "https://media.queryunstuck.in/qu-005/longform.mp4",
+    "duration_sec": 943,
+    "srt_path": "captions.srt"
+  },
+  "thumbnail": {
+    "frame": 60,
+    "url": "https://media.queryunstuck.in/qu-005/thumbnail.png"
   }
 }

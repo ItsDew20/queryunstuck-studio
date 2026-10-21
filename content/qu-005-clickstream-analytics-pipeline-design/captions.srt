@@ -1,0 +1,329 @@
+1
+00:00:00,000 --> 00:00:12,500
+Every click becomes a dashboard number
+6 steps in between
+
+2
+00:00:12,500 --> 00:00:25,000
+Kafka, streaming, watermarks
+Idempotency, medallion, pruning
+
+3
+00:00:25,000 --> 00:00:40,000
+Clickstream: one row per user action
+event_id, user_id, event_type
+
+4
+00:00:40,000 --> 00:00:55,000
+event_time: when it happened
+ingest_time: when we received it
+
+5
+00:00:55,000 --> 00:01:16,500
+Our events table: 9 rows, 8 events
+Event 3 arrives twice (a retry)
+
+6
+00:01:16,500 --> 00:01:38,000
+Event 6 arrives 17 min 40 s late
+
+7
+00:01:38,000 --> 00:01:51,000
+Kafka doesn't order your topic.
+It orders each partition.
+
+8
+00:01:51,000 --> 00:02:06,500
+Topic: a named stream of events
+Split into partitions across brokers
+
+9
+00:02:06,500 --> 00:02:22,000
+One partition: read in the order written
+Across partitions: no order promised
+
+10
+00:02:22,000 --> 00:02:39,000
+Same key, same partition
+Key = user_id
+
+11
+00:02:39,000 --> 00:02:56,000
+User 101: view, click, purchase in order
+
+12
+00:02:56,000 --> 00:03:11,000
+Consumer group: consumers sharing a topic
+Each partition: one consumer in the group
+
+13
+00:03:11,000 --> 00:03:26,000
+Position: one offset per partition
+
+14
+00:03:26,000 --> 00:03:35,500
+Q: How do you keep a user's events in order?
+A: key by user_id
+
+15
+00:03:35,500 --> 00:03:45,000
+Order is per partition, not per topic
+
+16
+00:03:45,000 --> 00:03:56,000
+Takeaway: order lives in the partition
+Pick the key that matches your question
+
+17
+00:03:56,000 --> 00:04:04,000
+Batch or streaming?
+First decide which clock you trust.
+
+18
+00:04:04,000 --> 00:04:16,500
+Batch: process what has landed, then stop
+Streaming: keep processing as events arrive
+
+19
+00:04:16,500 --> 00:04:29,000
+Same events, different trigger
+
+20
+00:04:29,000 --> 00:04:49,500
+Event time: the time inside the data
+Ingest time: when it reached us
+
+21
+00:04:49,500 --> 00:05:10,000
+Event 6: 17 min 40 s between them
+
+22
+00:05:10,000 --> 00:05:21,500
+Spark tracks how far each stream has read
+Offsets + checkpoints: a replayable source
+
+23
+00:05:21,500 --> 00:05:33,000
+Restart: pick up from the checkpoint
+
+24
+00:05:33,000 --> 00:05:47,000
+Ask first: how fresh must the numbers be?
+Let the requirement pick the mode
+
+25
+00:05:47,000 --> 00:06:01,000
+Either way: count by event_time
+
+26
+00:06:01,000 --> 00:06:12,000
+Takeaway: ask how fresh it needs to be
+Event time picks the bucket
+
+27
+00:06:12,000 --> 00:06:22,000
+Late data isn't automatically dropped.
+The watermark decides.
+
+28
+00:06:22,000 --> 00:06:32,500
+When is the 09:00 window finished?
+A straggler could always show up
+
+29
+00:06:32,500 --> 00:06:43,000
+Threshold: how late can data be?
+
+30
+00:06:43,000 --> 00:06:58,000
+watermark = max event time seen - threshold
+Less late than threshold: guaranteed
+
+31
+00:06:58,000 --> 00:07:13,000
+Later than that: best effort, may drop
+
+32
+00:07:13,000 --> 00:07:27,000
+Illustration in SQL, not Spark itself
+Event 6 arrives: max seen is 09:06:40
+
+33
+00:07:27,000 --> 00:07:41,000
+Only 2 min 40 s behind in event time
+10 min threshold: guaranteed
+
+34
+00:07:41,000 --> 00:07:55,000
+2 min threshold: best effort
+
+35
+00:07:55,000 --> 00:08:08,000
+Lateness is measured in event time
+Not wall-clock delay
+
+36
+00:08:08,000 --> 00:08:21,000
+Watermark moves only with newer events
+
+37
+00:08:21,000 --> 00:08:30,000
+Takeaway: watermark = max event time - threshold
+Inside: guaranteed. Outside: best effort.
+
+38
+00:08:30,000 --> 00:08:39,000
+Assume your pipeline runs twice.
+Make twice look like once.
+
+39
+00:08:39,000 --> 00:08:51,000
+Idempotent: run twice = run once
+Retries and replays are normal
+
+40
+00:08:51,000 --> 00:09:03,000
+Event 3 already arrived twice
+
+41
+00:09:03,000 --> 00:09:18,500
+Kafka idempotent producer
+Producer ID + sequence number
+
+42
+00:09:18,500 --> 00:09:34,000
+Broker spots the resend and dedupes it
+
+43
+00:09:34,000 --> 00:09:57,000
+DuckDB: PRIMARY KEY (event_id)
+INSERT ... ON CONFLICT DO NOTHING
+
+44
+00:09:57,000 --> 00:10:20,000
+Load 9 rows, then retry the load
+Result: 8 rows, one per event
+
+45
+00:10:20,000 --> 00:10:30,000
+Spark exactly-once: two ingredients
+1. Replayable source (offsets, checkpoints)
+
+46
+00:10:30,000 --> 00:10:40,000
+2. Idempotent sink
+Replay safely, write safely
+
+47
+00:10:40,000 --> 00:10:52,000
+Inside the stream: dropDuplicates
+With watermark: key on event_id + event_time
+
+48
+00:10:52,000 --> 00:11:01,000
+Takeaway: assume every step runs twice
+Key on event_id. Make the sink idempotent.
+
+49
+00:11:01,000 --> 00:11:10,000
+Your dashboard says 4 clicks.
+There were 3.
+
+50
+00:11:10,000 --> 00:11:20,000
+Bronze: raw, unvalidated, as it arrived
+Silver: cleaned, validated, deduplicated
+
+51
+00:11:20,000 --> 00:11:30,000
+Gold: aggregated for dashboards and BI
+
+52
+00:11:30,000 --> 00:11:48,000
+Count clicks straight from bronze
+click: 4 (event 3 counted twice)
+
+53
+00:11:48,000 --> 00:12:04,500
+ROW_NUMBER() per event_id
+Keep rn = 1: the first arrival
+
+54
+00:12:04,500 --> 00:12:21,000
+9 rows in, 8 rows out
+
+55
+00:12:21,000 --> 00:12:33,500
+GROUP BY event_date, event_type
+click 3, page_view 3, purchase 2
+
+56
+00:12:33,500 --> 00:12:46,000
+Distinct users with COUNT(DISTINCT)
+
+57
+00:12:46,000 --> 00:13:06,000
+Why keep bronze?
+Rules change: rebuild silver from raw
+
+58
+00:13:06,000 --> 00:13:12,000
+Takeaway: bronze keeps, silver fixes,
+gold answers.
+
+59
+00:13:12,000 --> 00:13:22,000
+Pruning needs a filter on the partition column.
+Miss it, and no partition is skipped.
+
+60
+00:13:22,000 --> 00:13:32,000
+Partition silver by event_date
+Each day stored in its own partition
+
+61
+00:13:32,000 --> 00:13:42,000
+Lake: event_date=2026-10-19/ folders
+
+62
+00:13:42,000 --> 00:14:02,500
+WHERE event_date = DATE '2026-10-19'
+Filter on partition column: skip the rest
+
+63
+00:14:02,500 --> 00:14:23,000
+BigQuery: fewer bytes processed
+DuckDB: filter pushed into Hive partitions
+
+64
+00:14:23,000 --> 00:14:34,500
+Filter only on user_id? No partition skipped
+The filter must hit the partition column
+
+65
+00:14:34,500 --> 00:14:46,000
+Partition by what you filter by
+
+66
+00:14:46,000 --> 00:14:52,000
+Takeaway: partition by what you filter by
+
+67
+00:14:52,000 --> 00:15:05,000
+Kafka: key by user_id, order per partition
+Clock: count by event_time
+
+68
+00:15:05,000 --> 00:15:18,000
+Watermark: max event time - threshold
+Idempotent: replayable source + keyed sink
+
+69
+00:15:18,000 --> 00:15:31,000
+Medallion: bronze, silver, gold
+Pruning: filter on event_date
+
+70
+00:15:31,000 --> 00:15:43,000
+More visual explanations: queryunstuck.in
+Data & AI Engineering, visualized.
