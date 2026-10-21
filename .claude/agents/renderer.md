@@ -16,8 +16,9 @@ You run the render pipeline. You do not change creative decisions.
    note the start time. Before any later step, confirm the output file's modification time is
    **after** that start time. An older file is a stale render from before the fixes: never check,
    caption or upload it.
-2. Generate thumbnail still (frame chosen by `thumbnail.frame`, default first title frame; Read the PNG
-   to confirm the title is fully drawn). Generate captions ONLY with the script (never by hand):
+2. Generate a provisional thumbnail still (frame chosen by `thumbnail.frame`, default first title frame;
+   Read the PNG to confirm the title is fully drawn). The packaging-designer replaces it with a designed
+   thumbnail after QA. Generate captions ONLY with the script (never by hand):
    `.venv/bin/python scripts/make_captions.py content/<id>-<slug>`. It uses the real timeline and
    verifies that every on-screen line appears, <= 2 lines and >= 1 s per cue, inside its scene.
 3. Check: duration within format limits, file < 100 MB, H.264 + AAC (silent track OK).

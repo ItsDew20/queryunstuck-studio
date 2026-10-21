@@ -38,3 +38,13 @@ through each step).
   keep text under about half of the frame. Fewer items per card with faster reveals.
 - For `reel-list` pieces also fill `carousel.slides` (if the scriptwriter hasn't): a cover slide,
   then slides of 3-5 items each with the full fact-checked lines, and a final takeaway slide.
+
+## Pacing and freshness (docs/creative-playbook.md)
+- Before handing off, run `.venv/bin/python scripts/engagement_stats.py content/<id>-<slug>` and
+  meet the playbook limits: first motion, longest gap between events, events per minute, same
+  component in a row. Give reading time motion (a highlight, counter or travelling dot), and split
+  long scenes into steps rather than holding one frame.
+- Build the `creative.md` signature visual and hook frame exactly; if a component can't, request it
+  via `needs_new_component`.
+- Next come the creative-director's storyboard audit and the audience-panel preview. Fix what they
+  route to you before render.

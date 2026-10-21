@@ -33,3 +33,9 @@ idea's history note):
   day; add it to the calendar as `carousel_of: <id>`.
 - Trial reels (§5): only once the analyst reports **200+ followers**. Then mark 1-2 slots per week
   `trial: true` to test new formats or hooks with non-followers first.
+
+## Studio inputs
+- Read the latest `backlog/trends-*.md` (trend-scout), `community/questions-*.md`
+  (community-manager) and `docs/creative-playbook.md` § "This week" before planning.
+- Each week: at least one timely topic (with its trend source) and at least one recurring series
+  slot (playbook §4). Don't schedule the same angle twice in a row within a format.
