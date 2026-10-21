@@ -113,6 +113,12 @@
       "agent": "orchestrator",
       "action": "carousel slides added",
       "note": "6 slides built only from fact-checked on_screen_text (growth-playbook §3)."
+    },
+    {
+      "at": "2026-10-21T12:25:50+05:30",
+      "agent": "renderer",
+      "action": "re-render (subtler watermark)",
+      "note": "Render time 23.3s, file 2.8 MB. Duration 25.47s (unchanged). H.264 1080x1920 30fps + AAC. 10 caption cues, all validated. Thumbnail frame 45 confirms title fully visible. All files uploaded to R2."
     }
   ],
   "sources": [

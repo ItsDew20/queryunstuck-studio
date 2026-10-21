@@ -144,6 +144,12 @@
       "agent": "orchestrator",
       "action": "opened review PR",
       "note": "branch content/qu-002"
+    },
+    {
+      "at": "2026-10-21T12:25:35+05:30",
+      "agent": "renderer",
+      "action": "re-render (subtler watermark)",
+      "note": "Render time 50.7s, file 5.4 MB. Duration 43.0s (unchanged). H.264 1080x1920 30fps + AAC. 15 caption cues, all validated. Thumbnail frame 60 confirms title fully visible. All files uploaded to R2."
     }
   ],
   "sources": [

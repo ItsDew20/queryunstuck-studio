@@ -1,3 +1,5 @@
+audio_name: QueryUnstuck – Spark shuffle
+
 Slow JOIN or GROUP BY? Check the shuffle.
 
 A shuffle regroups data across partitions. It usually means copying rows across executors and machines.
